@@ -6,7 +6,6 @@
     <meta name="api-key" content="AIzaSyAsgtua-xP1bgpPqATGTgeokAUEc2b1gMM">
     <title>Unclescar Premier League</title>
     <style>
-        /* (Same CSS as index.html so it matches perfectly) */
         :root { --primary-color: #00ff88; --bg-color: #0b0f19; --card-bg: #1a2235; --text-main: #ffffff; --text-muted: #8892b0; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; --red: #ff3333; }
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); text-align: center; scroll-behavior: smooth; }
         header { padding: 20px; background: linear-gradient(180deg, #05070a 0%, transparent 100%); }
@@ -100,7 +99,7 @@
                 <div class="form-group"><label>Email Address</label><input type="email" name="email" required></div>
                 <div class="form-group"><label>WhatsApp Number</label><input type="tel" name="whatsapp" required></div>
                 
-                <button type="submit" class="cta-button submit-btn" id="submitBtn">Pay ₦1,000 Entry Fee</button>
+                <button type="submit" class="cta-button submit-btn" id="submitBtn">Pay ₦1,500 Entry Fee</button>
             </form>
         </div>
     </section>
@@ -124,8 +123,14 @@
             btn.style.backgroundColor = "#ffd700"; 
             btn.disabled = true;
             fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) })
-            .then(response => { window.location.href = "https://paystack.shop/pay/hynwe1eujv"; })
-            .catch(error => { window.location.href = "https://paystack.shop/pay/hynwe1eujv"; });
+            .then(response => { 
+                // !!! REPLACE THE LINK BELOW WITH YOUR NEW ₦1,500 PAYSTACK LINK !!!
+                window.location.href = "https://paystack.shop/pay/hynwe1eujv"; 
+            })
+            .catch(error => { 
+                // !!! REPLACE THE LINK BELOW WITH YOUR NEW ₦1,500 PAYSTACK LINK !!!
+                window.location.href = "https://paystack.shop/pay/hynwe1eujv"; 
+            });
         });
     </script>
 </body>
