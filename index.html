@@ -68,29 +68,7 @@
             transform: scale(0.95);
         }
 
-        .features {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px;
-            align-items: center;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            padding: 25px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 350px;
-            border: 1px solid #2a3553;
-        }
-
-        .card h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-        }
-
-        /* --- Standings & Playoffs Styles --- */
+        /* --- Standings & Tables --- */
         .tournament-stage {
             padding: 40px 20px;
         }
@@ -99,7 +77,7 @@
             width: 90%;
             max-width: 800px;
             margin: 0 auto;
-            overflow-x: auto; /* Allows scrolling on small phones */
+            overflow-x: auto;
             background-color: var(--card-bg);
             border-radius: 10px;
             border: 1px solid #2a3553;
@@ -133,23 +111,76 @@
             font-weight: bold;
         }
 
-        /* Highlights top players moving to playoffs */
         .qualifier {
             border-left: 4px solid var(--primary-color);
             background-color: rgba(0, 255, 136, 0.05);
         }
 
         .playoff-info {
-            margin-top: 30px;
+            margin-top: 20px;
             color: var(--text-muted);
             font-style: italic;
+        }
+
+        /* --- Rules & Prizes Section --- */
+        .rules-section {
+            padding: 50px 20px;
+            background-color: #0d1323;
+            border-top: 1px solid #2a3553;
+            border-bottom: 1px solid #2a3553;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .info-card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            border: 1px solid #2a3553;
+        }
+
+        .info-card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 1px solid #2a3553;
+            padding-bottom: 10px;
+        }
+
+        .info-card ul {
+            list-style-type: none;
+            padding: 0;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .info-card li {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .info-card li::before {
+            content: "•";
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .money-highlight {
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 1.1rem;
         }
 
         /* --- Registration Form Styles --- */
         .registration-section {
             padding: 50px 20px;
             background-color: #05070a;
-            border-top: 1px solid #2a3553;
             margin-top: 30px;
         }
 
@@ -201,6 +232,36 @@
             margin-top: 10px;
         }
 
+        /* --- Footer Styles --- */
+        footer {
+            background-color: #030407;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid #2a3553;
+        }
+
+        .social-links {
+            margin-bottom: 20px;
+        }
+
+        .social-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        footer p {
+            color: #4a5568;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
     </style>
 </head>
 <body>
@@ -213,6 +274,30 @@
         <h2>Compete. Win. Get Paid.</h2>
         <p>Join the ultimate mobile gaming arena. Register for upcoming Dream League Soccer tournaments, dominate the bracket, and win massive real-money prize pools.</p>
         <a href="#register" class="cta-button">Register Now</a>
+    </section>
+
+    <section class="rules-section">
+        <div class="info-card">
+            <h3>The Prize Pool Split</h3>
+            <p style="color: var(--text-muted); margin-bottom: 15px;">The total prize pool is determined by the number of registered players. Here is how the cash is distributed:</p>
+            <ul>
+                <li><span class="money-highlight">1st Place (Champion):</span> 50% of the Prize Pool</li>
+                <li><span class="money-highlight">2nd Place (Runner-Up):</span> 20% of the Prize Pool</li>
+                <li><span class="money-highlight">3rd Place:</span> 10% of the Prize Pool</li>
+                <li><span class="money-highlight">Platform Fee:</span> 20% (For hosting, organization, and moderation)</li>
+            </ul>
+        </div>
+
+        <div class="info-card">
+            <h3>Tournament Rules & Entry</h3>
+            <ul>
+                <li><span class="money-highlight">Entry Fee:</span> [Enter Your Amount Here, e.g., $10 / NGN 5000] per player.</li>
+                <li>Payment instructions will be emailed directly to you upon registration approval.</li>
+                <li>Both players must take a screenshot of the final match result and submit it to the admin.</li>
+                <li>Any use of exploits, game glitches, or toxic behavior results in an instant ban without a refund.</li>
+                <li>Matches must be completed within the 24-hour window of the scheduled fixture.</li>
+            </ul>
+        </div>
     </section>
 
     <section id="standings" class="tournament-stage">
@@ -278,21 +363,6 @@
         <p class="playoff-info">Top 16 players at the end of the season advance to the Knockout Playoffs.</p>
     </section>
 
-    <section class="features">
-        <div class="card">
-            <h3>Top 3 Payouts</h3>
-            <p>We don't just reward the champion. 1st, 2nd, and 3rd place all walk away with guaranteed cash prizes.</p>
-        </div>
-        <div class="card">
-            <h3>Secure Profiles</h3>
-            <p>Your data and your winnings are locked down with enterprise-grade security.</p>
-        </div>
-        <div class="card">
-            <h3>Fair Play Regulated</h3>
-            <p>Strict anti-cheat monitoring ensures a level playing field for every competitor.</p>
-        </div>
-    </section>
-
     <section id="register" class="registration-section">
         <h2>Create Your Player Profile</h2>
         <div class="form-container">
@@ -318,6 +388,16 @@
             </form>
         </div>
     </section>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://linktr.ee/tinklebird" target="_blank">Linktree</a> | 
+            <a href="http://tiktok.com/@tinkle_bird4l" target="_blank">TikTok</a> | 
+            <a href="https://x.com/official_tbird?s=11" target="_blank">X (Twitter)</a> | 
+            <a href="https://www.facebook.com/profile.php?id=61574824795293" target="_blank">Facebook</a>
+        </div>
+        <p>&copy; 2026 UncleScar DLS Tournament. All rights reserved.</p>
+    </footer>
 
 </body>
 </html>
