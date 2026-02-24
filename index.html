@@ -245,3 +245,135 @@
 
     <section class="hero">
         <h2>Compete. Win. Get Paid.</h2>
+        <p>Join the ultimate mobile gaming arena. Register for upcoming Dream League Soccer tournaments, dominate the bracket, and win massive real-money prize pools.</p>
+        <a href="#register" class="cta-button">Register Now</a>
+    </section>
+
+    <section class="prizes">
+        <h2 class="section-title">Prize Pool Breakdown</h2>
+        <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto;">Platform takes a 20% hosting and moderation fee. The remaining pool is distributed entirely to the top 3 players.</p>
+        
+        <div class="prize-grid">
+            <div class="prize-card first">
+                <span>1st Place 🥇</span>
+                <span>50%</span>
+            </div>
+            <div class="prize-card second">
+                <span>2nd Place 🥈</span>
+                <span>20%</span>
+            </div>
+            <div class="prize-card third">
+                <span>3rd Place 🥉</span>
+                <span>10%</span>
+            </div>
+        </div>
+
+        <div class="entry-fee">
+            Season 1 Entry Fee: <br>
+            <span>₦1,000</span>
+        </div>
+    </section>
+
+    <section class="bracket-section">
+        <h2 class="section-title">Live Bracket: Season 1</h2>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Scores are reported automatically by players. Bracket updates in real-time.</p>
+        
+        <div class="iframe-container">
+            <iframe src="https://challonge.com/unclescar1/module" width="100%" height="100%" frameborder="0" scrolling="auto" allowtransparency="true"></iframe>
+        </div>
+    </section>
+
+    <section id="rules" style="padding: 50px 20px; background-color: #05070a; border-top: 1px solid #2a3553; text-align: left;">
+        <div class="rules-container">
+            <h2 class="section-title" style="text-align: center; color: var(--text-main);">Official Tournament Rules</h2>
+            <p style="color: var(--text-muted); text-align: center; margin-bottom: 30px;">Read carefully. Ignorance of the rules is not an excuse.</p>
+            
+            <h3 style="color: var(--primary-color);">1. Match Setup & Fixtures</h3>
+            <ul style="color: var(--text-main); line-height: 1.6;">
+                <li>Players will receive their opponent's WhatsApp number to coordinate the match. The player listed on the top of the bracket hosts the friendly match.</li>
+                <li>You have exactly 15 minutes from the scheduled start time to join. Failure to respond or join results in an automatic forfeit.</li>
+            </ul>
+
+            <h3 style="color: var(--primary-color); margin-top: 20px;">2. Disconnections & Lag</h3>
+            <ul style="color: var(--text-main); line-height: 1.6;">
+                <li>If a player disconnects within the first 10 in-game minutes while the score is 0-0, the match will be restarted.</li>
+                <li>If a player disconnects after 10 in-game minutes, the remaining player takes an automatic 3-0 win. Make sure you have a stable network!</li>
+            </ul>
+
+            <h3 style="color: var(--primary-color); margin-top: 20px;">3. Reporting Scores</h3>
+            <ul style="color: var(--text-main); line-height: 1.6;">
+                <li><strong>MANDATORY:</strong> Winners must submit their scores via the Challonge bracket.</li>
+                <li>Both players MUST take a screenshot of the final match result screen. Keep this screenshot in case your opponent disputes the score!</li>
+            </ul>
+
+            <h3 style="color: var(--primary-color); margin-top: 20px;">4. Payouts</h3>
+            <ul style="color: var(--text-main); line-height: 1.6;">
+                <li>Prize money will be transferred directly to the winners' bank accounts within 24 hours of the final match concluding.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="register" class="registration-section">
+        <h2 class="section-title">Create Your Player Profile</h2>
+        <div class="form-container">
+            
+            <form id="registrationForm">
+                <input type="hidden" name="access_key" value="d871e97e-7d62-47be-961d-da243d66ef57">
+                <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+
+                <div class="form-group">
+                    <label for="dls-name">DLS Team / Manager Name</label>
+                    <input type="text" id="dls-name" name="dls-name" placeholder="Enter your in-game name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="player@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp Number (For Fixtures)</label>
+                    <input type="tel" id="whatsapp" name="whatsapp" placeholder="E.g. +234..." required>
+                </div>
+
+                <button type="submit" class="cta-button submit-btn" id="submitBtn">Secure My Spot</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="social-links">
+            <a href="http://tiktok.com/@tinkle_bird4l" target="_blank">TikTok</a>
+            <a href="https://linktr.ee/tinklebird" target="_blank">Linktree</a>
+            <a href="https://www.facebook.com/profile.php?id=61574824795293" target="_blank">Facebook</a>
+            <a href="https://x.com/official_tbird?s=11" target="_blank">X</a>
+        </div>
+        <p>&copy; 2026 Unclescar Studios. Fair Play Regulated.</p>
+    </footer>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            const form = e.target;
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Redirecting to Paystack...";
+            btn.style.backgroundColor = "#ffd700"; 
+            btn.disabled = true;
+
+            const formData = new FormData(form);
+
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                window.location.href = "https://paystack.shop/pay/hynwe1eujv";
+            })
+            .catch(error => {
+                window.location.href = "https://paystack.shop/pay/hynwe1eujv";
+            });
+        });
+    </script>
+
+</body>
+</html>
