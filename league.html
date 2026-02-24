@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="api-key" content="AIzaSyAsgtua-xP1bgpPqATGTgeokAUEc2b1gMM">
+    <title>Unclescar Premier League</title>
+    <style>
+        /* (Same CSS as index.html so it matches perfectly) */
+        :root { --primary-color: #00ff88; --bg-color: #0b0f19; --card-bg: #1a2235; --text-main: #ffffff; --text-muted: #8892b0; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; --red: #ff3333; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); text-align: center; scroll-behavior: smooth; }
+        header { padding: 20px; background: linear-gradient(180deg, #05070a 0%, transparent 100%); }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; }
+        .highlight { color: var(--primary-color); }
+        
+        nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 20px; border-bottom: 1px solid #2a3553; border-top: 1px solid #2a3553; }
+        nav a { color: var(--text-main); text-decoration: none; font-size: 1.1rem; font-weight: bold; padding: 8px 16px; border-radius: 5px; transition: all 0.3s; }
+        nav a:hover, nav a.active { background-color: var(--primary-color); color: #000; }
+
+        .hero { padding: 50px 20px; }
+        .hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px auto; line-height: 1.6; }
+        .cta-button { background-color: var(--primary-color); color: #000; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .section-title { font-size: 2rem; margin-bottom: 20px; color: var(--text-main); }
+
+        .rules-container { max-width: 800px; margin: 0 auto; background-color: var(--card-bg); padding: 30px; border-radius: 10px; border: 1px solid #2a3553; text-align: left; margin-bottom: 40px;}
+        .iframe-container { width: 100%; max-width: 900px; height: 600px; margin: 0 auto; background-color: var(--card-bg); border: 1px solid #2a3553; border-radius: 10px; overflow: hidden; }
+
+        .registration-section { padding: 50px 20px; background-color: #05070a; border-top: 1px solid #2a3553; }
+        .form-container { background-color: var(--card-bg); padding: 30px; border-radius: 10px; width: 90%; max-width: 400px; margin: 0 auto; border: 1px solid #2a3553; text-align: left; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--text-main); font-weight: bold; }
+        input[type="text"], input[type="email"], input[type="tel"] { width: 100%; padding: 12px; background-color: var(--bg-color); border: 1px solid #2a3553; color: var(--text-main); border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
+        input:focus { border-color: var(--primary-color); outline: none; }
+        .submit-btn { width: 100%; margin-top: 10px; }
+        
+        footer { padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); background-color: #05070a; border-top: 1px solid #2a3553; }
+        .social-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .social-links a { color: var(--primary-color); text-decoration: none; font-weight: bold; padding: 5px 10px; border: 1px solid var(--primary-color); border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Unclescar <span class="highlight">UPL</span> 2026</h1>
+    </header>
+
+    <nav>
+        <a href="index.html">Knockouts</a>
+        <a href="league.html" class="active">Premier League</a>
+    </nav>
+
+    <section class="hero">
+        <h2>The Ultimate Marathon.</h2>
+        <p>16 Managers. 15 Matchdays. Fight for the Unclescar Champions League, or fight to survive Relegation. This is the Unclescar Premier League.</p>
+        <a href="#register" class="cta-button">Register for Season 1</a>
+    </section>
+
+    <section style="padding: 20px;">
+        <div class="rules-container">
+            <h2 class="section-title" style="text-align: center; color: var(--text-main);">League Structure & Stakes</h2>
+            
+            <h3 style="color: var(--primary-color);">🏆 The Title Race (Round Robin)</h3>
+            <ul style="color: var(--text-main); line-height: 1.6;">
+                <li>Every manager plays each other once. 3 points for a win, 1 point for a draw, 0 for a loss.</li>
+                <li>Goal difference matters. Every goal counts!</li>
+            </ul>
+
+            <h3 style="color: var(--gold); margin-top: 20px;">⭐ The Top 6 (UCL Qualification)</h3>
+            <ul style="color: var(--text-main); line-height: 1.6;">
+                <li>The top 6 managers at the end of the season secure their spot in the high-stakes <strong>Unclescar Champions League</strong> knockout bracket for the massive final prize pool.</li>
+            </ul>
+
+            <h3 style="color: var(--silver); margin-top: 20px;">⚔️ Ranks 7 to 13 (UEL Qualification)</h3>
+            <ul style="color: var(--text-main); line-height: 1.6;">
+                <li>Mid-table managers will enter the <strong>Unclescar Europa League</strong> to compete for the secondary prize pool and secure their spot in the UPL for next season.</li>
+            </ul>
+
+            <h3 style="color: var(--red); margin-top: 20px;">🔻 The Bottom 3 (Relegation Zone)</h3>
+            <ul style="color: var(--text-main); line-height: 1.6;">
+                <li>Finish in the bottom 3, and you are Relegated. You will lose your guaranteed roster spot for Season 2 and must re-apply or pay a Relegation Penalty fee to challenge your way back in.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section style="padding: 20px; background-color: var(--bg-color);">
+        <h2 class="section-title">Official UPL Table</h2>
+        <div class="iframe-container">
+            <iframe src="https://challonge.com/unclescarpremierleague2026/module" width="100%" height="100%" frameborder="0" scrolling="auto" allowtransparency="true"></iframe>
+        </div>
+    </section>
+
+    <section id="register" class="registration-section">
+        <h2 class="section-title">Apply for the League</h2>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Only 16 spots available for Season 1. Secure your franchise.</p>
+        <div class="form-container">
+            <form id="registrationForm">
+                <input type="hidden" name="access_key" value="d871e97e-7d62-47be-961d-da243d66ef57">
+                <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+                <div class="form-group"><label>DLS Team / Manager Name</label><input type="text" name="dls-name" required></div>
+                <div class="form-group"><label>Email Address</label><input type="email" name="email" required></div>
+                <div class="form-group"><label>WhatsApp Number</label><input type="tel" name="whatsapp" required></div>
+                
+                <button type="submit" class="cta-button submit-btn" id="submitBtn">Pay ₦1,000 Entry Fee</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="social-links">
+            <a href="http://tiktok.com/@tinkle_bird4l">TikTok</a>
+            <a href="https://linktr.ee/tinklebird">Linktree</a>
+            <a href="https://www.facebook.com/profile.php?id=61574824795293">Facebook</a>
+            <a href="https://x.com/official_tbird?s=11">X</a>
+        </div>
+        <p>&copy; 2026 Unclescar Studios. Fair Play Regulated.</p>
+    </footer>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            const form = e.target;
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Redirecting to Paystack...";
+            btn.style.backgroundColor = "#ffd700"; 
+            btn.disabled = true;
+            fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) })
+            .then(response => { window.location.href = "https://paystack.shop/pay/hynwe1eujv"; })
+            .catch(error => { window.location.href = "https://paystack.shop/pay/hynwe1eujv"; });
+        });
+    </script>
+</body>
+</html>
