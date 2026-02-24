@@ -19,6 +19,7 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             text-align: center;
+            scroll-behavior: smooth;
         }
 
         header {
@@ -60,6 +61,7 @@
             cursor: pointer;
             text-decoration: none;
             transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
         }
 
         .cta-button:active {
@@ -88,6 +90,62 @@
             color: var(--primary-color);
         }
 
+        /* --- New Registration Form Styles --- */
+        .registration-section {
+            padding: 50px 20px;
+            background-color: #05070a;
+            border-top: 1px solid #2a3553;
+            margin-top: 30px;
+        }
+
+        .form-container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            margin: 0 auto;
+            border: 1px solid #2a3553;
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-color);
+            border: 1px solid #2a3553;
+            color: var(--text-main);
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -111,9 +169,31 @@
             <h3>Secure Profiles</h3>
             <p>Your data and your winnings are locked down with enterprise-grade security.</p>
         </div>
-        <div class="card">
-            <h3>Fair Play Regulated</h3>
-            <p>Strict anti-cheat monitoring ensures a level playing field for every competitor.</p>
+    </section>
+
+    <section id="register" class="registration-section">
+        <h2>Create Your Player Profile</h2>
+        <div class="form-container">
+            <form action="#" method="POST">
+                
+                <div class="form-group">
+                    <label for="dls-name">DLS Team Name / Manager Name</label>
+                    <input type="text" id="dls-name" name="dls-name" placeholder="Enter your in-game name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="player@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Create Password</label>
+                    <input type="password" id="password" name="password" placeholder="Minimum 8 characters" required>
+                </div>
+
+                <button type="submit" class="cta-button submit-btn">Secure My Spot</button>
+                
+            </form>
         </div>
     </section>
 
