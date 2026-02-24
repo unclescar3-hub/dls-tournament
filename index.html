@@ -398,12 +398,10 @@
         <h2 class="section-title">Create Your Player Profile</h2>
         <div class="form-container">
             
-            <form action="https://api.web3forms.com/submit" method="POST">
+            <form id="registrationForm">
                 
                 <input type="hidden" name="access_key" value="d871e97e-7d62-47be-961d-da243d66ef57">
                 
-                <input type="hidden" name="redirect" value="https://paystack.shop/pay/hynwe1eujv">
-
                 <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
 
                 <div class="form-group">
@@ -421,7 +419,7 @@
                     <input type="tel" id="whatsapp" name="whatsapp" placeholder="E.g. +234..." required>
                 </div>
 
-                <button type="submit" class="cta-button submit-btn">Secure My Spot</button>
+                <button type="submit" class="cta-button submit-btn" id="submitBtn">Secure My Spot</button>
                 
             </form>
         </div>
@@ -436,6 +434,36 @@
         </div>
         <p>&copy; 2026 Unclescar Studios. Fair Play Regulated.</p>
     </footer>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // This stops the white screen from appearing!
+            
+            const form = e.target;
+            const btn = document.getElementById('submitBtn');
+            
+            // Change the button text so the player knows it's loading
+            btn.innerText = "Redirecting to Paystack...";
+            btn.style.backgroundColor = "#ffd700"; // Turns button gold while loading
+            btn.disabled = true;
+
+            const formData = new FormData(form);
+
+            // Send data to your Gmail silently
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Instantly force the screen to Paystack after email sends
+                window.location.href = "https://paystack.shop/pay/hynwe1eujv";
+            })
+            .catch(error => {
+                // Even if their network hiccups sending the email, send them to pay!
+                window.location.href = "https://paystack.shop/pay/hynwe1eujv";
+            });
+        });
+    </script>
 
 </body>
 </html>
