@@ -144,10 +144,12 @@
             e.preventDefault(); 
             const form = e.target;
             const btn = document.getElementById('submitBtn');
-            btn.innerText = "Redirecting..."; btn.style.backgroundColor = "#ffd700"; btn.disabled = true;
+            btn.innerText = "Redirecting..."; 
+            btn.style.backgroundColor = "#ffd700"; 
+            btn.disabled = true;
             fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) })
-            .then(() => window.location.href = "https://paystack.shop/pay/hynwe1eujv")
-            .catch(() => window.location.href = "https://paystack.shop/pay/hynwe1eujv");
+            .then(() => window.location.href = "https://paystack.shop/pay/m08sdsi06g")
+            .catch(() => window.location.href = "https://paystack.shop/pay/m08sdsi06g");
         });
     </script>
 </body>
