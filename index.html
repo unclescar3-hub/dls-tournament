@@ -7,25 +7,24 @@
     <title>Unclescar Studios | Elite Esports</title>
     <style>
         :root { 
-            --primary-color: #00ff88; /* DLS Green */
-            --efootball-color: #00e5ff; /* eFootball Blue */
-            --eafc-color: #ff3366; /* EA FC Neon Red/Pink */
+            --primary-color: #00ff88; 
+            --efootball-color: #00e5ff; 
+            --eafc-color: #ff0055; 
             --bg-color: #0b0f19; 
             --card-bg: #1a2235; 
             --text-main: #ffffff; 
             --text-muted: #8892b0; 
             --gold: #ffd700; 
             --silver: #c0c0c0; 
+            --bronze: #cd7f32;
         }
         
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); text-align: center; }
         
-        /* Navigation */
         nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
-        nav a { color: var(--text-main); text-decoration: none; font-size: 1rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
+        nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
         nav a:hover, nav a.active { background-color: var(--primary-color); color: #000; }
 
-        /* Header */
         header { padding: 40px 20px 20px 20px; background: linear-gradient(180deg, #05070a 0%, transparent 100%); }
         h1 { font-size: 2.5rem; margin-bottom: 5px; text-transform: uppercase; }
         .highlight { color: var(--primary-color); }
@@ -33,24 +32,17 @@
         .highlight-eafc { color: var(--eafc-color); }
         .subtitle { color: var(--text-muted); font-size: 1.1rem; margin-top: 0; }
 
-        /* Dashboard Grid System */
         .dashboard-container { padding: 20px 20px 60px 20px; max-width: 1000px; margin: 0 auto; }
-        
-        /* Section Dividers */
         .section-divider { margin: 40px 0 20px 0; border-bottom: 2px solid #2a3553; text-align: left; padding-bottom: 10px; }
         .section-divider h2 { font-size: 1.8rem; color: var(--text-main); margin: 0; text-transform: uppercase; letter-spacing: 1px; }
         .section-divider p { color: var(--text-muted); margin: 5px 0 0 0; font-size: 1rem; }
         
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         
-        /* Cards */
-        .card { 
-            background-color: var(--card-bg); border: 1px solid #2a3553; border-radius: 10px; padding: 30px 20px; 
-            text-decoration: none; color: var(--text-main); transition: 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+        .card { background-color: var(--card-bg); border: 1px solid #2a3553; border-radius: 10px; padding: 30px 20px; text-decoration: none; color: var(--text-main); transition: 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,255,136,0.1); border-color: var(--primary-color); }
         .card.efc-hover:hover { box-shadow: 0 10px 20px rgba(0,229,255,0.1); border-color: var(--efootball-color); }
-        .card.eafc-hover:hover { box-shadow: 0 10px 20px rgba(255,51,102,0.1); border-color: var(--eafc-color); }
+        .card.eafc-hover:hover { box-shadow: 0 10px 20px rgba(255,0,85,0.1); border-color: var(--eafc-color); }
 
         .card h3 { font-size: 1.5rem; margin: 0 0 10px 0; }
         .card p { color: var(--text-muted); margin: 0 0 20px 0; line-height: 1.5; font-size: 0.95rem; }
@@ -59,9 +51,10 @@
         .status-badge.locked { background-color: #333; color: var(--text-muted); }
         .status-badge.live { background-color: var(--gold); }
         .status-badge.efootball-badge { background-color: var(--efootball-color); color: #000; }
-        .status-badge.eafc-badge { background-color: var(--eafc-color); color: #000; }
+        .status-badge.eafc-badge { background-color: var(--eafc-color); color: #ffffff; }
+        .status-badge.academy { background-color: var(--bronze); color: #ffffff; }
 
-        /* Card Borders */
+        .card.academy { border-top: 4px solid var(--bronze); }
         .card.upl { border-top: 4px solid var(--primary-color); }
         .card.knockout { border-top: 4px solid var(--gold); }
         .card.ucl { border-top: 4px solid #333; cursor: not-allowed; }
@@ -69,7 +62,6 @@
         .card.efootball { border-top: 4px solid var(--efootball-color); }
         .card.eafc { border-top: 4px solid var(--eafc-color); }
 
-        /* Investor Section */
         .investor-section { margin-top: 20px; background-color: #05070a; padding: 50px 20px; border-top: 1px solid #2a3553; }
         .investor-box { max-width: 800px; margin: 0 auto; }
         .investor-box h2 { color: var(--gold); font-size: 2rem; margin-bottom: 15px; }
@@ -82,16 +74,17 @@
 <body>
 
     <nav>
-        <a href="index.html" class="active">Home Hub</a>
-        <a href="league.html">DLS Premier League</a>
-        <a href="knockouts.html">DLS Knockouts</a>
-        <a href="efootball.html">eFootball Cup</a>
-        <a href="eafc.html">EA FC Cup</a>
+        <a href="index.html" class="active">Hub</a>
+        <a href="academy.html">Academy</a>
+        <a href="league.html">UPL</a>
+        <a href="knockouts.html">Knockouts</a>
+        <a href="efootball.html">eFootball</a>
+        <a href="eafc.html">EA FC</a>
     </nav>
 
     <header>
         <h1>Unclescar <span class="highlight">Studios</span></h1>
-        <p class="subtitle">The Ultimate Mobile Esports Ecosystem</p>
+        <p class="subtitle">The Ultimate Multi-Platform Esports Ecosystem</p>
     </header>
 
     <div class="dashboard-container">
@@ -100,10 +93,15 @@
             <h2><span class="highlight">DLS</span> Arena</h2>
             <p>Our flagship Dream League Soccer divisions and tournaments.</p>
         </div>
-        
         <div class="grid">
+            <a href="academy.html" class="card academy">
+                <h3>DLS Academy</h3>
+                <p>The proving grounds. Low entry fee, micro-stakes. Build your skills and earn your way to the big leagues.</p>
+                <div class="status-badge academy">₦100 ENTRY</div>
+            </a>
+            
             <a href="league.html" class="card upl">
-                <h3>Unclescar Premier League</h3>
+                <h3>Premier League</h3>
                 <p>The ultimate 16-manager marathon. Fight for the title, qualify for Europe, or survive Relegation.</p>
                 <div class="status-badge">REGISTRATION OPEN</div>
             </a>
@@ -113,13 +111,8 @@
                 <div class="status-badge live">LIVE WEEKLY</div>
             </a>
             <div class="card ucl">
-                <h3>Unclescar Champions League</h3>
-                <p>The most exclusive tournament in DLS. Only the Top 6 managers from the UPL qualify. Massive final prize pool.</p>
-                <div class="status-badge locked">LOCKED (SEASON END)</div>
-            </div>
-            <div class="card uel">
-                <h3>Unclescar Europa League</h3>
-                <p>The redemption bracket. Managers finishing 7th to 13th in the UPL battle it out for glory and survival.</p>
+                <h3>Champions League</h3>
+                <p>The most exclusive tournament in DLS. Only the Top 6 managers from the UPL qualify.</p>
                 <div class="status-badge locked">LOCKED (SEASON END)</div>
             </div>
         </div>
@@ -128,24 +121,22 @@
             <h2><span class="highlight-efootball">eFootball</span> Arena</h2>
             <p>Step up to the next level. High-stakes eFootball mobile tournaments.</p>
         </div>
-
         <div class="grid">
             <a href="efootball.html" class="card efootball efc-hover">
                 <h3>eFootball Launch Cup</h3>
-                <p>Our inaugural eFootball knockout tournament. Prove your skills and claim the first-ever Unclescar eFootball title.</p>
-                <div class="status-badge efootball-badge">REGISTRATION OPEN</div>
+                <p>Our inaugural eFootball knockout tournament. Prove your skills and claim the first-ever title.</p>
+                <div class="status-badge efootball-badge">COMING SOON</div>
             </a>
         </div>
 
         <div class="section-divider" style="margin-top: 60px;">
-            <h2><span class="highlight-eafc">EA FC 26</span> Arena</h2>
-            <p>The heavyweight division. Bring your Ultimate Team and dominate the pitch.</p>
+            <h2><span class="highlight-eafc">Console</span> Arena</h2>
+            <p>PlayStation & Xbox crossover tournaments on EA Sports FC.</p>
         </div>
-
         <div class="grid">
             <a href="eafc.html" class="card eafc eafc-hover">
                 <h3>EA FC Launch Cup</h3>
-                <p>No squad limits. Bring your best Ultimate Team. 16 players, single elimination, winner takes all.</p>
+                <p>Cross-play enabled console tournament. Fire up the console, add your opponent, and take the crown.</p>
                 <div class="status-badge eafc-badge">COMING SOON</div>
             </a>
         </div>
@@ -154,8 +145,8 @@
 
     <div class="investor-section">
         <div class="investor-box">
-            <h2>Partner With The Future of Mobile Esports</h2>
-            <p>Unclescar Studios is building the most competitive and structured mobile gaming community in Africa. Hosting elite tournaments across DLS, eFootball, and EA FC, we offer unparalleled engagement for brands and investors.</p>
+            <h2>Partner With The Future of Esports</h2>
+            <p>Unclescar Studios is building the most competitive gaming community in Africa. Hosting elite tournaments across DLS, eFootball, and EA FC, we offer unparalleled engagement for brands and investors.</p>
             <a href="mailto:unclescarstudio@gmail.com" class="contact-btn">Contact Our Board</a>
         </div>
     </div>
