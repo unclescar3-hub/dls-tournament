@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="api-key" content="AIzaSyAsgtua-xP1bgpPqATGTgeokAUEc2b1gMM">
+    <title>DLS Academy | Unclescar</title>
+    <style>
+        :root { 
+            --primary-color: #00ff88; 
+            --bg-color: #0b0f19; 
+            --card-bg: #1a2235; 
+            --text-main: #ffffff; 
+            --text-muted: #8892b0; 
+            --gold: #ffd700; 
+            --silver: #c0c0c0; 
+            --bronze: #cd7f32; 
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); text-align: center; scroll-behavior: smooth; }
+        
+        nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
+        nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
+        nav a:hover, nav a.active { background-color: var(--bronze); color: #ffffff; }
+
+        header { padding: 40px 20px 20px 20px; background: linear-gradient(180deg, #05070a 0%, transparent 100%); }
+        h1 { font-size: 2.5rem; margin-bottom: 5px; text-transform: uppercase; }
+        .highlight { color: var(--bronze); }
+
+        .hero { padding: 30px 20px; }
+        .hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px auto; line-height: 1.6; }
+        .cta-button { background-color: var(--bronze); color: #ffffff; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; }
+        .cta-button:hover { box-shadow: 0 0 15px var(--bronze); }
+        
+        .section-title { font-size: 2rem; margin-bottom: 20px; color: var(--text-main); }
+        .iframe-container { width: 100%; max-width: 900px; height: 500px; margin: 0 auto; background-color: var(--card-bg); border: 1px solid #2a3553; border-radius: 10px; overflow: hidden; }
+
+        .form-container { background-color: var(--card-bg); padding: 30px; border-radius: 10px; width: 90%; max-width: 400px; margin: 0 auto; border: 1px solid #2a3553; text-align: left; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input { width: 100%; padding: 12px; background-color: var(--bg-color); border: 1px solid #2a3553; color: var(--text-main); border-radius: 5px; box-sizing: border-box; }
+        input:focus { border-color: var(--bronze); outline: none; }
+        .submit-btn { width: 100%; margin-top: 10px; }
+        
+        .prize-grid { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px; }
+        .prize-card { background-color: var(--card-bg); padding: 20px; border-radius: 8px; width: 90%; max-width: 350px; border: 1px solid #2a3553; display: flex; justify-content: space-between; font-weight: bold; }
+        
+        footer { padding: 40px 20px; background-color: #05070a; border-top: 1px solid #2a3553; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">Hub</a>
+        <a href="academy.html" class="active">Academy</a>
+        <a href="league.html">UPL</a>
+        <a href="knockouts.html">Knockouts</a>
+        <a href="efootball.html">eFootball</a>
+        <a href="eafc.html">EA FC</a>
+    </nav>
+
+    <header>
+        <h1>DLS <span class="highlight">Academy Division</span></h1>
+    </header>
+
+    <section class="hero">
+        <p>Welcome to the proving grounds. Low entry fee, high intensity. Build your skills, win cash, and earn your way to the premium Unclescar Tournaments.</p>
+        <a href="#register" class="cta-button">Register for ₦100</a>
+    </section>
+
+    <section style="padding: 20px;">
+        <h2 class="section-title">Academy Prize Pool</h2>
+        <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 20px auto;">A perfect starting point. Win enough here, and your entry to the Weekend Knockouts is paid for.</p>
+        <div class="prize-grid">
+            <div class="prize-card" style="color: var(--gold); border-color: var(--gold);"><span>1st Place 🥇</span><span>50%</span></div>
+            <div class="prize-card" style="color: var(--silver);"><span>2nd Place 🥈</span><span>20%</span></div>
+            <div class="prize-card" style="color: var(--bronze);"><span>3rd Place 🥉</span><span>10%</span></div>
+        </div>
+    </section>
+
+    <section style="padding: 20px;">
+        <h2 class="section-title">Live Academy Bracket</h2>
+        <div class="iframe-container">
+            <iframe src="https://challonge.com/unclescaracademy1/module" width="100%" height="100%" frameborder="0" scrolling="auto" allowtransparency="true"></iframe>
+        </div>
+    </section>
+
+    <section id="register" style="padding: 50px 20px; background-color: #05070a;">
+        <h2 class="section-title">Enter The Proving Grounds</h2>
+        <div class="form-container">
+            <form id="registrationForm">
+                <input type="hidden" name="access_key" value="d871e97e-7d62-47be-961d-da243d66ef57">
+                <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+                
+                <div class="form-group"><label>DLS Team Name</label><input type="text" name="dls-name" required></div>
+                <div class="form-group"><label>Email Address</label><input type="email" name="email" required></div>
+                <div class="form-group"><label>WhatsApp Number</label><input type="tel" name="whatsapp" required></div>
+                
+                <button type="submit" class="cta-button submit-btn" id="submitBtn">Pay ₦100 Entry Fee</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p style="color: var(--text-muted);">&copy; 2026 Unclescar Studios.</p>
+    </footer>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            const form = e.target;
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Redirecting..."; btn.style.backgroundColor = "#cd7f32"; btn.disabled = true;
+            fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) })
+            .then(() => {
+                // ========== INSERT YOUR ₦100 ACADEMY PAYSTACK LINK BELOW ==========
+                window.location.href = "https://paystack.shop/pay/YOUR_ACADEMY_LINK_HERE"; 
+            })
+            .catch(() => {
+                // ========== INSERT YOUR ₦100 ACADEMY PAYSTACK LINK BELOW ==========
+                window.location.href = "https://paystack.shop/pay/YOUR_ACADEMY_LINK_HERE"; 
+            });
+        });
+    </script>
+</body>
+</html>
