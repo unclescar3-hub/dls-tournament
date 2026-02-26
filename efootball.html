@@ -17,7 +17,6 @@
         
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
         
-        /* The New Clean Navigation */
         nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
         nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
         nav a:hover, nav a.active { background-color: var(--efootball-blue); color: #000; }
@@ -30,10 +29,13 @@
         
         .info-card { background-color: var(--card-bg); border-left: 4px solid var(--efootball-blue); padding: 25px; margin-bottom: 30px; border-radius: 0 8px 8px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .info-card h2 { margin-top: 0; color: #fff; display: flex; align-items: center; gap: 10px; font-size: 1.5rem; border-bottom: 1px solid #2a3553; padding-bottom: 10px; }
-        .info-card p { color: var(--text-muted); }
+        .info-card ul { padding-left: 20px; color: var(--text-muted); }
+        .info-card li { margin-bottom: 10px; }
+        .info-card strong { color: var(--text-main); }
 
-        /* The Locked Button */
-        .pay-btn.locked { background-color: #3a3f4a; color: #8892b0; padding: 18px 30px; border: 1px solid #2a3553; border-radius: 8px; font-size: 1.3rem; font-weight: bold; width: 100%; max-width: 400px; display: block; margin: 40px auto 10px auto; text-align: center; text-transform: uppercase; cursor: not-allowed; font-family: inherit; }
+        /* The Live Payment Button */
+        .pay-btn { background-color: var(--efootball-blue); color: #000; padding: 18px 30px; text-decoration: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; width: 100%; max-width: 400px; display: block; margin: 40px auto 10px auto; text-align: center; transition: 0.3s; text-transform: uppercase; box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+        .pay-btn:hover { background-color: #fff; transform: scale(1.05); }
 
         footer { text-align: center; padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid #2a3553; margin-top: 50px; }
     </style>
@@ -57,12 +59,17 @@
     <div class="content-container">
         
         <div class="info-card">
-            <h2>🎮 Master the Pitch</h2>
-            <p>Unclescar Studios is expanding. The eFootball Arena will feature its own dedicated Academy knockouts, pro leagues, and massive weekend cash prizes.</p>
+            <h2>🎮 eFootball Launch Cup</h2>
+            <ul>
+                <li><strong>Game:</strong> eFootball</li>
+                <li><strong>Format:</strong> Knockout Tournament</li>
+                <li><strong>Entry Fee:</strong> ₦1,500 per player</li>
+                <li><strong>Status:</strong> Registration is officially OPEN.</li>
+            </ul>
         </div>
 
-        <button class="pay-btn locked" disabled>🔒 Registration Opens Soon</button>
-        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">The server infrastructure for eFootball is currently being optimized. Stay tuned for the official launch date.</p>
+        <a href="https://paystack.shop/pay/Unclescarefootball1" class="pay-btn">PAY ₦1,500 ENTRY FEE</a>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">Powered securely by Paystack. Secure your spot now.</p>
 
     </div>
 
