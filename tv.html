@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unclescar TV | Live Matches</title>
+    <style>
+        :root { 
+            --primary-color: #00ff88; 
+            --bg-color: #0b0f19; 
+            --card-bg: #1a2235; 
+            --text-main: #ffffff; 
+            --text-muted: #8892b0; 
+            --red-live: #ff0033;
+            --eafc-color: #ff0055;
+            --efootball-color: #00e5ff;
+        }
+        
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); text-align: center; }
+        
+        nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
+        nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
+        nav a:hover, nav a.active { background-color: var(--red-live); color: #fff; }
+
+        header { padding: 40px 20px 20px 20px; background: linear-gradient(180deg, #1a0000 0%, transparent 100%); }
+        h1 { font-size: 2.5rem; margin-bottom: 5px; text-transform: uppercase; }
+        
+        .live-badge { background-color: var(--red-live); color: white; padding: 4px 10px; border-radius: 5px; font-size: 1rem; vertical-align: middle; margin-left: 10px; animation: pulse 2s infinite; display: inline-block; }
+        @keyframes pulse { 0% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 0, 51, 0.7); } 70% { opacity: 0.8; box-shadow: 0 0 0 10px rgba(255, 0, 51, 0); } 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 0, 51, 0); } }
+
+        .video-container { max-width: 900px; margin: 30px auto; padding: 20px; background-color: var(--card-bg); border: 1px solid #2a3553; border-radius: 10px; box-shadow: 0 0 25px rgba(255, 0, 51, 0.15); }
+        .iframe-wrapper { position: relative; padding-bottom: 56.25%; /* 16:9 ratio for standard video */ height: 0; overflow: hidden; border-radius: 8px; background-color: #000; }
+        .iframe-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+        .schedule-board { max-width: 800px; margin: 50px auto; text-align: left; padding: 0 20px 50px 20px; }
+        .schedule-board h2 { border-bottom: 2px solid #2a3553; padding-bottom: 10px; color: var(--text-main); text-transform: uppercase; font-size: 1.5rem; }
+        
+        .match-row { display: flex; justify-content: space-between; align-items: center; background-color: var(--card-bg); padding: 15px 20px; margin-bottom: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .match-row.efootball { border-left-color: var(--efootball-color); }
+        .match-row.eafc { border-left-color: var(--eafc-color); }
+        
+        .match-info strong { font-size: 1.1rem; color: #fff; display: block; margin-bottom: 4px; }
+        .match-info span { font-size: 0.9rem; color: var(--text-muted); }
+        .match-time { color: var(--primary-color); font-weight: bold; font-size: 1rem; text-align: right; }
+
+        footer { padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid #2a3553; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">Hub</a>
+        <a href="academy.html">Academy</a>
+        <a href="league.html">UPL</a>
+        <a href="knockouts.html">Knockouts</a>
+        <a href="hall-of-fame.html">Hall of Fame</a>
+        <a href="tv.html" class="active">🔴 TV</a>
+    </nav>
+
+    <header>
+        <h1>Unclescar <span style="color: var(--red-live);">TV</span> <span class="live-badge">LIVE</span></h1>
+        <p style="color: var(--text-muted); max-width: 600px; margin: 10px auto 0 auto;">The main stage. Watch the biggest rivalries and Grand Finals unfold in real-time.</p>
+    </header>
+
+    <div class="video-container">
+        <div class="iframe-wrapper">
+            <iframe id="broadcast-frame" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0" title="Unclescar TV Broadcast" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <p style="margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">Want to be on the main broadcast? Stream your Grand Final match and send the YouTube/Twitch link to the Admin.</p>
+    </div>
+
+    <div class="schedule-board">
+        <h2>Broadcast Schedule</h2>
+        
+        <div class="match-row">
+            <div class="match-info">
+                <strong>DLS Academy - Grand Final</strong>
+                <span>TBD vs TBD</span>
+            </div>
+            <div class="match-time">Coming Soon</div>
+        </div>
+
+        <div class="match-row efootball">
+            <div class="match-info">
+                <strong>eFootball Launch Cup - Final</strong>
+                <span>TBD vs TBD</span>
+            </div>
+            <div class="match-time">Coming Soon</div>
+        </div>
+        
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Unclescar Studios. Broadcasting live.</p>
+    </footer>
+
+</body>
+</html>
