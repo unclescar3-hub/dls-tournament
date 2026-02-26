@@ -3,109 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="api-key" content="AIzaSyAsgtua-xP1bgpPqATGTgeokAUEc2b1gMM">
-    <title>Weekend Knockouts | Unclescar</title>
+    <title>Champions Knockouts | Unclescar Studios</title>
     <style>
-        :root { --primary-color: #00ff88; --bg-color: #0b0f19; --card-bg: #1a2235; --text-main: #ffffff; --text-muted: #8892b0; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); text-align: center; scroll-behavior: smooth; }
+        :root { 
+            --primary-color: #00ff88; 
+            --bg-color: #0b0f19; 
+            --card-bg: #1a2235; 
+            --text-main: #ffffff; 
+            --text-muted: #8892b0; 
+            --danger: #ff4444;
+            --purple: #9d4edd;
+        }
         
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
+        
+        /* The New Clean Navigation */
         nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
-        nav a { color: var(--text-main); text-decoration: none; font-size: 1rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
+        nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
         nav a:hover, nav a.active { background-color: var(--primary-color); color: #000; }
 
-        header { padding: 40px 20px 20px 20px; background: linear-gradient(180deg, #05070a 0%, transparent 100%); }
-        h1 { font-size: 2.5rem; margin-bottom: 5px; text-transform: uppercase; }
-        .highlight { color: var(--primary-color); }
+        header { text-align: center; padding: 50px 20px; background: linear-gradient(180deg, #1a0b2e 0%, transparent 100%); border-bottom: 1px solid #2a3553; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: #fff; text-transform: uppercase; }
+        .subtitle { color: var(--purple); font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
 
-        .hero { padding: 30px 20px; }
-        .hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px auto; line-height: 1.6; }
-        .cta-button { background-color: var(--primary-color); color: #000; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .content-container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
         
-        .section-title { font-size: 2rem; margin-bottom: 20px; color: var(--text-main); }
-        .iframe-container { width: 100%; max-width: 900px; height: 500px; margin: 0 auto; background-color: var(--card-bg); border: 1px solid #2a3553; border-radius: 10px; overflow: hidden; }
+        .info-card { background-color: var(--card-bg); border-left: 4px solid var(--purple); padding: 25px; margin-bottom: 30px; border-radius: 0 8px 8px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .info-card h2 { margin-top: 0; color: #fff; display: flex; align-items: center; gap: 10px; font-size: 1.5rem; border-bottom: 1px solid #2a3553; padding-bottom: 10px; }
+        .info-card ul { padding-left: 20px; color: var(--text-muted); }
+        .info-card li { margin-bottom: 10px; }
+        .info-card strong { color: var(--text-main); }
 
-        .form-container { background-color: var(--card-bg); padding: 30px; border-radius: 10px; width: 90%; max-width: 400px; margin: 0 auto; border: 1px solid #2a3553; text-align: left; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input { width: 100%; padding: 12px; background-color: var(--bg-color); border: 1px solid #2a3553; color: var(--text-main); border-radius: 5px; box-sizing: border-box; }
-        input:focus { border-color: var(--primary-color); outline: none; }
-        .submit-btn { width: 100%; margin-top: 10px; }
-        
-        .prize-grid { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px; }
-        .prize-card { background-color: var(--card-bg); padding: 20px; border-radius: 8px; width: 90%; max-width: 350px; border: 1px solid #2a3553; display: flex; justify-content: space-between; font-weight: bold; }
-        
-        footer { padding: 40px 20px; background-color: #05070a; border-top: 1px solid #2a3553; margin-top: 40px; }
-        .social-links { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
-        .social-links a { color: var(--primary-color); text-decoration: none; font-weight: bold; padding: 5px 10px; border: 1px solid var(--primary-color); border-radius: 5px; }
+        /* The Locked Button */
+        .pay-btn.locked { background-color: #3a3f4a; color: #8892b0; padding: 18px 30px; border: 1px solid #2a3553; border-radius: 8px; font-size: 1.3rem; font-weight: bold; width: 100%; max-width: 400px; display: block; margin: 40px auto 10px auto; text-align: center; text-transform: uppercase; cursor: not-allowed; font-family: inherit; }
+
+        footer { text-align: center; padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid #2a3553; margin-top: 50px; }
     </style>
 </head>
 <body>
 
     <nav>
-        <a href="index.html">Home</a>
-        <a href="league.html">Premier League</a>
-        <a href="knockouts.html" class="active">Weekend Knockouts</a>
+        <a href="index.html">Hub</a>
+        <a href="dls-arena.html" class="active">DLS Arena</a>
+        <a href="efootball.html">eFootball Arena</a>
+        <a href="eafc.html">EA FC Arena</a>
+        <a href="hall-of-fame.html">Hall of Fame</a>
+        <a href="tv.html">🔴 TV</a>
     </nav>
 
     <header>
-        <h1>Weekend <span class="highlight">Knockouts</span></h1>
+        <h1>Champions Knockouts</h1>
+        <p class="subtitle">High Stakes. Elite Players Only.</p>
     </header>
 
-    <section class="hero">
-        <p>Register for our weekend DLS tournaments. Survive the bracket, take the crown, and win real-money prize pools.</p>
-        <a href="#register" class="cta-button">Register Now</a>
-    </section>
-
-    <section style="padding: 20px;">
-        <h2 class="section-title">Prize Pool Breakdown</h2>
-        <div class="prize-grid">
-            <div class="prize-card" style="color: var(--gold); border-color: var(--gold);"><span>1st Place 🥇</span><span>50%</span></div>
-            <div class="prize-card" style="color: var(--silver);"><span>2nd Place 🥈</span><span>20%</span></div>
-            <div class="prize-card" style="color: var(--bronze);"><span>3rd Place 🥉</span><span>10%</span></div>
+    <div class="content-container">
+        
+        <div class="info-card">
+            <h2>🏆 Tournament Format</h2>
+            <ul>
+                <li><strong>Game:</strong> Dream League Soccer</li>
+                <li><strong>Format:</strong> 16-Player Single Elimination (Weekend Event)</li>
+                <li><strong>Entry Fee:</strong> ₦1,500 to ₦2,000 (Tiered)</li>
+                <li><strong>Match Rules:</strong> Two-legged ties (Home and Away format). Aggregate score decides the winner. Away goals do not count.</li>
+            </ul>
         </div>
-    </section>
 
-    <section style="padding: 20px;">
-        <h2 class="section-title">Live Bracket</h2>
-        <div class="iframe-container">
-            <iframe src="https://challonge.com/unclescar1/module" width="100%" height="100%" frameborder="0" scrolling="auto" allowtransparency="true"></iframe>
+        <div class="info-card">
+            <h2>💀 The Danger Zone</h2>
+            <p style="color: var(--text-muted); margin-bottom: 0;">This is not the Academy. The Champions Knockouts are for players who want to risk more to win more. High entry fees mean a massive, concentrated prize pool for the top 3 survivors.</p>
         </div>
-    </section>
 
-    <section id="register" style="padding: 50px 20px; background-color: #05070a;">
-        <h2 class="section-title">Join The Next Knockout</h2>
-        <div class="form-container">
-            <form id="registrationForm">
-                <input type="hidden" name="access_key" value="d871e97e-7d62-47be-961d-da243d66ef57">
-                <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
-                <div class="form-group"><label>DLS Team Name</label><input type="text" name="dls-name" required></div>
-                <div class="form-group"><label>Email Address</label><input type="email" name="email" required></div>
-                <div class="form-group"><label>WhatsApp Number</label><input type="tel" name="whatsapp" required></div>
-                <button type="submit" class="cta-button submit-btn" id="submitBtn">Pay ₦1,000 Entry Fee</button>
-            </form>
-        </div>
-    </section>
+        <button class="pay-btn locked" disabled>🔒 Registration Opens Soon</button>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">The Champions Arena is currently closed. Warm up in the Academy first.</p>
+
+    </div>
 
     <footer>
-        <div class="social-links">
-            <a href="http://tiktok.com/@tinkle_bird4l">TikTok</a>
-            <a href="https://linktr.ee/tinklebird">Linktree</a>
-            <a href="https://www.facebook.com/profile.php?id=61574824795293">Facebook</a>
-            <a href="https://x.com/official_tbird?s=11">X</a>
-        </div>
-        <p style="color: var(--text-muted);">&copy; 2026 Unclescar Studios.</p>
+        <p>&copy; 2026 Unclescar Studios. All rights reserved.</p>
+        <p><a href="rules.html" style="color: var(--danger); text-decoration: none; font-weight: bold;">⚖️ Read Official Rulebook</a></p>
     </footer>
 
-    <script>
-        document.getElementById('registrationForm').addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            const form = e.target;
-            const btn = document.getElementById('submitBtn');
-            btn.innerText = "Redirecting..."; btn.style.backgroundColor = "#ffd700"; btn.disabled = true;
-            fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) })
-            .then(() => window.location.href = "https://paystack.shop/pay/hynwe1eujv")
-            .catch(() => window.location.href = "https://paystack.shop/pay/hynwe1eujv");
-        });
-    </script>
 </body>
 </html>
