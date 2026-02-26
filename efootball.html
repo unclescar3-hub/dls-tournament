@@ -13,6 +13,7 @@
             --text-muted: #8892b0; 
             --danger: #ff4444;
             --efootball-blue: #00e5ff;
+            --gold: #ffd700;
         }
         
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
@@ -32,6 +33,9 @@
         .info-card ul { padding-left: 20px; color: var(--text-muted); }
         .info-card li { margin-bottom: 10px; }
         .info-card strong { color: var(--text-main); }
+
+        /* Bracket Container */
+        .bracket-container { background-color: #fff; border-radius: 8px; overflow: hidden; height: 500px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0, 229, 255, 0.2); border: 2px solid var(--efootball-blue); }
 
         /* The Live Payment Button */
         .pay-btn { background-color: var(--efootball-blue); color: #000; padding: 18px 30px; text-decoration: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; width: 100%; max-width: 400px; display: block; margin: 40px auto 10px auto; text-align: center; transition: 0.3s; text-transform: uppercase; box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
@@ -62,10 +66,15 @@
             <h2>🎮 eFootball Launch Cup</h2>
             <ul>
                 <li><strong>Game:</strong> eFootball</li>
-                <li><strong>Format:</strong> Knockout Tournament</li>
+                <li><strong>Format:</strong> Single Elimination Bracket</li>
                 <li><strong>Entry Fee:</strong> ₦1,500 per player</li>
                 <li><strong>Status:</strong> Registration is officially OPEN.</li>
             </ul>
+        </div>
+
+        <h2 style="color: #fff; text-align: center; margin-bottom: 15px;">📊 Live Bracket</h2>
+        <div class="bracket-container">
+            <iframe src="https://challonge.com/unclescarefootball1/module" width="100%" height="100%" frameborder="0" scrolling="auto" allowtransparency="true"></iframe>
         </div>
 
         <a href="https://paystack.shop/pay/Unclescarefootball1" class="pay-btn">PAY ₦1,500 ENTRY FEE</a>
