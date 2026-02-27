@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Official Rules | Unclescar Studios</title>
+    <title>Official Rulebook | Unclescar Studios</title>
     <style>
         :root { 
             --primary-color: #00ff88; 
@@ -12,33 +12,27 @@
             --text-main: #ffffff; 
             --text-muted: #8892b0; 
             --danger: #ff4444;
-            --gold: #ffd700;
         }
-        
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
         
         nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
         nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
-        nav a:hover, nav a.active { background-color: #333; }
+        nav a:hover, nav a.active { background-color: var(--danger); color: #fff; }
 
-        header { padding: 40px 20px; text-align: center; background: linear-gradient(180deg, #1a0505 0%, transparent 100%); border-bottom: 1px solid #2a3553; }
-        h1 { font-size: 2.5rem; margin-bottom: 10px; text-transform: uppercase; color: var(--danger); }
-        .subtitle { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+        header { text-align: center; padding: 50px 20px; background: linear-gradient(180deg, #220b0b 0%, transparent 100%); border-bottom: 1px solid #2a3553; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: #fff; text-transform: uppercase; }
+        .subtitle { color: var(--danger); font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
 
         .content-container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
         
-        .rule-section { background-color: var(--card-bg); border-left: 4px solid var(--primary-color); padding: 25px; margin-bottom: 25px; border-radius: 0 8px 8px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .rule-section.strict { border-left-color: var(--danger); }
-        
-        .rule-section h2 { margin-top: 0; color: #fff; display: flex; align-items: center; gap: 10px; font-size: 1.4rem; border-bottom: 1px solid #2a3553; padding-bottom: 10px; }
-        .rule-section ul { padding-left: 20px; color: var(--text-muted); }
-        .rule-section li { margin-bottom: 10px; }
+        .rule-section { background-color: var(--card-bg); border-left: 4px solid var(--danger); padding: 25px; margin-bottom: 30px; border-radius: 0 8px 8px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .rule-section h2 { margin-top: 0; color: #fff; font-size: 1.5rem; border-bottom: 1px solid #2a3553; padding-bottom: 10px; }
+        .rule-section p, .rule-section ul { color: var(--text-muted); }
+        .rule-section ul { padding-left: 20px; }
+        .rule-section li { margin-bottom: 15px; }
         .rule-section strong { color: var(--text-main); }
 
-        .admin-box { background-color: rgba(255, 215, 0, 0.1); border: 1px solid var(--gold); padding: 20px; border-radius: 8px; text-align: center; margin-top: 40px; }
-        .admin-box h3 { color: var(--gold); margin-top: 0; }
-
-        footer { text-align: center; padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid #2a3553; margin-top: 40px; }
+        footer { text-align: center; padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid #2a3553; margin-top: 50px; }
     </style>
 </head>
 <body>
@@ -53,57 +47,49 @@
     </nav>
 
     <header>
-        <h1>Fair Play & Rules</h1>
-        <p class="subtitle">To protect the integrity of the prize pool, all players must adhere to the Unclescar Studios competitive rulebook. No exceptions.</p>
+        <h1>Official Rulebook</h1>
+        <p class="subtitle">Terms, Conditions & Anti-Cheat Protocol</p>
     </header>
 
     <div class="content-container">
         
-        <div class="rule-section">
-            <h2>⏱️ 1. Punctuality & Matchmaking</h2>
+        <div class="rule-section" style="border-left-color: var(--primary-color);">
+            <h2>1. The "No Scammer" Match Protocol</h2>
+            <p>To protect the integrity of Unclescar Tournaments and ensure payouts go to the true winners, the following proof-of-win rules are strictly enforced:</p>
             <ul>
-                <li><strong>The 10-Minute Rule:</strong> Once you are tagged in the WhatsApp Locker Room by your opponent, you have <strong>10 minutes</strong> to respond and join the match.</li>
-                <li>Failure to respond within 10 minutes results in an automatic forfeit, and your opponent advances.</li>
-                <li>Both players are responsible for adding each other using the correct in-game codes.</li>
+                <li><strong>Video Proof is Mandatory:</strong> Screenshots can be faked in minutes. The winning player MUST take a 5 to 10-second screen recording of the final match stats showing both usernames clearly.</li>
+                <li><strong>Dispute Resolution:</strong> If a match result is contested and neither player can provide video proof, both players will be disqualified, or the Admin may force a rematch at their discretion.</li>
+                <li><strong>The Admin is Final:</strong> The Tournament Admin holds the absolute final say in all disputes, disqualifications, and rulings. Arguing with the Admin after a final ruling will result in a permanent ban from the platform.</li>
             </ul>
         </div>
 
-        <div class="rule-section strict">
-            <h2>📶 2. Disconnections & Lag</h2>
+        <div class="rule-section" style="border-left-color: #ffd700;">
+            <h2>2. Payments & Refunds</h2>
             <ul>
-                <li><strong>Stable Connection Required:</strong> You are required to play on a stable WiFi or 4G/5G connection.</li>
-                <li><strong>Mid-Game Disconnects:</strong> If the server kicks a player out of the match, the player who disconnected takes an <strong>automatic 3-0 loss</strong>. The game's internal server ruling is final.</li>
-                <li>If the game deems the match "Void" due to server error, a rematch must be played immediately.</li>
-                <li>Intentionally lagging the game or using network manipulation will result in a permanent ban.</li>
+                <li><strong>Strictly No Refunds:</strong> All entry fees are 100% final. Once the bracket has been generated and your name is on it, no refunds will be issued for no-shows, lag, or connection issues.</li>
+                <li><strong>Skill-Based Competition:</strong> Unclescar Tournaments are competitive eSports events based entirely on player skill. This is a tournament of ability, not gambling, betting, or a game of chance.</li>
+                <li><strong>Prize Payouts:</strong> Payouts are sent directly to the winner's designated bank account within 24 hours of the tournament's conclusion and verification of results.</li>
             </ul>
         </div>
 
-        <div class="rule-section">
-            <h2>📸 3. Reporting Scores</h2>
+        <div class="rule-section" style="border-left-color: #00e5ff;">
+            <h2>3. Connection & Lag</h2>
             <ul>
-                <li>The <strong>WINNER</strong> is solely responsible for reporting the score.</li>
-                <li>You must take a clear screenshot of the final match result screen showing both team names and the score.</li>
-                <li>Post the screenshot in the official WhatsApp group and tag the Admin. <strong>No screenshot = No win.</strong></li>
+                <li>It is the sole responsibility of the player to ensure a stable internet connection before entering a match.</li>
+                <li>If a player disconnects during a match, it counts as an automatic forfeit (3-0 loss) unless both players agree to a rematch. Proof of agreement must be submitted to the Admin.</li>
             </ul>
         </div>
 
-        <div class="rule-section strict">
-            <h2>🚫 4. Toxicity & The Blacklist</h2>
-            <ul>
-                <li>Trash talk is part of the game, but personal insults, threats, or hate speech are not. Crossing the line results in immediate disqualification without a refund.</li>
-                <li>Any player caught submitting a fake or edited screenshot will be permanently placed on the <strong>Unclescar Blacklist</strong> and banned from all future tournaments.</li>
-            </ul>
-        </div>
-
-        <div class="admin-box">
-            <h3>⚖️ The Admin's Word is Final</h3>
-            <p style="color: var(--text-muted); margin-bottom: 0;">In the event of a dispute not covered explicitly by this rulebook, the Unclescar Studios Admin will review the evidence. The Admin's ruling is absolute and cannot be appealed.</p>
+        <div class="rule-section" style="border-left-color: var(--danger);">
+            <h2>4. Legal Disclaimer & Copyright</h2>
+            <p><strong>Independent Organizer:</strong> Unclescar Studios is an independent, grassroots eSports tournament organizer. We are strictly <strong>NOT affiliated with, sponsored by, or endorsed by First Touch Games (creators of Dream League Soccer), Konami (creators of eFootball), or Electronic Arts (creators of EA Sports FC).</strong></p>
+            <p>All game titles, names, logos, and brands are the property of their respective trademark owners. Entry fees go entirely toward tournament administration, web server hosting, and guaranteed player prize pools.</p>
         </div>
 
     </div>
 
     <footer>
-        <p>&copy; 2026 Unclescar Studios. Play hard, play fair.</p>
+        <p>&copy; 2026 Unclescar Studios. All rights reserved.</p>
     </footer>
 
 </body>
