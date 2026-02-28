@@ -1,1 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uncle Scar Studio | Match Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+        }
+        .form-container {
+            background: #161b22;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #00f2fe;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h2 { text-align: center; color: white; margin-bottom: 5px; }
+        label { font-weight: bold; display: block; margin-top: 15px; color: #8b949e; }
+        input[type="text"], input[type="number"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 5px;
+            border: 1px solid #30363d;
+            background-color: #0d1117;
+            color: white;
+            box-sizing: border-box;
+        }
+        .submit-btn {
+            background-color: #00f2fe;
+            color: #000;
+            font-weight: bold;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            margin-top: 25px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
 
+    <div class="form-container">
+        <h2>📸 Submit Match Result</h2>
+        <p style="text-align:center; font-size:14px; margin-bottom: 20px;">Upload your final score and screenshot for verification.</p>
+
+        <form action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data">
+            
+            <input type="hidden" name="access_key" value="d871e97e-7d62-47be-961d-da243d66ef57">
+
+            <label for="matchCode">Match Code / Fixture (e.g., Round 1):</label>
+            <input type="text" id="matchCode" name="Match_Code" required>
+
+            <label for="playerName">Your Name / Tag:</label>
+            <input type="text" id="playerName" name="Player_Name" required>
+
+            <label for="myScore">Your Score:</label>
+            <input type="number" id="myScore" name="My_Score" required>
+
+            <label for="opponentScore">Opponent's Score:</label>
+            <input type="number" id="opponentScore" name="Opponent_Score" required>
+
+            <label for="screenshot">Upload Match Screenshot:</label>
+            <input type="file" id="screenshot" name="Screenshot" accept="image/png, image/jpeg" required>
+
+            <input type="hidden" name="redirect" value="https://unclescar3-hub.github.io/dls-tournament/">
+
+            <button type="submit" class="submit-btn">SEND TO ADMIN</button>
+        </form>
+    </div>
+
+</body>
+</html>
