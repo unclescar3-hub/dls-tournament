@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unclescar TV | Live Streams</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+  <div class="nav-links">
+    <a href="/">Hub</a>
+    <a href="/dls.html">DLS Arena</a>
+    <a href="/efootball.html">eFootball</a>
+    <a href="/eafc.html">EA FC</a>
+    <a href="/hall-of-fame.html">Hall of Fame</a>
+    <a href="/tv.html" class="nav-tv active">&#9679; TV</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" class="nav-btn nav-btn-outline" id="nav-login-btn" onclick="openModal('login-modal');return false;">Log In</a>
+    <a href="#" class="nav-btn nav-btn-primary" id="nav-register-btn" onclick="openModal('register-modal');return false;">Sign Up</a>
+    <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
+      <span style="color:var(--muted);font-size:.85rem;">Hi, <strong id="nav-username"></strong></span>
+      <a href="/dashboard.html" id="nav-dashboard-link" class="nav-btn nav-btn-outline">Dashboard</a>
+      <button onclick="logout()" class="nav-btn nav-btn-outline">Log Out</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero" style="background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(255,26,26,.07) 0%,transparent 70%)">
+  <div class="hero-eyebrow" style="background:rgba(255,26,26,.1);border:1px solid rgba(255,26,26,.3);color:#ff1a1a;font-size:.72rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;padding:5px 14px;border-radius:100px;display:inline-block">
+    <span class="live-dot" style="display:inline-block;margin-right:6px;vertical-align:middle"></span>Broadcast
+  </div>
+  <h1 style="color:#ff1a1a">UNCLESCAR TV</h1>
+  <p>Watch live tournament matches, grand finals, and highlights. Updated in real-time by our admins.</p>
+</div>
+
+<div class="section">
+  <div id="live-section" style="margin-bottom:48px">
+    <p class="section-label">Now Broadcasting</p>
+    <h2 class="section-title">Live Streams</h2>
+    <div id="live-list"><div class="spinner"></div></div>
+  </div>
+
+  <div>
+    <p class="section-label">Recent Broadcasts</p>
+    <h2 class="section-title">All Streams</h2>
+    <div id="all-streams-list"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- Embed Modal -->
+<div class="modal-overlay" id="stream-modal">
+  <div class="modal" style="max-width:760px;width:100%">
+    <button class="modal-close" onclick="closeModal('stream-modal')">&times;</button>
+    <h2 id="stream-modal-title" style="margin-bottom:16px"></h2>
+    <div id="stream-embed" style="background:#000;border-radius:8px;overflow:hidden;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center">
+      <p style="color:var(--muted)">Loading stream...</p>
+    </div>
+    <p id="stream-modal-link" style="margin-top:12px;font-size:.85rem;color:var(--muted)"></p>
+  </div>
+</div>
+
+<footer><div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div><span class="footer-copy">&copy; 2026 Unclescar Studios.</span></footer>
+<div class="modal-overlay" id="login-modal"><div class="modal"><button class="modal-close" onclick="closeModal('login-modal')">&times;</button><h2>Log In</h2><form id="login-form"><div class="form-group"><label>Email</label><input type="email" id="login-email" required></div><div class="form-group"><label>Password</label><input type="password" id="login-password" required></div><button type="submit" class="btn btn-primary btn-block">Log In</button></form></div></div>
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<script>
+function getYouTubeEmbedUrl(url) {
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (match) return `https://www.youtube.com/embed/${match[1]}?autoplay=1`;
+  return null;
+}
+
+function openStream(s) {
+  document.getElementById('stream-modal-title').textContent = s.title;
+  const embed = document.getElementById('stream-embed');
+  const ytUrl = getYouTubeEmbedUrl(s.stream_url);
+  if (ytUrl) {
+    embed.innerHTML = `<iframe src="${ytUrl}" width="100%" height="100%" frameborder="0" allowfullscreen allow="autoplay"></iframe>`;
+  } else {
+    embed.innerHTML = `<div style="text-align:center;padding:40px"><p style="color:var(--muted);margin-bottom:16px">This stream is hosted externally.</p><a href="${s.stream_url}" target="_blank" rel="noopener" class="btn btn-primary">Watch on ${s.platform}</a></div>`;
+  }
+  document.getElementById('stream-modal-link').innerHTML = `<a href="${s.stream_url}" target="_blank" rel="noopener" style="color:var(--action-blue)">Open in ${s.platform} &#8599;</a>`;
+  openModal('stream-modal');
+}
+
+function streamCard(s) {
+  const platformIcons = { youtube:'YT', twitch:'TTV', tiktok:'TK', facebook:'FB', other:'&#9654;' };
+  return `<div class="card" style="cursor:pointer" onclick='openStream(${JSON.stringify(s)})'>
+    <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:48px;height:48px;background:${s.is_live?'rgba(255,26,26,.15)':'var(--surface)'};border:1px solid ${s.is_live?'rgba(255,26,26,.4)':'var(--border)'};border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:${s.is_live?'#ff1a1a':'var(--muted)'}">${platformIcons[s.platform]||'&#9654;'}</div>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${s.title}</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">${s.tournament_name} &middot; ${s.arena?.toUpperCase()}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${s.is_live?`<span class="live-badge" style="background:rgba(255,26,26,.12);border:1px solid rgba(255,26,26,.3);color:#ff1a1a"><span class="live-dot"></span>LIVE</span>`:''}
+        <span class="btn btn-outline btn-sm">Watch &#9654;</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function loadStreams() {
+  try {
+    const streams = await api('GET', '/streams');
+    const live = streams.filter(s => s.is_live);
+    const all = streams.filter(s => !s.is_live);
+
+    const liveEl = document.getElementById('live-list');
+    if (!live.length) liveEl.innerHTML = '<p style="color:var(--muted)">No live streams right now. Check back for grand finals!</p>';
+    else liveEl.innerHTML = live.map(streamCard).join('');
+
+    const allEl = document.getElementById('all-streams-list');
+    if (!all.length) allEl.innerHTML = '<p style="color:var(--muted)">No recorded streams yet.</p>';
+    else allEl.innerHTML = all.map(streamCard).join('');
+  } catch { document.getElementById('live-list').innerHTML = '<p style="color:var(--muted)">Could not load streams.</p>'; }
+}
+
+document.getElementById('login-form').addEventListener('submit',async e=>{e.preventDefault();try{const d=await api('POST','/auth/login',{email:document.getElementById('login-email').value,password:document.getElementById('login-password').value});currentUser=d.user;updateNavAuth();closeModal('login-modal');toast('Welcome back!','success');}catch(err){toast(err.message,'error');}});
+document.addEventListener('DOMContentLoaded', loadStreams);
+</script>
+</body>
+</html>

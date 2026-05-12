@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Unclescar Studios</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+  <div class="nav-links">
+    <a href="/admin.html" class="active">Admin</a>
+    <a href="/">View Site</a>
+  </div>
+  <div class="nav-right">
+    <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
+      <span class="tag tag-danger">ADMIN</span>
+      <span style="color:var(--muted);font-size:.85rem"><strong id="nav-username" style="color:var(--text)"></strong></span>
+      <button onclick="logout()" class="nav-btn nav-btn-outline">Log Out</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Admin Login Gate -->
+<div id="admin-login-screen" style="display:none;min-height:80vh;display:flex;align-items:center;justify-content:center">
+  <div class="modal" style="position:static;max-width:400px;margin:0 auto">
+    <h2 style="margin-bottom:8px">Admin Access</h2>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:24px">Enter your admin password to continue.</p>
+    <form id="admin-login-form">
+      <div class="form-group"><label>Admin Password</label><input type="password" id="admin-pw" required placeholder="••••••••"></div>
+      <button type="submit" class="btn btn-danger btn-block">Access Admin Panel</button>
+    </form>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin-panel" style="display:none">
+  <div class="page-hero" style="background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,68,68,.06) 0%,transparent 70%)">
+    <div class="hero-eyebrow tag tag-danger">Control Center</div>
+    <h1>ADMIN DASHBOARD</h1>
+    <p>Manage tournaments, review matches, and control the entire platform.</p>
+  </div>
+
+  <div class="section">
+    <!-- Stats -->
+    <div class="grid-3" style="margin-bottom:40px" id="admin-stats">
+      <div class="card"><div class="card-body" style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--primary)" id="s-users">–</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Total Players</div></div></div>
+      <div class="card"><div class="card-body" style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--gold)" id="s-regs">–</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Paid Registrations</div></div></div>
+      <div class="card"><div class="card-body" style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--danger)" id="s-pending">–</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Pending Reviews</div></div></div>
+    </div>
+
+    <!-- TABS -->
+    <div style="display:flex;gap:8px;margin-bottom:28px;border-bottom:1px solid var(--border);padding-bottom:0">
+      <button class="admin-tab active" data-tab="tournaments" onclick="switchTab('tournaments')">Tournaments</button>
+      <button class="admin-tab" data-tab="create" onclick="switchTab('create')">Create Tournament</button>
+      <button class="admin-tab" data-tab="matches" onclick="switchTab('matches')">Match Reviews</button>
+      <button class="admin-tab" data-tab="users" onclick="switchTab('users')">Players</button>
+      <button class="admin-tab" data-tab="streams" onclick="switchTab('streams')">Streams</button>
+    </div>
+
+    <!-- TOURNAMENTS TAB -->
+    <div id="tab-tournaments" class="admin-tab-content">
+      <div id="tournaments-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- CREATE TAB -->
+    <div id="tab-create" class="admin-tab-content" style="display:none">
+      <div class="card" style="max-width:600px">
+        <div class="card-header"><h3>Create New Tournament</h3></div>
+        <div class="card-body">
+          <form id="create-form">
+            <div class="form-group"><label>Tournament Name</label><input type="text" id="c-name" required placeholder="e.g. DLS Academy Cup Vol. 2"></div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Arena</label>
+                <select id="c-arena" required>
+                  <option value="dls">DLS Arena</option>
+                  <option value="efootball">eFootball Arena</option>
+                  <option value="eafc">EA FC Arena</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Format</label>
+                <select id="c-format" required>
+                  <option value="open-ladder">Open Ladder (Proving Grounds)</option>
+                  <option value="32-player-single-elimination">32-Player Single Elimination</option>
+                  <option value="64-player-single-elimination">64-Player Single Elimination</option>
+                  <option value="16-player-single-elimination">16-Player Single Elimination</option>
+                  <option value="20-manager-round-robin">20-Manager Round Robin (Premier League)</option>
+                  <option value="16-manager-round-robin">16-Manager Round Robin</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Max Players</label>
+                <select id="c-maxplayers" required>
+                  <option value="16">16</option>
+                  <option value="20">20</option>
+                  <option value="32" selected>32</option>
+                  <option value="64">64</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Entry Fee (₦)</label><input type="number" id="c-fee" required placeholder="100" min="0"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Tournament</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATCH REVIEWS TAB -->
+    <div id="tab-matches" class="admin-tab-content" style="display:none">
+      <div id="pending-matches-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div id="tab-users" class="admin-tab-content" style="display:none">
+      <div id="users-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- STREAMS TAB -->
+    <div id="tab-streams" class="admin-tab-content" style="display:none">
+      <div id="streams-list"><div class="spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div><span class="footer-copy">Admin Panel &copy; 2026</span></footer>
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<style>
+.admin-tab { background:none; border:none; color:var(--muted); font-family:'Inter',sans-serif; font-size:.875rem; font-weight:600; padding:10px 18px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .2s; }
+.admin-tab:hover { color:var(--text); }
+.admin-tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+</style>
+<script>
+let isAdmin = false;
+
+async function initAdmin() {
+  const user = await loadUser();
+  if (user && user.role === 'admin') {
+    isAdmin = true;
+    showAdminPanel();
+  } else {
+    document.getElementById('admin-login-screen').style.display = 'flex';
+  }
+}
+
+function showAdminPanel() {
+  document.getElementById('admin-login-screen').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  loadStats();
+  loadTournamentsTab();
+}
+
+document.getElementById('admin-login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.textContent = 'Verifying...'; btn.disabled = true;
+  try {
+    await api('POST', '/admin/login', { password: document.getElementById('admin-pw').value });
+    await loadUser();
+    isAdmin = true;
+    showAdminPanel();
+    toast('Welcome, Admin!', 'success');
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = 'Access Admin Panel'; btn.disabled = false; }
+});
+
+async function loadStats() {
+  try {
+    const s = await api('GET', '/admin/stats');
+    document.getElementById('s-users').textContent = s.total_users;
+    document.getElementById('s-regs').textContent = s.total_registrations;
+    document.getElementById('s-pending').textContent = s.pending_reviews;
+  } catch {}
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
+  document.getElementById('tab-' + name).style.display = 'block';
+  if (name === 'tournaments') loadTournamentsTab();
+  if (name === 'matches') loadPendingMatches();
+  if (name === 'users') loadUsers();
+  if (name === 'streams') loadStreams();
+}
+
+async function loadTournamentsTab() {
+  try {
+    const ts = await api('GET', '/tournaments');
+    const list = document.getElementById('tournaments-list');
+    if (!ts.length) { list.innerHTML = '<p style="color:var(--muted)">No tournaments yet. Create one!</p>'; return; }
+    list.innerHTML = ts.map(t => `
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700">${t.name}</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${t.arena} &middot; ${t.format} &middot; ${naira(t.entry_fee)} &middot; ${t.registered||0}/${t.max_players} players</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${statusBadge(t.status)}
+            <a href="/tournament.html?id=${t.id}" class="btn btn-outline btn-sm">View</a>
+            <select class="btn btn-sm btn-outline" onchange="changeStatus('${t.id}',this.value)">
+              <option value="">Change Status</option>
+              <option value="open">Open</option>
+              <option value="ongoing">Ongoing</option>
+              <option value="closed">Closed</option>
+              <option value="completed">Completed</option>
+            </select>
+            <button class="btn btn-danger btn-sm" onclick="deleteTournament('${t.id}')">Delete</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(err) { toast(err.message,'error'); }
+}
+
+async function changeStatus(id, status) {
+  if (!status) return;
+  try { await api('PATCH', `/tournaments/${id}`, { status }); toast('Status updated','success'); loadTournamentsTab(); loadStats(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+async function deleteTournament(id) {
+  if (!confirm('Delete this tournament and all its data?')) return;
+  try { await api('DELETE', `/tournaments/${id}`); toast('Deleted','success'); loadTournamentsTab(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+document.getElementById('create-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.textContent = 'Creating...'; btn.disabled = true;
+  try {
+    await api('POST', '/tournaments', {
+      name: document.getElementById('c-name').value,
+      arena: document.getElementById('c-arena').value,
+      format: document.getElementById('c-format').value,
+      max_players: document.getElementById('c-maxplayers').value,
+      entry_fee: document.getElementById('c-fee').value
+    });
+    toast('Tournament created!', 'success');
+    e.target.reset();
+    switchTab('tournaments');
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.textContent='Create Tournament'; btn.disabled=false; }
+});
+
+async function loadPendingMatches() {
+  try {
+    const matches = await api('GET', '/matches/pending');
+    const ml = document.getElementById('pending-matches-list');
+    if (!matches.length) { ml.innerHTML='<p style="color:var(--muted)">No pending match reviews.</p>'; return; }
+    ml.innerHTML = matches.map(m => `
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-body">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+            <div>
+              <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">${m.tournament_name}</div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700">
+                ${m.submitter_name} <span style="color:var(--primary)">${m.submitter_score}</span>
+                &ndash;
+                <span style="color:var(--danger)">${m.opponent_score}</span> ${m.opponent_name}
+              </div>
+              <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Submitted ${fmtDate(m.submitted_at)}</div>
+              ${m.ai_result ? `<div style="font-size:.78rem;margin-top:8px;padding:8px 12px;background:var(--surface);border-radius:6px;border:1px solid var(--border)">
+                <strong>AI:</strong> ${m.ai_result.notes||''} &middot; Confidence: ${m.ai_result.confidence||'–'}
+              </div>` : ''}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              ${m.screenshot_path ? `<a href="/${m.screenshot_path}" target="_blank" class="btn btn-outline btn-sm">View Screenshot</a>` : ''}
+              <button class="btn btn-primary btn-sm" onclick="reviewMatch('${m.id}',true)">&#10003; Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="reviewMatch('${m.id}',false)">&#10007; Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(err) { toast(err.message,'error'); }
+}
+
+async function reviewMatch(id, approved) {
+  try {
+    await api('PATCH', `/matches/${id}/review`, { approved });
+    toast(approved ? 'Match approved & standings updated' : 'Match rejected', approved ? 'success' : 'info');
+    loadPendingMatches(); loadStats();
+  } catch(err) { toast(err.message,'error'); }
+}
+
+async function loadUsers() {
+  try {
+    const users = await api('GET', '/admin/users');
+    const ul = document.getElementById('users-list');
+    ul.innerHTML = `<div style="overflow-x:auto"><table class="standings-table">
+      <thead><tr><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead>
+      <tbody>${users.map(u=>`<tr>
+        <td><strong>${u.username}</strong></td>
+        <td>${u.email}</td>
+        <td>${u.phone||'–'}</td>
+        <td><span class="tag ${u.role==='admin'?'tag-danger':u.role==='banned'?'tag-muted':'tag-primary'}">${u.role}</span></td>
+        <td>${fmtDate(u.created_at)}</td>
+        <td>
+          ${u.role!=='admin'?`<select class="btn btn-sm btn-outline" onchange="changeRole('${u.id}',this.value)">
+            <option value="">Change Role</option>
+            <option value="player">Player</option>
+            <option value="banned">Ban</option>
+          </select>`:'–'}
+        </td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  } catch(err) { toast(err.message,'error'); }
+}
+
+async function changeRole(id, role) {
+  if (!role) return;
+  try { await api('PATCH', `/admin/users/${id}/role`, { role }); toast('Role updated','success'); loadUsers(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+async function loadStreams() {
+  try {
+    const streams = await api('GET', '/streams');
+    const sl = document.getElementById('streams-list');
+    if (!streams.length) { sl.innerHTML='<p style="color:var(--muted)">No streams submitted yet.</p>'; return; }
+    sl.innerHTML = streams.map(s=>`
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${s.title}</div>
+            <div style="font-size:.8rem;color:var(--muted)">${s.platform} &middot; ${s.tournament_name} &middot; <a href="${s.stream_url}" target="_blank" style="color:var(--action-blue)">${s.stream_url.slice(0,40)}…</a></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${s.is_live?'<span class="live-badge" style="background:rgba(255,26,26,.12);border:1px solid rgba(255,26,26,.3);color:#ff1a1a"><span class="live-dot"></span>LIVE</span>':''}
+            <button class="btn btn-${s.is_live?'outline':'primary'} btn-sm" onclick="toggleLive('${s.id}',${!s.is_live})">${s.is_live?'Stop Live':'Set Live'}</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteStream('${s.id}')">Delete</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(err) { toast(err.message,'error'); }
+}
+
+async function toggleLive(id, isLive) {
+  try { await api('PATCH', `/streams/${id}/live`, { is_live: isLive }); loadStreams(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+async function deleteStream(id) {
+  try { await api('DELETE', `/streams/${id}`); toast('Stream removed','info'); loadStreams(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+document.addEventListener('DOMContentLoaded', initAdmin);
+</script>
+</body>
+</html>
