@@ -4,94 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unclescar TV | Live Matches</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary-color: #00ff88; 
-            --bg-color: #0b0f19; 
-            --card-bg: #1a2235; 
-            --text-main: #ffffff; 
-            --text-muted: #8892b0; 
-            --red-live: #ff0033;
-            --eafc-color: #ff0055;
-            --efootball-color: #00e5ff;
+        :root {
+            --primary: #00e676;
+            --primary-dim: rgba(0,230,118,0.12);
+            --ef: #00e5ff;
+            --eafc: #ff1a5e;
+            --red-live: #ff1a1a;
+            --bg: #080c14;
+            --surface: #0f1623;
+            --card: #111827;
+            --border: #1e2d45;
+            --text: #f0f4ff;
+            --muted: #6b7a99;
         }
-        
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); text-align: center; }
-        
-        nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
-        nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
-        nav a:hover, nav a.active { background-color: var(--red-live); color: #fff; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        h1, h2, h3, h4 { font-family: 'Rajdhani', sans-serif; }
 
-        header { padding: 40px 20px 20px 20px; background: linear-gradient(180deg, #1a0000 0%, transparent 100%); }
-        h1 { font-size: 2.5rem; margin-bottom: 5px; text-transform: uppercase; }
-        
-        .live-badge { background-color: var(--red-live); color: white; padding: 4px 10px; border-radius: 5px; font-size: 1rem; vertical-align: middle; margin-left: 10px; animation: pulse 2s infinite; display: inline-block; }
-        @keyframes pulse { 0% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 0, 51, 0.7); } 70% { opacity: 0.8; box-shadow: 0 0 0 10px rgba(255, 0, 51, 0); } 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 0, 51, 0); } }
+        nav { background: rgba(8,12,20,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+        .nav-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--text); text-decoration: none; letter-spacing: 1px; }
+        .nav-brand span { color: var(--primary); }
+        .nav-links { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 8px 14px; border-radius: 6px; transition: all 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface); }
+        .nav-tv { color: #ff1a1a !important; border: 1px solid rgba(255,26,26,0.3); }
+        .nav-tv.active, .nav-tv:hover { background: rgba(255,26,26,0.1) !important; }
 
-        .video-container { max-width: 900px; margin: 30px auto; padding: 20px; background-color: var(--card-bg); border: 1px solid #2a3553; border-radius: 10px; box-shadow: 0 0 25px rgba(255, 0, 51, 0.15); }
-        .iframe-wrapper { position: relative; padding-bottom: 56.25%; /* 16:9 ratio for standard video */ height: 0; overflow: hidden; border-radius: 8px; background-color: #000; }
-        .iframe-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .page-hero { padding: 64px 32px 48px; background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(255,26,26,0.06) 0%, transparent 70%); border-bottom: 1px solid var(--border); text-align: center; }
+        .live-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--red-live); background: rgba(255,26,26,0.12); border: 1px solid rgba(255,26,26,0.3); padding: 5px 14px; border-radius: 100px; margin-bottom: 16px; }
+        .live-dot { width: 7px; height: 7px; background: var(--red-live); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,26,26,0.5); } 50% { opacity: 0.7; box-shadow: 0 0 0 5px rgba(255,26,26,0); } }
+        .page-hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .page-hero h1 span { color: var(--red-live); }
+        .page-hero p { color: var(--muted); margin-top: 10px; font-size: 0.95rem; max-width: 500px; margin-left: auto; margin-right: auto; }
 
-        .schedule-board { max-width: 800px; margin: 50px auto; text-align: left; padding: 0 20px 50px 20px; }
-        .schedule-board h2 { border-bottom: 2px solid #2a3553; padding-bottom: 10px; color: var(--text-main); text-transform: uppercase; font-size: 1.5rem; }
-        
-        .match-row { display: flex; justify-content: space-between; align-items: center; background-color: var(--card-bg); padding: 15px 20px; margin-bottom: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .match-row.efootball { border-left-color: var(--efootball-color); }
-        .match-row.eafc { border-left-color: var(--eafc-color); }
-        
-        .match-info strong { font-size: 1.1rem; color: #fff; display: block; margin-bottom: 4px; }
-        .match-info span { font-size: 0.9rem; color: var(--text-muted); }
-        .match-time { color: var(--primary-color); font-weight: bold; font-size: 1rem; text-align: right; }
+        .section { padding: 56px 32px; max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px; }
+        .section-heading { font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 20px; }
 
-        footer { padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid #2a3553; }
+        .video-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 0 40px rgba(255,26,26,0.06); }
+        .video-card-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .video-card-header h2 { font-size: 1.1rem; font-weight: 600; }
+        .live-indicator { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 600; color: var(--red-live); letter-spacing: 1px; text-transform: uppercase; }
+        .live-indicator-dot { width: 7px; height: 7px; background: var(--red-live); border-radius: 50%; animation: pulse 2s infinite; }
+        .video-frame-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; }
+        .video-frame-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .video-note { padding: 14px 24px; font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--border); }
+
+        .schedule-list { display: flex; flex-direction: column; gap: 12px; }
+        .match-row { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; overflow: hidden; transition: all 0.2s; }
+        .match-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: 10px 0 0 10px; }
+        .match-row.dls::before { background: var(--primary); }
+        .match-row.ef::before { background: var(--ef); }
+        .match-row.eafc::before { background: var(--eafc); }
+        .match-row:hover { border-color: #2a3f60; }
+        .match-info-event { font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+        .match-info-title { font-family: 'Rajdhani', sans-serif; font-size: 1.05rem; font-weight: 600; }
+        .match-info-teams { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+        .match-time { font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+
+        footer { background: var(--surface); border-top: 1px solid var(--border); padding: 40px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .footer-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; }
+        .footer-brand span { color: var(--primary); }
+        .footer-copy { color: var(--muted); font-size: 0.85rem; }
+
+        @media (max-width: 640px) {
+            nav { padding: 0 16px; }
+            .nav-links a { padding: 6px 9px; font-size: 0.78rem; }
+            .page-hero { padding: 48px 16px 36px; }
+            .section { padding: 40px 16px; }
+            .match-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+            footer { flex-direction: column; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <a href="index.html">Hub</a>
-        <a href="dls-arena.html">DLS Arena</a>
-        <a href="efootball.html">eFootball Arena</a>
-        <a href="eafc.html">EA FC Arena</a>
-        <a href="hall-of-fame.html">Hall of Fame</a>
-        <a href="tv.html">🔴 TV</a>
+        <a href="index.html" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+        <div class="nav-links">
+            <a href="index.html">Hub</a>
+            <a href="dls-arena.html">DLS Arena</a>
+            <a href="efootball.html">eFootball</a>
+            <a href="eafc.html">EA FC</a>
+            <a href="hall-of-fame.html">Hall of Fame</a>
+            <a href="tv.html" class="nav-tv active">&#9679; TV</a>
+        </div>
     </nav>
 
-    <header>
-        <h1>Unclescar <span style="color: var(--red-live);">TV</span> <span class="live-badge">LIVE</span></h1>
-        <p style="color: var(--text-muted); max-width: 600px; margin: 10px auto 0 auto;">The main stage. Watch the biggest rivalries and Grand Finals unfold in real-time.</p>
-    </header>
-
-    <div class="video-container">
-        <div class="iframe-wrapper">
-            <iframe id="broadcast-frame" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0" title="Unclescar TV Broadcast" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-        <p style="margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">Want to be on the main broadcast? Stream your Grand Final match and send the YouTube/Twitch link to the Admin.</p>
+    <div class="page-hero">
+        <div class="live-badge"><span class="live-dot"></span> Broadcasting</div>
+        <h1>Unclescar <span>TV</span></h1>
+        <p>The main stage. Watch the biggest rivalries and Grand Finals unfold in real-time.</p>
     </div>
 
-    <div class="schedule-board">
-        <h2>Broadcast Schedule</h2>
-        
-        <div class="match-row">
-            <div class="match-info">
-                <strong>DLS Academy - Grand Final</strong>
-                <span>TBD vs TBD</span>
+    <div class="section">
+
+        <div>
+            <div class="video-card">
+                <div class="video-card-header">
+                    <h2>Main Broadcast</h2>
+                    <div class="live-indicator"><span class="live-indicator-dot"></span> Live</div>
+                </div>
+                <div class="video-frame-wrapper">
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0" title="Unclescar TV Broadcast" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <p class="video-note">Want to be on the main broadcast? Stream your Grand Final match and send the YouTube/Twitch link to the Admin.</p>
             </div>
-            <div class="match-time">Coming Soon</div>
         </div>
 
-        <div class="match-row efootball">
-            <div class="match-info">
-                <strong>eFootball Launch Cup - Final</strong>
-                <span>TBD vs TBD</span>
+        <div>
+            <h2 class="section-heading">Broadcast Schedule</h2>
+            <div class="schedule-list">
+                <div class="match-row dls">
+                    <div>
+                        <div class="match-info-event">DLS Arena</div>
+                        <div class="match-info-title">Academy Cup &mdash; Grand Final</div>
+                        <div class="match-info-teams">TBD vs TBD</div>
+                    </div>
+                    <div class="match-time">Coming Soon</div>
+                </div>
+                <div class="match-row ef">
+                    <div>
+                        <div class="match-info-event">eFootball Arena</div>
+                        <div class="match-info-title">Launch Cup &mdash; Final</div>
+                        <div class="match-info-teams">TBD vs TBD</div>
+                    </div>
+                    <div class="match-time">Coming Soon</div>
+                </div>
             </div>
-            <div class="match-time">Coming Soon</div>
         </div>
-        
+
     </div>
 
     <footer>
-        <p>&copy; 2026 Unclescar Studios. Broadcasting live.</p>
+        <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
+        <span class="footer-copy">&copy; 2026 Unclescar Studios. Broadcasting live.</span>
     </footer>
 
 </body>

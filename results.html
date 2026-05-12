@@ -3,78 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uncle Scar Studio | Match Results</title>
+    <title>Submit Match Result | Unclescar Studios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0d1117;
-            color: #c9d1d9;
-            padding: 20px;
-            max-width: 500px;
-            margin: auto;
+        :root {
+            --primary: #00e676;
+            --primary-dim: rgba(0,230,118,0.12);
+            --bg: #080c14;
+            --surface: #0f1623;
+            --card: #111827;
+            --border: #1e2d45;
+            --text: #f0f4ff;
+            --muted: #6b7a99;
+            --input-bg: #0a0f1a;
         }
-        .form-container {
-            background: #161b22;
-            padding: 25px;
-            border-radius: 10px;
-            border-left: 5px solid #00f2fe;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        h2 { text-align: center; color: white; margin-bottom: 5px; }
-        label { font-weight: bold; display: block; margin-top: 15px; color: #8b949e; }
-        input[type="text"], input[type="number"], input[type="file"] {
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 16px; }
+        h1, h2, h3 { font-family: 'Rajdhani', sans-serif; }
+
+        .form-wrapper { width: 100%; max-width: 520px; }
+        .form-header { text-align: center; margin-bottom: 32px; }
+        .form-eyebrow { display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--primary); background: var(--primary-dim); border: 1px solid rgba(0,230,118,0.25); padding: 5px 14px; border-radius: 100px; margin-bottom: 14px; }
+        .form-header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: 1px; }
+        .form-header p { color: var(--muted); font-size: 0.9rem; margin-top: 8px; line-height: 1.5; }
+
+        .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 40px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+        input[type="text"],
+        input[type="number"],
+        input[type="file"] {
             width: 100%;
-            padding: 12px;
-            margin-top: 8px;
-            border-radius: 5px;
-            border: 1px solid #30363d;
-            background-color: #0d1117;
-            color: white;
-            box-sizing: border-box;
+            padding: 12px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
         }
+        input[type="text"]:focus,
+        input[type="number"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,230,118,0.1); }
+        input[type="file"] { padding: 10px 16px; cursor: pointer; }
+
+        .score-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
         .submit-btn {
-            background-color: #00f2fe;
-            color: #000;
-            font-weight: bold;
-            padding: 15px;
             width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            background: var(--primary);
+            color: #000;
             border: none;
-            border-radius: 5px;
-            margin-top: 25px;
+            border-radius: 8px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             cursor: pointer;
-            font-size: 16px;
+            transition: all 0.2s;
+            box-shadow: 0 0 20px rgba(0,230,118,0.2);
         }
+        .submit-btn:hover { background: #33ed91; transform: translateY(-1px); box-shadow: 0 4px 24px rgba(0,230,118,0.3); }
+
+        .back-link { display: block; text-align: center; margin-top: 20px; color: var(--muted); font-size: 0.85rem; text-decoration: none; }
+        .back-link:hover { color: var(--text); }
     </style>
 </head>
 <body>
 
-    <div class="form-container">
-        <h2>📸 Submit Match Result</h2>
-        <p style="text-align:center; font-size:14px; margin-bottom: 20px;">Upload your final score and screenshot for verification.</p>
+    <div class="form-wrapper">
+        <div class="form-header">
+            <div class="form-eyebrow">Match Verification</div>
+            <h1>Submit Result</h1>
+            <p>Upload your final score and proof screenshot for admin verification.</p>
+        </div>
 
-        <form action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data">
-            
-            <input type="hidden" name="access_key" value="d871e97e-7d62-47be-961d-da243d66ef57">
+        <div class="form-card">
+            <form action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="access_key" value="d871e97e-7d62-47be-961d-da243d66ef57">
+                <input type="hidden" name="redirect" value="https://unclescar3-hub.github.io/dls-tournament/">
 
-            <label for="matchCode">Match Code / Fixture (e.g., Round 1):</label>
-            <input type="text" id="matchCode" name="Match_Code" required>
+                <div class="form-group">
+                    <label for="matchCode">Match Code / Fixture</label>
+                    <input type="text" id="matchCode" name="Match_Code" placeholder="e.g. Round 1, Quarter-Final" required>
+                </div>
 
-            <label for="playerName">Your Name / Tag:</label>
-            <input type="text" id="playerName" name="Player_Name" required>
+                <div class="form-group">
+                    <label for="playerName">Your Name / Tag</label>
+                    <input type="text" id="playerName" name="Player_Name" placeholder="Your in-game username" required>
+                </div>
 
-            <label for="myScore">Your Score:</label>
-            <input type="number" id="myScore" name="My_Score" required>
+                <div class="score-row">
+                    <div class="form-group">
+                        <label for="myScore">Your Score</label>
+                        <input type="number" id="myScore" name="My_Score" placeholder="0" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="opponentScore">Opponent's Score</label>
+                        <input type="number" id="opponentScore" name="Opponent_Score" placeholder="0" min="0" required>
+                    </div>
+                </div>
 
-            <label for="opponentScore">Opponent's Score:</label>
-            <input type="number" id="opponentScore" name="Opponent_Score" required>
+                <div class="form-group">
+                    <label for="screenshot">Match Screenshot</label>
+                    <input type="file" id="screenshot" name="Screenshot" accept="image/png,image/jpeg" required>
+                </div>
 
-            <label for="screenshot">Upload Match Screenshot:</label>
-            <input type="file" id="screenshot" name="Screenshot" accept="image/png, image/jpeg" required>
+                <button type="submit" class="submit-btn">Send to Admin</button>
+            </form>
+        </div>
 
-            <input type="hidden" name="redirect" value="https://unclescar3-hub.github.io/dls-tournament/">
-
-            <button type="submit" class="submit-btn">SEND TO ADMIN</button>
-        </form>
+        <a href="index.html" class="back-link">&#8592; Back to Hub</a>
     </div>
 
 </body>

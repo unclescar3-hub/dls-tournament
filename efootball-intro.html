@@ -4,92 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eFootball Proving Grounds | Unclescar Studios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --bg-color: #0b0f19;
-            --card-bg: #1a2235; 
-            --text-main: #ffffff; 
-            --text-muted: #8892b0; 
-            --gold: #ffd700;
-            --efootball-blue: #00e5ff;
-            --action-blue: #00aaff;
+        :root {
+            --primary: #00e676;
+            --ef: #00e5ff;
+            --ef-dim: rgba(0,229,255,0.12);
+            --action-blue: #3b82f6;
+            --action-blue-dim: rgba(59,130,246,0.12);
+            --bg: #080c14;
+            --surface: #0f1623;
+            --card: #111827;
+            --border: #1e2d45;
+            --text: #f0f4ff;
+            --muted: #6b7a99;
         }
-        
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
-        nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
-        nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
-        nav a:hover, nav a.active { background-color: var(--efootball-blue); color: #000; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        h1, h2, h3, h4 { font-family: 'Rajdhani', sans-serif; }
 
-        header { text-align: center; padding: 50px 20px; background: linear-gradient(180deg, #001a22 0%, transparent 100%); border-bottom: 1px solid #2a3553; }
-        h1 { font-size: 2.5rem; margin-bottom: 10px; color: #fff; text-transform: uppercase; }
-        .subtitle { color: var(--efootball-blue); font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        nav { background: rgba(8,12,20,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+        .nav-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--text); text-decoration: none; letter-spacing: 1px; }
+        .nav-brand span { color: var(--primary); }
+        .nav-links { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 8px 14px; border-radius: 6px; transition: all 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface); }
+        .nav-tv { color: #ff1a1a !important; border: 1px solid rgba(255,26,26,0.3); }
+        .nav-tv:hover { background: rgba(255,26,26,0.1) !important; }
 
-        .content-container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-        
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
-        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
-        
-        .info-card { background-color: var(--card-bg); border-left: 4px solid var(--efootball-blue); padding: 25px; border-radius: 0 8px 8px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .info-card h2 { margin-top: 0; color: #fff; font-size: 1.3rem; border-bottom: 1px solid #2a3553; padding-bottom: 10px; }
-        .info-card ul { padding-left: 20px; color: var(--text-muted); font-size: 0.9rem; }
-        .info-card li { margin-bottom: 8px; }
+        .page-hero { padding: 64px 32px 48px; background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(0,229,255,0.06) 0%, transparent 70%); border-bottom: 1px solid var(--border); text-align: center; }
+        .hero-eyebrow { display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--ef); background: var(--ef-dim); border: 1px solid rgba(0,229,255,0.25); padding: 5px 14px; border-radius: 100px; margin-bottom: 16px; }
+        .page-hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .page-hero p { color: var(--muted); margin-top: 10px; font-size: 0.95rem; }
 
-        .action-card { background-color: #05070a; border: 1px solid #2a3553; padding: 25px; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; gap: 15px; }
-        
-        .btn { padding: 15px; text-decoration: none; border-radius: 8px; font-weight: bold; text-align: center; text-transform: uppercase; transition: 0.3s; display: block; }
-        .btn-pay { background-color: var(--efootball-blue); color: #000; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3); }
-        .btn-pay:hover { background-color: #fff; transform: scale(1.02); }
-        .btn-submit { background-color: transparent; color: var(--action-blue); border: 2px solid var(--action-blue); }
-        .btn-submit:hover { background-color: var(--action-blue); color: #000; }
+        .section { padding: 56px 32px; max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
 
-        .table-title { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
-        .table-title h2 { margin: 0; font-size: 1.8rem; color: #fff; }
-        .table-title span { color: var(--text-muted); font-size: 0.9rem; }
+        .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        @media (max-width: 700px) { .top-grid { grid-template-columns: 1fr; } }
 
-        .challonge-container { width: 100%; overflow: hidden; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid #2a3553; background-color: var(--card-bg); }
+        .info-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .info-card-header { padding: 18px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+        .info-card-header h2 { font-size: 1.1rem; font-weight: 700; }
+        .accent-bar { width: 4px; height: 24px; border-radius: 2px; flex-shrink: 0; }
+        .info-card-body { padding: 24px 28px; }
+        .info-card-body ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .info-card-body li { color: var(--muted); font-size: 0.88rem; line-height: 1.6; padding-left: 20px; position: relative; }
+        .info-card-body li::before { content: '—'; position: absolute; left: 0; color: var(--border); }
+        .info-card-body li strong { color: var(--text); }
+
+        .action-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+        .action-card p { font-size: 0.85rem; color: var(--muted); text-align: center; }
+
+        .btn { display: block; padding: 14px 20px; border-radius: 8px; font-weight: 600; font-size: 0.875rem; text-align: center; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+        .btn-pay { background: var(--ef); color: #000; box-shadow: 0 0 16px rgba(0,229,255,0.2); }
+        .btn-pay:hover { background: #40eaff; transform: translateY(-1px); }
+        .btn-submit { background: transparent; color: var(--action-blue); border: 1.5px solid var(--action-blue); }
+        .btn-submit:hover { background: var(--action-blue); color: #fff; }
+
+        .standings-section h2 { font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 6px; }
+        .standings-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; }
+        .bracket-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .bracket-frame { height: 600px; background: #fff; }
+        .bracket-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+        footer { background: var(--surface); border-top: 1px solid var(--border); padding: 40px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+        .footer-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; }
+        .footer-brand span { color: var(--primary); }
+        .footer-copy { color: var(--muted); font-size: 0.85rem; }
+
+        @media (max-width: 640px) {
+            nav { padding: 0 16px; }
+            .nav-links a { padding: 6px 9px; font-size: 0.78rem; }
+            .page-hero { padding: 48px 16px 36px; }
+            .section { padding: 40px 16px; }
+            .info-card-header, .info-card-body { padding: 16px 20px; }
+            .bracket-frame { height: 450px; }
+            footer { flex-direction: column; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <a href="index.html">Hub</a>
-        <a href="dls-arena.html">DLS Arena</a>
-        <a href="efootball.html" class="active">eFootball Arena</a>
-        <a href="eafc.html">EA FC Arena</a>
-        <a href="hall-of-fame.html">Hall of Fame</a>
+        <a href="index.html" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+        <div class="nav-links">
+            <a href="index.html">Hub</a>
+            <a href="dls-arena.html">DLS Arena</a>
+            <a href="efootball.html" class="active">eFootball</a>
+            <a href="eafc.html">EA FC</a>
+            <a href="hall-of-fame.html">Hall of Fame</a>
+            <a href="tv.html" class="nav-tv">&#9679; TV</a>
+        </div>
     </nav>
 
-    <header>
+    <div class="page-hero">
+        <div class="hero-eyebrow">eFootball Arena &mdash; Entry Level</div>
         <h1>eFootball Proving Grounds</h1>
-        <p class="subtitle">The Konami Intro Division</p>
-    </header>
+        <p>The Konami Intro Division &mdash; &#8358;200 open ladder.</p>
+    </div>
 
-    <div class="content-container">
-        
-        <div class="dashboard-grid">
+    <div class="section">
+
+        <div class="top-grid">
             <div class="info-card">
-                <h2>📜 Division Rules</h2>
-                <ul>
-                    <li><strong>Entry Fee:</strong> ₦200 (One-time season pass).</li>
-                    <li><strong>Format:</strong> 32-Player Open Ladder.</li>
-                    <li><strong>The Prize:</strong> Top 3 players earn a FREE ticket to the ₦1,500 eFootball Launch Cup.</li>
-                    <li><strong>Matchmaking:</strong> Challenge anyone on the table. Win = +3 Pts, Draw = +1 Pt.</li>
-                </ul>
+                <div class="info-card-header">
+                    <div class="accent-bar" style="background: var(--ef);"></div>
+                    <h2>Division Rules</h2>
+                </div>
+                <div class="info-card-body">
+                    <ul>
+                        <li><strong>Entry Fee:</strong> &#8358;200 (One-time season pass).</li>
+                        <li><strong>Format:</strong> 32-Player Open Ladder.</li>
+                        <li><strong>The Prize:</strong> Top 3 players earn a FREE ticket to the &#8358;1,500 eFootball Launch Cup.</li>
+                        <li><strong>Matchmaking:</strong> Challenge anyone on the table. Win = +3 Pts, Draw = +1 Pt.</li>
+                    </ul>
+                </div>
             </div>
             <div class="action-card">
-                <a href="https://paystack.shop/pay/eFootballProvinggrounds" class="btn btn-pay">Pay ₦200 & Enter Ladder</a>
-                <a href="YOUR_EFOOTBALL_CHALLONGE_LINK_HERE" target="_blank" class="btn-submit">📸 Submit Match Result</a>
+                <a href="https://paystack.shop/pay/eFootballProvinggrounds" class="btn btn-pay">Pay &#8358;200 &amp; Enter Ladder</a>
+                <a href="YOUR_EFOOTBALL_CHALLONGE_LINK_HERE" target="_blank" class="btn btn-submit">Submit Match Result</a>
+                <p>After paying, join the WhatsApp group via the Paystack confirmation page.</p>
             </div>
         </div>
 
-        <div class="table-title">
+        <div class="standings-section">
             <h2>Live Standings</h2>
-            <span>Powered by Challonge</span>
+            <p class="standings-label">Powered by Challonge</p>
+            <div class="bracket-box">
+                <div class="bracket-frame">
+                    <iframe src="YOUR_EFOOTBALL_CHALLONGE_LINK_HERE/module" scrolling="auto" allowtransparency="true"></iframe>
+                </div>
+            </div>
         </div>
-        
-        <div class="challonge-container">
-            <iframe src="YOUR_EFOOTBALL_CHALLONGE_LINK_HERE/module" width="100%" height="600" frameborder="0" scrolling="auto" allowtransparency="true"></iframe>
-        </div>
+
     </div>
+
+    <footer>
+        <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
+        <span class="footer-copy">&copy; 2026 Unclescar Studios. All rights reserved.</span>
+    </footer>
+
 </body>
 </html>

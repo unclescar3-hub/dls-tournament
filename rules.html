@@ -4,92 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Official Rulebook | Unclescar Studios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary-color: #00ff88; 
-            --bg-color: #0b0f19; 
-            --card-bg: #1a2235; 
-            --text-main: #ffffff; 
-            --text-muted: #8892b0; 
+        :root {
+            --primary: #00e676;
+            --primary-dim: rgba(0,230,118,0.12);
+            --ef: #00e5ff;
+            --gold: #ffc107;
+            --gold-dim: rgba(255,193,7,0.12);
             --danger: #ff4444;
+            --danger-dim: rgba(255,68,68,0.12);
+            --bg: #080c14;
+            --surface: #0f1623;
+            --card: #111827;
+            --border: #1e2d45;
+            --text: #f0f4ff;
+            --muted: #6b7a99;
         }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
-        
-        nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
-        nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
-        nav a:hover, nav a.active { background-color: var(--danger); color: #fff; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        h1, h2, h3, h4 { font-family: 'Rajdhani', sans-serif; }
 
-        header { text-align: center; padding: 50px 20px; background: linear-gradient(180deg, #220b0b 0%, transparent 100%); border-bottom: 1px solid #2a3553; }
-        h1 { font-size: 2.5rem; margin-bottom: 10px; color: #fff; text-transform: uppercase; }
-        .subtitle { color: var(--danger); font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        nav { background: rgba(8,12,20,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+        .nav-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--text); text-decoration: none; letter-spacing: 1px; }
+        .nav-brand span { color: var(--primary); }
+        .nav-links { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 8px 14px; border-radius: 6px; transition: all 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface); }
+        .nav-tv { color: #ff1a1a !important; border: 1px solid rgba(255,26,26,0.3); }
+        .nav-tv:hover { background: rgba(255,26,26,0.1) !important; }
 
-        .content-container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-        
-        .rule-section { background-color: var(--card-bg); border-left: 4px solid var(--danger); padding: 25px; margin-bottom: 30px; border-radius: 0 8px 8px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .rule-section h2 { margin-top: 0; color: #fff; font-size: 1.5rem; border-bottom: 1px solid #2a3553; padding-bottom: 10px; }
-        .rule-section p, .rule-section ul { color: var(--text-muted); }
-        .rule-section ul { padding-left: 20px; }
-        .rule-section li { margin-bottom: 15px; }
-        .rule-section strong { color: var(--text-main); }
+        .page-hero { padding: 64px 32px 48px; background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(255,68,68,0.05) 0%, transparent 70%); border-bottom: 1px solid var(--border); text-align: center; }
+        .hero-eyebrow { display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--danger); background: var(--danger-dim); border: 1px solid rgba(255,68,68,0.25); padding: 5px 14px; border-radius: 100px; margin-bottom: 16px; }
+        .page-hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .page-hero p { color: var(--muted); margin-top: 10px; font-size: 0.95rem; }
 
-        footer { text-align: center; padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid #2a3553; margin-top: 50px; }
+        .section { padding: 56px 32px; max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+        .rule-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .rule-card-header { padding: 20px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
+        .rule-number { font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--muted); }
+        .rule-card-header h2 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.5px; }
+        .accent-bar { width: 4px; height: 28px; border-radius: 2px; flex-shrink: 0; }
+        .rule-card-body { padding: 24px 28px; }
+        .rule-card-body p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 16px; }
+        .rule-card-body p:last-child { margin-bottom: 0; }
+        .rule-card-body ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+        .rule-card-body li { color: var(--muted); font-size: 0.9rem; line-height: 1.6; padding-left: 20px; position: relative; }
+        .rule-card-body li::before { content: '—'; position: absolute; left: 0; color: var(--border); }
+        .rule-card-body li strong { color: var(--text); }
+
+        footer { background: var(--surface); border-top: 1px solid var(--border); padding: 40px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .footer-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; }
+        .footer-brand span { color: var(--primary); }
+        .footer-copy { color: var(--muted); font-size: 0.85rem; }
+
+        @media (max-width: 640px) {
+            nav { padding: 0 16px; }
+            .nav-links a { padding: 6px 9px; font-size: 0.78rem; }
+            .page-hero { padding: 48px 16px 36px; }
+            .section { padding: 40px 16px; }
+            .rule-card-header, .rule-card-body { padding: 16px 20px; }
+            footer { flex-direction: column; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <a href="index.html">Hub</a>
-        <a href="dls-arena.html">DLS Arena</a>
-        <a href="efootball.html">eFootball Arena</a>
-        <a href="eafc.html">EA FC Arena</a>
-        <a href="hall-of-fame.html">Hall of Fame</a>
-        <a href="tv.html">🔴 TV</a>
+        <a href="index.html" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+        <div class="nav-links">
+            <a href="index.html">Hub</a>
+            <a href="dls-arena.html">DLS Arena</a>
+            <a href="efootball.html">eFootball</a>
+            <a href="eafc.html">EA FC</a>
+            <a href="hall-of-fame.html">Hall of Fame</a>
+            <a href="tv.html" class="nav-tv">&#9679; TV</a>
+        </div>
     </nav>
 
-    <header>
+    <div class="page-hero">
+        <div class="hero-eyebrow">Platform Regulations</div>
         <h1>Official Rulebook</h1>
-        <p class="subtitle">Terms, Conditions & Anti-Cheat Protocol</p>
-    </header>
+        <p>Terms, Conditions &amp; Anti-Cheat Protocol</p>
+    </div>
 
-    <div class="content-container">
-        
-        <div class="rule-section" style="border-left-color: var(--primary-color);">
-            <h2>1. The "No Scammer" Match Protocol</h2>
-            <p>To protect the integrity of Unclescar Tournaments and ensure payouts go to the true winners, the following proof-of-win rules are strictly enforced:</p>
-            <ul>
-                <li><strong>Video Proof is Mandatory:</strong> Screenshots can be faked in minutes. The winning player MUST take a 5 to 10-second screen recording of the final match stats showing both usernames clearly.</li>
-                <li><strong>Dispute Resolution:</strong> If a match result is contested and neither player can provide video proof, both players will be disqualified, or the Admin may force a rematch at their discretion.</li>
-                <li><strong>The Admin is Final:</strong> The Tournament Admin holds the absolute final say in all disputes, disqualifications, and rulings. Arguing with the Admin after a final ruling will result in a permanent ban from the platform.</li>
-            </ul>
+    <div class="section">
+
+        <div class="rule-card">
+            <div class="rule-card-header">
+                <div class="accent-bar" style="background: var(--primary);"></div>
+                <span class="rule-number">01</span>
+                <h2>The "No Scammer" Match Protocol</h2>
+            </div>
+            <div class="rule-card-body">
+                <p>To protect the integrity of Unclescar Tournaments and ensure payouts go to the true winners, the following proof-of-win rules are strictly enforced:</p>
+                <ul>
+                    <li><strong>Video Proof is Mandatory.</strong> Screenshots can be faked in minutes. The winning player MUST take a 5 to 10-second screen recording of the final match stats showing both usernames clearly.</li>
+                    <li><strong>Dispute Resolution.</strong> If a match result is contested and neither player can provide video proof, both players will be disqualified, or the Admin may force a rematch at their discretion.</li>
+                    <li><strong>The Admin is Final.</strong> The Tournament Admin holds the absolute final say in all disputes, disqualifications, and rulings. Arguing with the Admin after a final ruling will result in a permanent ban from the platform.</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="rule-section" style="border-left-color: #ffd700;">
-            <h2>2. Payments & Refunds</h2>
-            <ul>
-                <li><strong>Strictly No Refunds:</strong> All entry fees are 100% final. Once the bracket has been generated and your name is on it, no refunds will be issued for no-shows, lag, or connection issues.</li>
-                <li><strong>Skill-Based Competition:</strong> Unclescar Tournaments are competitive eSports events based entirely on player skill. This is a tournament of ability, not gambling, betting, or a game of chance.</li>
-                <li><strong>Prize Payouts:</strong> Payouts are sent directly to the winner's designated bank account within 24 hours of the tournament's conclusion and verification of results.</li>
-            </ul>
+        <div class="rule-card">
+            <div class="rule-card-header">
+                <div class="accent-bar" style="background: var(--gold);"></div>
+                <span class="rule-number">02</span>
+                <h2>Payments &amp; Refunds</h2>
+            </div>
+            <div class="rule-card-body">
+                <ul>
+                    <li><strong>Strictly No Refunds.</strong> All entry fees are 100% final. Once the bracket has been generated and your name is on it, no refunds will be issued for no-shows, lag, or connection issues.</li>
+                    <li><strong>Skill-Based Competition.</strong> Unclescar Tournaments are competitive eSports events based entirely on player skill. This is a tournament of ability, not gambling, betting, or a game of chance.</li>
+                    <li><strong>Prize Payouts.</strong> Payouts are sent directly to the winner's designated bank account within 24 hours of the tournament's conclusion and verification of results.</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="rule-section" style="border-left-color: #00e5ff;">
-            <h2>3. Connection & Lag</h2>
-            <ul>
-                <li>It is the sole responsibility of the player to ensure a stable internet connection before entering a match.</li>
-                <li>If a player disconnects during a match, it counts as an automatic forfeit (3-0 loss) unless both players agree to a rematch. Proof of agreement must be submitted to the Admin.</li>
-            </ul>
+        <div class="rule-card">
+            <div class="rule-card-header">
+                <div class="accent-bar" style="background: var(--ef);"></div>
+                <span class="rule-number">03</span>
+                <h2>Connection &amp; Lag</h2>
+            </div>
+            <div class="rule-card-body">
+                <ul>
+                    <li>It is the sole responsibility of the player to ensure a stable internet connection before entering a match.</li>
+                    <li>If a player disconnects during a match, it counts as an automatic forfeit (3-0 loss) unless both players agree to a rematch. Proof of agreement must be submitted to the Admin.</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="rule-section" style="border-left-color: var(--danger);">
-            <h2>4. Legal Disclaimer & Copyright</h2>
-            <p><strong>Independent Organizer:</strong> Unclescar Studios is an independent, grassroots eSports tournament organizer. We are strictly <strong>NOT affiliated with, sponsored by, or endorsed by First Touch Games (creators of Dream League Soccer), Konami (creators of eFootball), or Electronic Arts (creators of EA Sports FC).</strong></p>
-            <p>All game titles, names, logos, and brands are the property of their respective trademark owners. Entry fees go entirely toward tournament administration, web server hosting, and guaranteed player prize pools.</p>
+        <div class="rule-card">
+            <div class="rule-card-header">
+                <div class="accent-bar" style="background: var(--danger);"></div>
+                <span class="rule-number">04</span>
+                <h2>Legal Disclaimer &amp; Copyright</h2>
+            </div>
+            <div class="rule-card-body">
+                <p><strong>Independent Organizer:</strong> Unclescar Studios is an independent, grassroots eSports tournament organizer. We are strictly <strong>NOT affiliated with, sponsored by, or endorsed by First Touch Games (creators of Dream League Soccer), Konami (creators of eFootball), or Electronic Arts (creators of EA Sports FC).</strong></p>
+                <p>All game titles, names, logos, and brands are the property of their respective trademark owners. Entry fees go entirely toward tournament administration, web server hosting, and guaranteed player prize pools.</p>
+            </div>
         </div>
 
     </div>
 
     <footer>
-        <p>&copy; 2026 Unclescar Studios. All rights reserved.</p>
+        <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
+        <span class="footer-copy">&copy; 2026 Unclescar Studios. All rights reserved.</span>
     </footer>
 
 </body>

@@ -4,107 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DLS Academy | Unclescar Studios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary-color: #00ff88; 
-            --bg-color: #0b0f19; 
-            --card-bg: #1a2235; 
-            --text-main: #ffffff; 
-            --text-muted: #8892b0; 
-            --gold: #ffd700;
+        :root {
+            --primary: #00e676;
+            --primary-dim: rgba(0,230,118,0.12);
+            --gold: #ffc107;
+            --gold-dim: rgba(255,193,7,0.14);
             --silver: #c0c0c0;
             --bronze: #cd7f32;
+            --bg: #080c14;
+            --surface: #0f1623;
+            --card: #111827;
+            --border: #1e2d45;
+            --text: #f0f4ff;
+            --muted: #6b7a99;
+            --danger: #ff4444;
         }
-        
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
-        
-        nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
-        nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
-        nav a:hover, nav a.active { background-color: var(--primary-color); color: #000; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        h1, h2, h3, h4 { font-family: 'Rajdhani', sans-serif; }
 
-        header { text-align: center; padding: 50px 20px; background: linear-gradient(180deg, #1a2235 0%, transparent 100%); border-bottom: 1px solid #2a3553; }
-        h1 { font-size: 2.5rem; margin-bottom: 10px; color: #fff; }
-        .subtitle { color: var(--primary-color); font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        nav { background: rgba(8,12,20,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+        .nav-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--text); text-decoration: none; letter-spacing: 1px; }
+        .nav-brand span { color: var(--primary); }
+        .nav-links { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 8px 14px; border-radius: 6px; transition: all 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface); }
+        .nav-tv { color: #ff1a1a !important; border: 1px solid rgba(255,26,26,0.3); }
+        .nav-tv:hover { background: rgba(255,26,26,0.1) !important; }
 
-        .content-container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-        
-        .info-card { background-color: var(--card-bg); border-left: 4px solid var(--primary-color); padding: 25px; margin-bottom: 30px; border-radius: 0 8px 8px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .info-card h2 { margin-top: 0; color: #fff; display: flex; align-items: center; gap: 10px; font-size: 1.5rem; border-bottom: 1px solid #2a3553; padding-bottom: 10px; }
-        .info-card ul { padding-left: 20px; color: var(--text-muted); }
-        .info-card li { margin-bottom: 10px; }
-        .info-card strong { color: var(--text-main); }
+        .page-hero { padding: 64px 32px 48px; background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(255,193,7,0.06) 0%, transparent 70%); border-bottom: 1px solid var(--border); text-align: center; }
+        .hero-eyebrow { display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); background: var(--gold-dim); border: 1px solid rgba(255,193,7,0.3); padding: 5px 14px; border-radius: 100px; margin-bottom: 16px; }
+        .page-hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .page-hero p { color: var(--muted); margin-top: 10px; font-size: 0.95rem; }
 
-        .prize-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .prize-card { background-color: #0b0f19; border: 1px solid #2a3553; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.2rem; font-weight: bold; display: flex; flex-direction: column; gap: 5px; }
-        
-        .bracket-container { background-color: #fff; border-radius: 8px; overflow: hidden; height: 500px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2); border: 2px solid var(--primary-color); }
-        
-        .pay-btn { background-color: var(--primary-color); color: #000; padding: 18px 30px; text-decoration: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; width: 100%; max-width: 400px; display: block; margin: 40px auto 10px auto; text-align: center; transition: 0.3s; text-transform: uppercase; box-shadow: 0 0 15px rgba(0, 255, 136, 0.4); }
-        .pay-btn:hover { background-color: #fff; transform: scale(1.05); }
+        .section { padding: 56px 32px; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
 
-        footer { text-align: center; padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid #2a3553; margin-top: 50px; }
+        .info-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .info-card-header { padding: 18px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+        .info-card-header h2 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.5px; }
+        .accent-bar { width: 4px; height: 24px; border-radius: 2px; flex-shrink: 0; }
+        .info-card-body { padding: 24px 28px; }
+        .info-card-body ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .info-card-body li { color: var(--muted); font-size: 0.9rem; line-height: 1.6; padding-left: 20px; position: relative; }
+        .info-card-body li::before { content: '—'; position: absolute; left: 0; color: var(--border); }
+        .info-card-body li strong { color: var(--text); }
+
+        .prize-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+        .prize-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; text-align: center; display: flex; flex-direction: column; gap: 6px; transition: all 0.2s; }
+        .prize-card:hover { border-color: #2a3f60; }
+        .prize-place { font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+        .prize-place.gold { color: var(--gold); }
+        .prize-place.silver { color: var(--silver); }
+        .prize-place.bronze { color: var(--bronze); }
+        .prize-amount { font-family: 'Rajdhani', sans-serif; font-size: 1.8rem; font-weight: 700; }
+        .prize-amount.gold { color: var(--gold); }
+        .prize-amount.silver { color: var(--silver); }
+        .prize-amount.bronze { color: var(--bronze); }
+        .prize-note { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: -8px; }
+
+        .bracket-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .bracket-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .bracket-header h3 { font-size: 1.1rem; font-weight: 600; }
+        .bracket-badge { font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; background: var(--gold-dim); color: var(--gold); }
+        .bracket-frame { height: 520px; background: #fff; }
+        .bracket-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+        .cta-block { text-align: center; padding: 8px 0 16px; }
+        .cta-btn { display: inline-block; padding: 16px 40px; background: var(--gold); color: #000; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; border-radius: 10px; transition: all 0.2s; box-shadow: 0 0 24px rgba(255,193,7,0.25); }
+        .cta-btn:hover { background: #ffd740; transform: translateY(-2px); box-shadow: 0 6px 32px rgba(255,193,7,0.35); }
+        .cta-note { color: var(--muted); font-size: 0.85rem; margin-top: 12px; }
+
+        footer { background: var(--surface); border-top: 1px solid var(--border); padding: 40px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .footer-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; }
+        .footer-brand span { color: var(--primary); }
+        .footer-copy { color: var(--muted); font-size: 0.85rem; }
+        .footer-link { color: var(--danger); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+
+        @media (max-width: 640px) {
+            nav { padding: 0 16px; }
+            .nav-links a { padding: 6px 9px; font-size: 0.78rem; }
+            .page-hero { padding: 48px 16px 36px; }
+            .section { padding: 40px 16px; }
+            .info-card-header, .info-card-body { padding: 16px 20px; }
+            .bracket-frame { height: 400px; }
+            footer { flex-direction: column; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <a href="index.html">Hub</a>
-        <a href="dls-arena.html" class="active">DLS Arena</a>
-        <a href="efootball.html">eFootball Arena</a>
-        <a href="eafc.html">EA FC Arena</a>
-        <a href="hall-of-fame.html">Hall of Fame</a>
-        <a href="tv.html">🔴 TV</a>
+        <a href="index.html" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+        <div class="nav-links">
+            <a href="index.html">Hub</a>
+            <a href="dls-arena.html" class="active">DLS Arena</a>
+            <a href="efootball.html">eFootball</a>
+            <a href="eafc.html">EA FC</a>
+            <a href="hall-of-fame.html">Hall of Fame</a>
+            <a href="tv.html" class="nav-tv">&#9679; TV</a>
+        </div>
     </nav>
 
-    <header>
+    <div class="page-hero">
+        <div class="hero-eyebrow">DLS Arena &mdash; Bracket Tournament</div>
         <h1>DLS Academy</h1>
-        <p class="subtitle">Daily Knockout Tournaments</p>
-    </header>
+        <p>Daily Knockout Tournaments &mdash; 32 players, one champion.</p>
+    </div>
 
-    <div class="content-container">
-        
-        <div class="info-card">
-            <h2>⚔️ Tournament Format</h2>
-            <ul>
-                <li><strong>Game:</strong> Dream League Soccer</li>
-                <li><strong>Format:</strong> 32-Player Single Elimination Bracket</li>
-                <li><strong>Entry Fee:</strong> ₦1,000 per player</li>
-                <li><strong>Match Rules:</strong> Standard DLS online friendly rules apply. The winner must post a screenshot of the final score in the official WhatsApp group.</li>
-            </ul>
-        </div>
+    <div class="section">
 
         <div class="info-card">
-            <h2>💰 The Prize Pool</h2>
-            <div class="prize-grid">
-                <div class="prize-card" style="color: var(--gold); border-color: var(--gold);">
-                    <span>1st Place 🥇</span>
-                    <span style="font-size: 1.5rem;">₦16,000</span>
-                </div>
-                <div class="prize-card" style="color: var(--silver);">
-                    <span>2nd Place 🥈</span>
-                    <span style="font-size: 1.5rem;">₦6,400</span>
-                </div>
-                <div class="prize-card" style="color: var(--bronze);">
-                    <span>3rd Place 🥉</span>
-                    <span style="font-size: 1.5rem;">₦3,200</span>
-                </div>
+            <div class="info-card-header">
+                <div class="accent-bar" style="background: var(--primary);"></div>
+                <h2>Tournament Format</h2>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 15px; font-style: italic; text-align: center;">*Displayed prize pool is guaranteed upon a full 32-player bracket.</p>
+            <div class="info-card-body">
+                <ul>
+                    <li><strong>Game:</strong> Dream League Soccer</li>
+                    <li><strong>Format:</strong> 32-Player Single Elimination Bracket</li>
+                    <li><strong>Entry Fee:</strong> &#8358;1,000 per player</li>
+                    <li><strong>Match Rules:</strong> Standard DLS online friendly rules apply. The winner must post a screenshot of the final score in the official WhatsApp group.</li>
+                </ul>
+            </div>
         </div>
 
-        <h2 style="color: #fff; text-align: center; margin-bottom: 15px;">📊 Live Bracket</h2>
-        <div class="bracket-container">
-            <iframe src="https://challonge.com/unclescaracademy1/module" width="100%" height="100%" frameborder="0" scrolling="auto" allowtransparency="true"></iframe>
+        <div class="info-card">
+            <div class="info-card-header">
+                <div class="accent-bar" style="background: var(--gold);"></div>
+                <h2>The Prize Pool</h2>
+            </div>
+            <div class="info-card-body">
+                <div class="prize-grid">
+                    <div class="prize-card">
+                        <span class="prize-place gold">1st Place</span>
+                        <span class="prize-amount gold">&#8358;16,000</span>
+                    </div>
+                    <div class="prize-card">
+                        <span class="prize-place silver">2nd Place</span>
+                        <span class="prize-amount silver">&#8358;6,400</span>
+                    </div>
+                    <div class="prize-card">
+                        <span class="prize-place bronze">3rd Place</span>
+                        <span class="prize-amount bronze">&#8358;3,200</span>
+                    </div>
+                </div>
+                <p class="prize-note" style="margin-top: 16px;">*Displayed prize pool is guaranteed upon a full 32-player bracket.</p>
+            </div>
         </div>
 
-        <a href="https://paystack.shop/pay/dlsacademy" class="pay-btn">PAY ₦1,000 ENTRY FEE</a>
-        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">Powered securely by Paystack. You will be redirected to the official locker room upon payment.</p>
+        <div class="bracket-box">
+            <div class="bracket-header">
+                <h3>Live Bracket</h3>
+                <span class="bracket-badge">Live via Challonge</span>
+            </div>
+            <div class="bracket-frame">
+                <iframe src="https://challonge.com/unclescaracademy1/module" scrolling="auto" allowtransparency="true"></iframe>
+            </div>
+        </div>
+
+        <div class="cta-block">
+            <a href="https://paystack.shop/pay/dlsacademy" class="cta-btn">Pay &#8358;1,000 Entry Fee</a>
+            <p class="cta-note">Powered securely by Paystack. You will be redirected to the official locker room upon payment.</p>
+        </div>
 
     </div>
 
     <footer>
-        <p>&copy; 2026 Unclescar Studios. All rights reserved.</p>
-        <p><a href="rules.html" style="color: var(--danger); text-decoration: none; font-weight: bold;">⚖️ Read Official Rulebook</a></p>
+        <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
+        <span class="footer-copy">&copy; 2026 Unclescar Studios. All rights reserved.</span>
+        <a href="rules.html" class="footer-link">Official Rulebook</a>
     </footer>
 
 </body>

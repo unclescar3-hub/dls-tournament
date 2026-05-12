@@ -4,126 +4,174 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hall of Fame | Unclescar Studios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary-color: #00ff88; 
-            --efootball-color: #00e5ff; 
-            --eafc-color: #ff0055; 
-            --bg-color: #0b0f19; 
-            --card-bg: #1a2235; 
-            --text-main: #ffffff; 
-            --text-muted: #8892b0; 
-            --gold: #ffd700; 
-            --silver: #c0c0c0; 
-            --bronze: #cd7f32; 
+        :root {
+            --primary: #00e676;
+            --primary-dim: rgba(0,230,118,0.12);
+            --ef: #00e5ff;
+            --ef-dim: rgba(0,229,255,0.12);
+            --eafc: #ff1a5e;
+            --eafc-dim: rgba(255,26,94,0.12);
+            --gold: #ffc107;
+            --gold-dim: rgba(255,193,7,0.14);
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+            --bg: #080c14;
+            --surface: #0f1623;
+            --card: #111827;
+            --border: #1e2d45;
+            --text: #f0f4ff;
+            --muted: #6b7a99;
+            --danger: #ff4444;
         }
-        
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); text-align: center; }
-        
-        nav { background-color: #05070a; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 1px solid #2a3553; flex-wrap: wrap; }
-        nav a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: 0.3s; }
-        nav a:hover, nav a.active { background-color: var(--gold); color: #000; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        h1, h2, h3, h4 { font-family: 'Rajdhani', sans-serif; }
 
-        header { padding: 50px 20px 20px 20px; background: linear-gradient(180deg, #1a1a00 0%, transparent 100%); }
-        h1 { font-size: 3rem; margin-bottom: 5px; text-transform: uppercase; color: var(--gold); text-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
-        .subtitle { color: var(--text-muted); font-size: 1.2rem; margin-top: 0; max-width: 600px; margin: 0 auto; }
+        nav { background: rgba(8,12,20,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+        .nav-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--text); text-decoration: none; letter-spacing: 1px; }
+        .nav-brand span { color: var(--primary); }
+        .nav-links { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 8px 14px; border-radius: 6px; transition: all 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface); }
+        .nav-tv { color: #ff1a1a !important; border: 1px solid rgba(255,26,26,0.3); }
+        .nav-tv:hover { background: rgba(255,26,26,0.1) !important; }
 
-        .payout-banner { margin: 40px auto; background-color: var(--card-bg); border: 2px solid var(--gold); padding: 20px; border-radius: 10px; max-width: 400px; box-shadow: 0 0 30px rgba(255, 215, 0, 0.1); }
-        .payout-banner h3 { margin: 0; color: var(--text-muted); font-size: 1rem; text-transform: uppercase; }
-        .payout-banner .amount { font-size: 2.5rem; color: var(--gold); font-weight: bold; margin: 10px 0 0 0; }
+        .page-hero { padding: 64px 32px 48px; background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(255,193,7,0.06) 0%, transparent 70%); border-bottom: 1px solid var(--border); text-align: center; }
+        .hero-eyebrow { display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); background: var(--gold-dim); border: 1px solid rgba(255,193,7,0.3); padding: 5px 14px; border-radius: 100px; margin-bottom: 16px; }
+        .page-hero h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+        .page-hero h1 span { color: var(--text); }
+        .page-hero p { color: var(--muted); margin-top: 12px; font-size: 0.95rem; max-width: 560px; margin-left: auto; margin-right: auto; line-height: 1.6; }
 
-        .dashboard-container { padding: 20px 20px 60px 20px; max-width: 1000px; margin: 0 auto; }
-        .section-divider { margin: 40px 0 20px 0; border-bottom: 2px solid #2a3553; text-align: left; padding-bottom: 10px; }
-        .section-divider h2 { font-size: 1.8rem; color: var(--text-main); margin: 0; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        
-        .trophy-card { background-color: var(--card-bg); border: 1px solid #2a3553; border-radius: 10px; padding: 30px 20px; text-decoration: none; color: var(--text-main); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-        .trophy-card::before { content: '🏆'; font-size: 6rem; position: absolute; opacity: 0.05; right: -20px; bottom: -20px; }
-        
-        .trophy-card.dls { border-top: 4px solid var(--primary-color); }
-        .trophy-card.efootball { border-top: 4px solid var(--efootball-color); }
-        .trophy-card.eafc { border-top: 4px solid var(--eafc-color); }
+        .payout-strip { background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 32px; text-align: center; }
+        .payout-strip p { font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+        .payout-amount { font-family: 'Rajdhani', sans-serif; font-size: 2.5rem; font-weight: 700; color: var(--gold); }
 
-        .tag { background-color: #333; color: var(--text-main); font-weight: bold; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 15px; text-transform: uppercase; }
-        .tag.gold { background-color: rgba(255, 215, 0, 0.2); color: var(--gold); }
-        
-        .champion-name { font-size: 1.8rem; font-weight: bold; margin: 0 0 5px 0; color: #fff; }
-        .champion-details { color: var(--text-muted); font-size: 0.95rem; margin: 0 0 15px 0; }
-        .prize-won { color: var(--primary-color); font-weight: bold; font-size: 1.2rem; margin: 0; }
+        .section { padding: 56px 32px; max-width: 1100px; margin: 0 auto; }
+        .division-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+        .division-header h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .division-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .division-dot.dls { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+        .division-dot.ef { background: var(--ef); box-shadow: 0 0 8px var(--ef); }
+        .division-dot.eafc { background: var(--eafc); box-shadow: 0 0 8px var(--eafc); }
 
-        footer { padding: 40px 20px; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid #2a3553; }
+        .champions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 56px; }
+
+        .trophy-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; transition: all 0.25s; }
+        .trophy-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+        .trophy-card.dls::before { background: var(--primary); }
+        .trophy-card.ef::before { background: var(--ef); }
+        .trophy-card.eafc::before { background: var(--eafc); }
+        .trophy-card:hover { border-color: #2a3f60; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+        .trophy-card .ghost-icon { position: absolute; right: 16px; bottom: 12px; font-size: 5rem; opacity: 0.04; pointer-events: none; }
+
+        .champ-event { font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; display: inline-block; width: fit-content; margin-bottom: 4px; }
+        .champ-event.gold { background: var(--gold-dim); color: var(--gold); }
+        .champ-event.pending { background: var(--surface); color: var(--muted); }
+        .champ-name { font-size: 1.6rem; font-weight: 700; }
+        .champ-detail { color: var(--muted); font-size: 0.85rem; }
+        .champ-prize { font-size: 1rem; font-weight: 600; margin-top: 4px; }
+        .champ-prize.dls { color: var(--primary); }
+        .champ-prize.ef { color: var(--ef); }
+        .champ-prize.eafc { color: var(--eafc); }
+
+        footer { background: var(--surface); border-top: 1px solid var(--border); padding: 40px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .footer-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; }
+        .footer-brand span { color: var(--primary); }
+        .footer-copy { color: var(--muted); font-size: 0.85rem; }
+
+        @media (max-width: 640px) {
+            nav { padding: 0 16px; }
+            .nav-links a { padding: 6px 9px; font-size: 0.78rem; }
+            .page-hero, .section { padding: 48px 16px 36px; }
+            footer { flex-direction: column; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
-<nav>
-        <a href="index.html">Hub</a>
-        <a href="dls-arena.html">DLS Arena</a>
-        <a href="efootball.html">eFootball Arena</a>
-        <a href="eafc.html">EA FC Arena</a>
-        <a href="hall-of-fame.html">Hall of Fame</a>
-        <a href="tv.html">🔴 TV</a>
+    <nav>
+        <a href="index.html" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+        <div class="nav-links">
+            <a href="index.html">Hub</a>
+            <a href="dls-arena.html">DLS Arena</a>
+            <a href="efootball.html">eFootball</a>
+            <a href="eafc.html">EA FC</a>
+            <a href="hall-of-fame.html" class="active">Hall of Fame</a>
+            <a href="tv.html" class="nav-tv">&#9679; TV</a>
+        </div>
     </nav>
 
-    <header>
-        <h1>Hall of <span style="color: #fff;">Fame</span></h1>
-        <p class="subtitle">Immortalizing the elite. These are the undisputed champions of the Unclescar Studios ecosystem.</p>
-    </header>
-
-    <div class="payout-banner">
-        <h3>Total Community Payouts</h3>
-        <p class="amount">₦0</p>
+    <div class="page-hero">
+        <div class="hero-eyebrow">All-Time Records</div>
+        <h1>Hall of <span>Fame</span></h1>
+        <p>Immortalizing the elite. These are the undisputed champions of the Unclescar Studios ecosystem.</p>
     </div>
 
-    <div class="dashboard-container">
-        
-        <div class="section-divider">
-            <h2><span style="color: var(--primary-color);">DLS</span> Legends</h2>
+    <div class="payout-strip">
+        <p>Total Community Payouts</p>
+        <div class="payout-amount">&#8358;0</div>
+    </div>
+
+    <div class="section">
+
+        <div class="division-header">
+            <div class="division-dot dls"></div>
+            <h2>DLS Legends</h2>
         </div>
-        <div class="grid">
+        <div class="champions-grid">
             <div class="trophy-card dls">
-                <div class="tag gold">UPL Season 1 Champion</div>
-                <h3 class="champion-name">TBD</h3>
-                <p class="champion-details">Season currently in progress</p>
-                <p class="prize-won">Prize Pending</p>
+                <span class="champ-event gold">UPL Season 1 Champion</span>
+                <h3 class="champ-name">TBD</h3>
+                <p class="champ-detail">Season currently in progress</p>
+                <p class="champ-prize dls">Prize Pending</p>
+                <span class="ghost-icon">&#127942;</span>
             </div>
             <div class="trophy-card dls">
-                <div class="tag">Academy Cup Vol. 1</div>
-                <h3 class="champion-name">TBD</h3>
-                <p class="champion-details">Awaiting first champion</p>
-                <p class="prize-won">Prize Pending</p>
+                <span class="champ-event pending">Academy Cup Vol. 1</span>
+                <h3 class="champ-name">TBD</h3>
+                <p class="champ-detail">Awaiting first champion</p>
+                <p class="champ-prize dls">Prize Pending</p>
+                <span class="ghost-icon">&#127942;</span>
             </div>
         </div>
 
-        <div class="section-divider" style="margin-top: 50px;">
-            <h2><span style="color: var(--efootball-color);">eFootball</span> Legends</h2>
+        <div class="division-header">
+            <div class="division-dot ef"></div>
+            <h2>eFootball Legends</h2>
         </div>
-        <div class="grid">
-            <div class="trophy-card efootball">
-                <div class="tag gold">Launch Cup Champion</div>
-                <h3 class="champion-name">TBD</h3>
-                <p class="champion-details">Tournament opens soon</p>
-                <p class="prize-won">Prize Pending</p>
+        <div class="champions-grid">
+            <div class="trophy-card ef">
+                <span class="champ-event gold">Launch Cup Champion</span>
+                <h3 class="champ-name">TBD</h3>
+                <p class="champ-detail">Tournament opens soon</p>
+                <p class="champ-prize ef">Prize Pending</p>
+                <span class="ghost-icon">&#127942;</span>
             </div>
         </div>
 
-        <div class="section-divider" style="margin-top: 50px;">
-            <h2><span style="color: var(--eafc-color);">Console</span> Kings</h2>
+        <div class="division-header">
+            <div class="division-dot eafc"></div>
+            <h2>Console Kings</h2>
         </div>
-        <div class="grid">
+        <div class="champions-grid">
             <div class="trophy-card eafc">
-                <div class="tag gold">Next-Gen Cup Champion</div>
-                <h3 class="champion-name">TBD</h3>
-                <p class="champion-details">Tournament opens soon</p>
-                <p class="prize-won">Prize Pending</p>
+                <span class="champ-event gold">Next-Gen Cup Champion</span>
+                <h3 class="champ-name">TBD</h3>
+                <p class="champ-detail">Tournament opens soon</p>
+                <p class="champ-prize eafc">Prize Pending</p>
+                <span class="ghost-icon">&#127942;</span>
             </div>
         </div>
 
     </div>
 
     <footer>
-        <p>&copy; 2026 Unclescar Studios. Fair Play Regulated.</p>
+        <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
+        <span class="footer-copy">&copy; 2026 Unclescar Studios. Fair Play Regulated.</span>
     </footer>
 
 </body>
