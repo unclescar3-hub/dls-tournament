@@ -28,11 +28,15 @@ router.get('/stats', adminMiddleware, async (req, res) => {
   }
 });
 
-// All users
+// All users (with bank account info)
 router.get('/users', adminMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, username, email, phone, role, created_at FROM users ORDER BY created_at DESC'
+      `SELECT u.id, u.username, u.email, u.phone, u.role, u.created_at,
+              ba.account_name as bank_account_name, ba.bank_name, ba.verified as bank_verified
+       FROM users u
+       LEFT JOIN bank_accounts ba ON ba.user_id = u.id
+       ORDER BY u.created_at DESC`
     );
     res.json(result.rows);
   } catch (err) {

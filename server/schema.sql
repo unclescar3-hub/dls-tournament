@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS bracket_entries (
   UNIQUE(tournament_id, user_id)
 );
 
--- Match Results (screenshots)
+-- Match Results
 CREATE TABLE IF NOT EXISTS match_results (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tournament_id UUID REFERENCES tournaments(id),
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS match_results (
   submitted_at TIMESTAMP DEFAULT NOW()
 );
 
--- Match Codes (lobby codes for players to join each other)
+-- Match Codes
 CREATE TABLE IF NOT EXISTS match_codes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tournament_id UUID REFERENCES tournaments(id) ON DELETE CASCADE,
@@ -110,6 +110,48 @@ CREATE TABLE IF NOT EXISTS streams (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Player Bank Accounts (for payouts)
+CREATE TABLE IF NOT EXISTS bank_accounts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+  account_number VARCHAR(20) NOT NULL,
+  bank_code VARCHAR(20) NOT NULL,
+  bank_name VARCHAR(100) NOT NULL,
+  account_name VARCHAR(150) NOT NULL,
+  recipient_code VARCHAR(100),
+  verified BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Tournament Prize Pools
+CREATE TABLE IF NOT EXISTS prize_pools (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tournament_id UUID REFERENCES tournaments(id) ON DELETE CASCADE UNIQUE,
+  positions JSONB NOT NULL DEFAULT '{}',
+  total_amount INT DEFAULT 0,
+  platform_cut_pct INT DEFAULT 10,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Payouts
+CREATE TABLE IF NOT EXISTS payouts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tournament_id UUID REFERENCES tournaments(id),
+  user_id UUID REFERENCES users(id),
+  position INT NOT NULL,
+  amount INT NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  transfer_code VARCHAR(100),
+  transfer_reference VARCHAR(100),
+  failure_reason TEXT,
+  initiated_by UUID REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  paid_at TIMESTAMP,
+  UNIQUE(tournament_id, user_id)
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_registrations_tournament ON registrations(tournament_id);
 CREATE INDEX IF NOT EXISTS idx_bracket_tournament ON bracket_entries(tournament_id);
@@ -117,3 +159,6 @@ CREATE INDEX IF NOT EXISTS idx_match_tournament ON match_results(tournament_id);
 CREATE INDEX IF NOT EXISTS idx_bracket_user ON bracket_entries(user_id);
 CREATE INDEX IF NOT EXISTS idx_reset_token ON password_resets(token);
 CREATE INDEX IF NOT EXISTS idx_invite_token ON admin_invites(token);
+CREATE INDEX IF NOT EXISTS idx_bank_accounts_user ON bank_accounts(user_id);
+CREATE INDEX IF NOT EXISTS idx_payouts_tournament ON payouts(tournament_id);
+CREATE INDEX IF NOT EXISTS idx_payouts_user ON payouts(user_id);

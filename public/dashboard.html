@@ -30,7 +30,7 @@
 <div class="page-hero" style="background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(0,230,118,.05) 0%,transparent 70%)">
   <div class="hero-eyebrow tag tag-primary">Player Portal</div>
   <h1>MY DASHBOARD</h1>
-  <p id="dash-welcome">Manage your registrations and submit match results.</p>
+  <p id="dash-welcome">Manage your tournaments, bank details, and earnings.</p>
 </div>
 
 <div class="section">
@@ -41,7 +41,7 @@
   </div>
 
   <div id="dash-content" style="display:none">
-    <!-- Stats -->
+    <!-- Stats row -->
     <div class="grid-3" style="margin-bottom:40px">
       <div class="card"><div class="card-body" style="text-align:center">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--primary)" id="my-reg-count">0</div>
@@ -57,73 +57,149 @@
       </div></div>
     </div>
 
-    <!-- My Tournaments -->
-    <div style="margin-bottom:40px">
-      <h2 class="section-title">My Tournaments</h2>
+    <!-- TABS -->
+    <div style="display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid var(--border);flex-wrap:wrap">
+      <button class="dash-tab active" onclick="switchDashTab('tournaments',this)">My Tournaments</button>
+      <button class="dash-tab" onclick="switchDashTab('payout',this)">💳 Payout Details</button>
+      <button class="dash-tab" onclick="switchDashTab('earnings',this)">💰 Earnings</button>
+      <button class="dash-tab" onclick="switchDashTab('submit',this)">Submit Result</button>
+      <button class="dash-tab" onclick="switchDashTab('stream',this)">Share Stream</button>
+    </div>
+
+    <!-- MY TOURNAMENTS -->
+    <div id="dtab-tournaments">
       <div id="my-tournaments-list"><div class="spinner"></div></div>
     </div>
 
-    <!-- Submit Match Result -->
-    <div class="card" style="margin-bottom:40px">
-      <div class="card-header">
-        <h3>Submit Match Result</h3>
-        <span class="tag tag-primary">Admin Reviewed</span>
+    <!-- PAYOUT DETAILS -->
+    <div id="dtab-payout" style="display:none">
+      <div class="grid-2">
+        <!-- Current account -->
+        <div class="card">
+          <div class="card-header">
+            <h3>My Bank Account</h3>
+            <span class="tag tag-primary" id="bank-status-tag" style="display:none">Verified ✓</span>
+          </div>
+          <div class="card-body" id="bank-current">
+            <div class="spinner"></div>
+          </div>
+        </div>
+
+        <!-- Add / update account -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Add / Update Bank Details</h3>
+            <span class="tag tag-gold">Required to receive prizes</span>
+          </div>
+          <div class="card-body">
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Your details are used exclusively for prize transfers via Paystack. We never store card details.</p>
+            <form id="bank-form">
+              <div class="form-group">
+                <label>Bank</label>
+                <select id="bank-select" required>
+                  <option value="">Loading banks...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Account Number</label>
+                <div style="display:flex;gap:8px">
+                  <input type="text" id="account-number" maxlength="10" placeholder="10-digit account number" required style="flex:1">
+                  <button type="button" class="btn btn-outline btn-sm" id="verify-btn" onclick="verifyAccount()" style="white-space:nowrap">Verify</button>
+                </div>
+              </div>
+              <div id="verified-account" style="display:none;background:var(--primary-dim);border:1px solid var(--primary);border-radius:8px;padding:12px;margin-bottom:16px">
+                <div style="font-size:.72rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Account Name</div>
+                <div style="font-weight:700;color:var(--primary)" id="verified-name"></div>
+              </div>
+              <div id="bank-error" style="display:none;background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:12px"></div>
+              <button type="submit" class="btn btn-primary btn-block" id="bank-save-btn" disabled>Save Bank Account</button>
+            </form>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
-        <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Upload your match screenshot. Our admin team reviews every result to ensure fair play.</p>
-        <form id="submit-match-form" enctype="multipart/form-data">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Tournament</label>
-              <select id="match-tournament" required>
-                <option value="">Select your tournament...</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Opponent Username</label>
-              <input type="text" id="match-opponent" placeholder="Type opponent's username" required>
-            </div>
+
+      <!-- Info box -->
+      <div class="card" style="margin-top:20px;border-color:rgba(0,230,118,.2)">
+        <div class="card-body" style="display:flex;gap:16px;align-items:flex-start">
+          <span style="font-size:1.5rem;flex-shrink:0">🔒</span>
+          <div>
+            <strong>How prize payouts work</strong>
+            <p style="color:var(--muted);font-size:.85rem;margin-top:6px;line-height:1.7">
+              When a tournament ends, the admin calculates prize positions and triggers payouts via Paystack Transfer. The money goes <strong style="color:var(--text)">directly into your bank account</strong> — no manual collection needed. You'll receive an email confirmation when your payout is sent. Funds typically arrive within minutes.
+            </p>
           </div>
-          <div class="form-row">
-            <div class="form-group"><label>Your Score</label><input type="number" id="match-my-score" min="0" required placeholder="0"></div>
-            <div class="form-group"><label>Opponent Score</label><input type="number" id="match-opp-score" min="0" required placeholder="0"></div>
-          </div>
-          <div class="form-group">
-            <label>Match Screenshot (required)</label>
-            <input type="file" id="match-screenshot" accept="image/*" required class="input-file">
-          </div>
-          <button type="submit" class="btn btn-primary">Submit Result</button>
-        </form>
-        <div id="match-result-box" style="display:none;margin-top:20px;padding:16px;border-radius:10px;border:1px solid var(--border)"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Submit Stream -->
-    <div class="card">
-      <div class="card-header"><h3>Share Your Stream</h3><span class="tag tag-ef">Broadcast</span></div>
-      <div class="card-body">
-        <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Playing a Grand Final? Share your stream link and we'll feature it on Unclescar TV.</p>
-        <form id="stream-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Tournament</label>
-              <select id="stream-tournament" required><option value="">Select tournament...</option></select>
+    <!-- EARNINGS -->
+    <div id="dtab-earnings" style="display:none">
+      <div id="earnings-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- SUBMIT RESULT -->
+    <div id="dtab-submit" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <h3>Submit Match Result</h3>
+          <span class="tag tag-primary">Admin Reviewed</span>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Upload your match screenshot. Our admin team reviews every result to ensure fair play.</p>
+          <form id="submit-match-form" enctype="multipart/form-data">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tournament</label>
+                <select id="match-tournament" required><option value="">Select your tournament...</option></select>
+              </div>
+              <div class="form-group">
+                <label>Opponent Username</label>
+                <input type="text" id="match-opponent" placeholder="Opponent's exact username" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Your Score</label><input type="number" id="match-my-score" min="0" required placeholder="0"></div>
+              <div class="form-group"><label>Opponent Score</label><input type="number" id="match-opp-score" min="0" required placeholder="0"></div>
             </div>
             <div class="form-group">
-              <label>Platform</label>
-              <select id="stream-platform">
-                <option value="youtube">YouTube</option>
-                <option value="twitch">Twitch</option>
-                <option value="tiktok">TikTok Live</option>
-                <option value="facebook">Facebook Live</option>
-                <option value="other">Other</option>
-              </select>
+              <label>Match Screenshot (required)</label>
+              <input type="file" id="match-screenshot" accept="image/*" required class="input-file">
             </div>
-          </div>
-          <div class="form-group"><label>Stream Title</label><input type="text" id="stream-title" placeholder="e.g. DLS Academy Grand Final" required></div>
-          <div class="form-group"><label>Stream URL</label><input type="url" id="stream-url" placeholder="https://youtube.com/live/..." required></div>
-          <button type="submit" class="btn btn-ef">Submit Stream Link</button>
-        </form>
+            <button type="submit" class="btn btn-primary">Submit Result</button>
+          </form>
+          <div id="match-result-box" style="display:none;margin-top:20px;padding:16px;border-radius:10px;border:1px solid var(--border)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STREAM -->
+    <div id="dtab-stream" style="display:none">
+      <div class="card">
+        <div class="card-header"><h3>Share Your Stream</h3><span class="tag tag-ef">Broadcast</span></div>
+        <div class="card-body">
+          <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Playing a Grand Final? Share your stream link and we'll feature it on Unclescar TV.</p>
+          <form id="stream-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tournament</label>
+                <select id="stream-tournament" required><option value="">Select tournament...</option></select>
+              </div>
+              <div class="form-group">
+                <label>Platform</label>
+                <select id="stream-platform">
+                  <option value="youtube">YouTube</option>
+                  <option value="twitch">Twitch</option>
+                  <option value="tiktok">TikTok Live</option>
+                  <option value="facebook">Facebook Live</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group"><label>Stream Title</label><input type="text" id="stream-title" placeholder="e.g. DLS Academy Grand Final" required></div>
+            <div class="form-group"><label>Stream URL</label><input type="url" id="stream-url" placeholder="https://youtube.com/live/..." required></div>
+            <button type="submit" class="btn btn-ef">Submit Stream Link</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -132,19 +208,42 @@
 <footer>
   <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
   <span class="footer-copy">&copy; 2026 Unclescar Studios.</span>
-  <a href="/rules.html" class="footer-link">Rulebook</a>
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/rules.html" class="footer-link">Rulebook</a>
+    <a href="/admin.html" class="footer-admin-link">&#9881; Admin Panel</a>
+  </div>
 </footer>
+
 <div id="toast-container"></div>
 <script src="/js/app.js"></script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
+
+<style>
+.dash-tab { background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:.875rem;font-weight:600;padding:10px 16px;cursor:pointer;margin-bottom:-1px;transition:all .2s; }
+.dash-tab:hover { color:var(--text); }
+.dash-tab.active { color:var(--primary);border-bottom-color:var(--primary); }
+</style>
+
 <script>
 let myRegistrations = [];
+let allBanks = [];
+let verifiedAccountData = null;
+
+function switchDashTab(name, btn) {
+  document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ['tournaments','payout','earnings','submit','stream'].forEach(t =>
+    document.getElementById('dtab-' + t).style.display = t === name ? 'block' : 'none'
+  );
+  if (name === 'payout') loadBankTab();
+  if (name === 'earnings') loadEarnings();
+}
 
 async function initDashboard() {
   const user = await loadUser();
   if (!user) { document.getElementById('not-logged-in').style.display = 'block'; return; }
   document.getElementById('dash-content').style.display = 'block';
-  document.getElementById('dash-welcome').textContent = `Welcome back, ${user.username}! Track your tournaments and submit results.`;
+  document.getElementById('dash-welcome').textContent = `Welcome back, ${user.username}! Track your tournaments, bank details, and earnings.`;
   if (user.role === 'admin') { window.location.href = '/admin.html'; return; }
   await Promise.all([loadMyTournaments(), loadStandingsStats()]);
 }
@@ -154,27 +253,28 @@ async function loadMyTournaments() {
     myRegistrations = await api('GET', '/tournaments/my/registrations');
     document.getElementById('my-reg-count').textContent = myRegistrations.filter(r => r.payment_status === 'paid').length;
     const list = document.getElementById('my-tournaments-list');
-    if (!myRegistrations.length) {
-      list.innerHTML = '<p style="color:var(--muted)">No tournaments joined yet. <a href="/" style="color:var(--primary)">Browse arenas</a></p>';
-      return;
-    }
 
     const tSelect = document.getElementById('match-tournament');
     const sSelect = document.getElementById('stream-tournament');
     tSelect.innerHTML = '<option value="">Select tournament...</option>';
     sSelect.innerHTML = '<option value="">Select tournament...</option>';
 
+    if (!myRegistrations.length) {
+      list.innerHTML = '<p style="color:var(--muted)">You haven\'t joined any tournaments yet. <a href="/" style="color:var(--primary)">Browse arenas</a> to find one.</p>';
+      return;
+    }
+
     list.innerHTML = myRegistrations.map(r => `
       <div class="card" style="margin-bottom:14px">
         <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700">${r.name}</div>
-            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${r.arena} · ${r.format} · Entry: ${naira(r.entry_fee)}</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${r.arena} · ${r.format.replace(/-/g,' ')} · Entry: ${naira(r.entry_fee)}</div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             ${statusBadge(r.tournament_status)}
             ${r.payment_status === 'paid' ? '<span class="tag tag-primary">✓ Paid</span>' : '<span class="tag tag-danger">Unpaid</span>'}
-            <a href="/tournament.html?id=${r.tournament_id}" class="btn btn-outline btn-sm">View</a>
+            <a href="/tournament.html?id=${r.tournament_id}" class="btn btn-outline btn-sm">View Tournament</a>
           </div>
         </div>
       </div>`).join('');
@@ -199,6 +299,153 @@ async function loadStandingsStats() {
   } catch {}
 }
 
+// ── BANK ACCOUNT ────────────────────────────────────────────────────────────
+
+async function loadBankTab() {
+  // Load banks list
+  if (!allBanks.length) {
+    try {
+      allBanks = await api('GET', '/payouts/banks');
+      const sel = document.getElementById('bank-select');
+      sel.innerHTML = '<option value="">Select your bank...</option>';
+      allBanks.forEach(b => {
+        sel.innerHTML += `<option value="${b.code}" data-name="${b.name}">${b.name}</option>`;
+      });
+    } catch { document.getElementById('bank-select').innerHTML = '<option value="">Could not load banks</option>'; }
+  }
+
+  // Load existing account
+  try {
+    const acct = await api('GET', '/payouts/my-account');
+    const el = document.getElementById('bank-current');
+    if (acct) {
+      document.getElementById('bank-status-tag').style.display = 'inline-block';
+      el.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px">
+            <div style="font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">Account Name</div>
+            <div style="font-weight:700;font-size:1.05rem">${acct.account_name}</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;flex:1">
+              <div style="font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">Bank</div>
+              <div style="font-weight:600">${acct.bank_name}</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;flex:1">
+              <div style="font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">Account No.</div>
+              <div style="font-weight:600;letter-spacing:2px">${acct.account_number}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--primary-dim);border:1px solid var(--primary);border-radius:8px">
+            <span style="color:var(--primary);font-size:1.1rem">&#10003;</span>
+            <span style="color:var(--primary);font-size:.85rem;font-weight:600">Bank account verified — you can receive prize payouts</span>
+          </div>
+        </div>`;
+    } else {
+      el.innerHTML = `<div style="text-align:center;padding:24px">
+        <div style="font-size:2.5rem;margin-bottom:12px">🏦</div>
+        <h4 style="margin-bottom:8px">No bank account saved</h4>
+        <p style="color:var(--muted);font-size:.85rem">Add your bank details on the right to receive prize payouts directly to your account.</p>
+      </div>`;
+    }
+  } catch { document.getElementById('bank-current').innerHTML = '<p style="color:var(--muted)">Could not load account info.</p>'; }
+}
+
+async function verifyAccount() {
+  const accountNumber = document.getElementById('account-number').value.trim();
+  const bankSelect = document.getElementById('bank-select');
+  const bankCode = bankSelect.value;
+  const errEl = document.getElementById('bank-error');
+  errEl.style.display = 'none';
+
+  if (!accountNumber || accountNumber.length !== 10) { errEl.textContent = 'Please enter a valid 10-digit account number'; errEl.style.display = 'block'; return; }
+  if (!bankCode) { errEl.textContent = 'Please select your bank first'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('verify-btn');
+  btn.textContent = 'Verifying...'; btn.disabled = true;
+  document.getElementById('verified-account').style.display = 'none';
+  document.getElementById('bank-save-btn').disabled = true;
+  verifiedAccountData = null;
+
+  try {
+    const data = await api('GET', `/payouts/verify-account?account_number=${accountNumber}&bank_code=${bankCode}`);
+    document.getElementById('verified-name').textContent = data.account_name;
+    document.getElementById('verified-account').style.display = 'block';
+    document.getElementById('bank-save-btn').disabled = false;
+    verifiedAccountData = {
+      account_name: data.account_name,
+      account_number: accountNumber,
+      bank_code: bankCode,
+      bank_name: bankSelect.options[bankSelect.selectedIndex].dataset.name
+    };
+    toast('Account verified: ' + data.account_name, 'success');
+  } catch(err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  }
+  finally { btn.textContent = 'Verify'; btn.disabled = false; }
+}
+
+document.getElementById('bank-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!verifiedAccountData) { toast('Please verify your account number first', 'error'); return; }
+  const btn = document.getElementById('bank-save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    await api('POST', '/payouts/account', verifiedAccountData);
+    toast('Bank account saved! You can now receive prize payouts.', 'success');
+    loadBankTab();
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = 'Save Bank Account'; btn.disabled = false; }
+});
+
+// ── EARNINGS ────────────────────────────────────────────────────────────────
+
+async function loadEarnings() {
+  const el = document.getElementById('earnings-list');
+  try {
+    const payouts = await api('GET', '/payouts/my-payouts');
+    if (!payouts.length) {
+      el.innerHTML = `<div style="text-align:center;padding:60px 0">
+        <div style="font-size:3rem;margin-bottom:16px">💰</div>
+        <h3 style="margin-bottom:8px">No earnings yet</h3>
+        <p style="color:var(--muted)">Win tournaments to earn prize money — it'll appear here once an admin sends your payout.</p>
+      </div>`;
+      return;
+    }
+    const totalEarned = payouts.filter(p => p.status === 'sent' || p.status === 'processing').reduce((a, p) => a + parseInt(p.amount || 0), 0);
+    el.innerHTML = `
+      <div class="card" style="margin-bottom:20px;border-color:var(--primary)">
+        <div class="card-body" style="text-align:center">
+          <div style="font-size:.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Total Prize Earnings</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:var(--primary)">₦${totalEarned.toLocaleString()}</div>
+        </div>
+      </div>
+      ${payouts.map(p => {
+        const ordinal = n => n + (['th','st','nd','rd'][((n%100-20)%10)||n%100>10?0:n%10]||'th');
+        const statusColor = { sent:'var(--primary)', processing:'var(--gold)', pending:'var(--muted)', failed:'var(--danger)' };
+        const statusLabel = { sent:'✓ Paid', processing:'⏳ Processing', pending:'Pending', failed:'✕ Failed' };
+        return `<div class="card" style="margin-bottom:12px">
+          <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
+            <div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${p.tournament_name}</div>
+              <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${p.arena} · ${ordinal(p.position)} place · ${fmtDate(p.created_at)}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="text-align:right">
+                <div style="font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:var(--primary)">₦${Number(p.amount).toLocaleString()}</div>
+              </div>
+              <span style="font-size:.75rem;font-weight:700;color:${statusColor[p.status]||'var(--muted)'};background:${statusColor[p.status]||'var(--muted)'}20;border:1px solid ${statusColor[p.status]||'var(--muted)'}40;padding:5px 12px;border-radius:6px">${statusLabel[p.status]||p.status}</span>
+            </div>
+          </div>
+          ${p.status==='failed'&&p.failure_reason?`<div style="padding:10px 20px;background:var(--danger-dim);border-top:1px solid var(--border);font-size:.8rem;color:var(--danger)">Issue: ${p.failure_reason}</div>`:''}
+        </div>`;
+      }).join('')}`;
+  } catch { el.innerHTML = '<p style="color:var(--muted)">Could not load earnings.</p>'; }
+}
+
+// ── MATCH SUBMIT ─────────────────────────────────────────────────────────────
+
 document.getElementById('submit-match-form').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = e.target.querySelector('button');
@@ -208,7 +455,7 @@ document.getElementById('submit-match-form').addEventListener('submit', async e 
   try {
     const tData = await api('GET', `/tournaments/${tournamentId}`);
     const oppEntry = tData.standings.find(s => s.username.toLowerCase() === opponentUsername.toLowerCase());
-    if (!oppEntry) throw new Error('Opponent not found in this tournament. Check their username spelling.');
+    if (!oppEntry) throw new Error('Opponent not found in this tournament. Check their username.');
 
     const fd = new FormData();
     fd.append('tournament_id', tournamentId);
@@ -222,13 +469,10 @@ document.getElementById('submit-match-form').addEventListener('submit', async e 
     box.style.display = 'block';
     const approved = result.status === 'ai_approved';
     box.style.borderColor = approved ? 'var(--primary)' : 'var(--gold)';
-    box.innerHTML = `
-      <div style="font-weight:700;color:${approved ? 'var(--primary)':'var(--gold)'};margin-bottom:6px">
-        ${approved ? '✓ Result submitted and approved' : '⏳ Submitted — pending admin review'}
-      </div>
-      <div style="font-size:.85rem;color:var(--muted)">
-        ${approved ? 'Standings have been updated.' : 'Our admin team will review your screenshot and update standings shortly.'}
-      </div>`;
+    box.innerHTML = `<div style="font-weight:700;color:${approved?'var(--primary)':'var(--gold)'};margin-bottom:6px">
+      ${approved ? '✓ Result submitted and approved' : '⏳ Submitted — pending admin review'}
+    </div>
+    <div style="font-size:.85rem;color:var(--muted)">${approved ? 'Standings have been updated.' : 'Our admin team will review your screenshot and update standings shortly.'}</div>`;
     toast(approved ? 'Result approved!' : 'Submitted — admin will review shortly', approved ? 'success' : 'info');
     e.target.reset();
   } catch(err) { toast(err.message, 'error'); }
@@ -250,7 +494,10 @@ document.getElementById('stream-form').addEventListener('submit', async e => {
 });
 
 const params = new URLSearchParams(location.search);
-if (params.get('payment') === 'success') toast('Payment confirmed! You are now registered.', 'success');
+if (params.get('payment') === 'success') {
+  toast('Payment confirmed! You are now registered.', 'success');
+  setTimeout(() => switchDashTab('payout', document.querySelector('.dash-tab:nth-child(2)')), 1500);
+}
 if (params.get('error')) toast('Payment issue: ' + params.get('error').replace(/_/g,' '), 'error');
 
 document.addEventListener('DOMContentLoaded', initDashboard);

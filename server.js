@@ -10,7 +10,6 @@ const pool = require('./server/db');
 const app = express();
 const PORT = 5000;
 
-// Ensure uploads dir exists
 if (!fs.existsSync('public/uploads')) fs.mkdirSync('public/uploads', { recursive: true });
 
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -27,8 +26,9 @@ app.use('/api/tournaments', require('./server/routes/tournaments'));
 app.use('/api/matches', require('./server/routes/matches'));
 app.use('/api/streams', require('./server/routes/streams'));
 app.use('/api/admin', require('./server/routes/admin'));
+app.use('/api/payouts', require('./server/routes/payouts'));
 
-// Serve static HTML pages
+// Serve HTML pages
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/:page.html', (req, res) => {
   const file = path.join(__dirname, 'public', req.params.page + '.html');
@@ -36,7 +36,6 @@ app.get('/:page.html', (req, res) => {
   else res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Init DB schema then start
 async function init() {
   try {
     const schema = fs.readFileSync('./server/schema.sql', 'utf8');

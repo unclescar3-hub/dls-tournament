@@ -24,9 +24,9 @@
 
 <!-- Admin Login Gate -->
 <div id="admin-login-screen" style="min-height:80vh;display:flex;align-items:center;justify-content:center">
-  <div class="modal" style="position:static;max-width:400px;margin:0 auto">
-    <h2 style="margin-bottom:8px">Admin Access</h2>
-    <p style="color:var(--muted);font-size:.88rem;margin-bottom:24px">Enter your admin password to continue.</p>
+  <div class="modal" style="position:static;max-width:420px;margin:0 auto">
+    <h2 style="margin-bottom:4px">Admin Access</h2>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:24px">Enter your ADMIN_PASSWORD to continue.</p>
     <form id="admin-login-form">
       <div class="form-group"><label>Admin Password</label><input type="password" id="admin-pw" required placeholder="••••••••" autocomplete="current-password"></div>
       <button type="submit" class="btn btn-danger btn-block">Access Admin Panel</button>
@@ -39,7 +39,7 @@
   <div class="page-hero" style="background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,68,68,.06) 0%,transparent 70%)">
     <div class="hero-eyebrow tag tag-danger">Control Center</div>
     <h1>ADMIN DASHBOARD</h1>
-    <p>Manage tournaments, review matches, send match codes, and control the platform.</p>
+    <p>Manage tournaments, review matches, send codes, handle payouts.</p>
   </div>
 
   <div class="section">
@@ -56,17 +56,18 @@
       <button class="admin-tab" data-tab="create" onclick="switchTab('create')">Create</button>
       <button class="admin-tab" data-tab="matches" onclick="switchTab('matches')">Match Reviews</button>
       <button class="admin-tab" data-tab="codes" onclick="switchTab('codes')">Match Codes</button>
+      <button class="admin-tab" data-tab="payouts" onclick="switchTab('payouts')">💰 Payouts</button>
       <button class="admin-tab" data-tab="users" onclick="switchTab('users')">Players</button>
       <button class="admin-tab" data-tab="streams" onclick="switchTab('streams')">Streams</button>
       <button class="admin-tab" data-tab="team" onclick="switchTab('team')">Admin Team</button>
     </div>
 
-    <!-- TOURNAMENTS TAB -->
+    <!-- TOURNAMENTS -->
     <div id="tab-tournaments" class="admin-tab-content">
       <div id="tournaments-list"><div class="spinner"></div></div>
     </div>
 
-    <!-- CREATE TAB -->
+    <!-- CREATE -->
     <div id="tab-create" class="admin-tab-content" style="display:none">
       <div class="card" style="max-width:600px">
         <div class="card-header"><h3>Create New Tournament</h3></div>
@@ -74,36 +75,25 @@
           <form id="create-form">
             <div class="form-group"><label>Tournament Name</label><input type="text" id="c-name" required placeholder="e.g. DLS Academy Cup Vol. 2"></div>
             <div class="form-row">
-              <div class="form-group">
-                <label>Arena</label>
+              <div class="form-group"><label>Arena</label>
                 <select id="c-arena" required>
                   <option value="dls">DLS Arena</option>
                   <option value="efootball">eFootball Arena</option>
                   <option value="eafc">EA FC Arena</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Format</label>
+                </select></div>
+              <div class="form-group"><label>Format</label>
                 <select id="c-format" required>
-                  <option value="open-ladder">Open Ladder (Proving Grounds)</option>
+                  <option value="open-ladder">Open Ladder</option>
                   <option value="32-player-single-elimination">32-Player Single Elimination</option>
                   <option value="64-player-single-elimination">64-Player Single Elimination</option>
                   <option value="16-player-single-elimination">16-Player Single Elimination</option>
-                  <option value="20-manager-round-robin">20-Manager Round Robin (Premier League)</option>
+                  <option value="20-manager-round-robin">20-Manager Round Robin</option>
                   <option value="16-manager-round-robin">16-Manager Round Robin</option>
-                </select>
-              </div>
+                </select></div>
             </div>
             <div class="form-row">
-              <div class="form-group">
-                <label>Max Players</label>
-                <select id="c-maxplayers" required>
-                  <option value="16">16</option>
-                  <option value="20">20</option>
-                  <option value="32" selected>32</option>
-                  <option value="64">64</option>
-                </select>
-              </div>
+              <div class="form-group"><label>Max Players</label>
+                <select id="c-maxplayers" required><option value="16">16</option><option value="20">20</option><option value="32" selected>32</option><option value="64">64</option></select></div>
               <div class="form-group"><label>Entry Fee (₦)</label><input type="number" id="c-fee" required placeholder="100" min="0"></div>
             </div>
             <button type="submit" class="btn btn-primary">Create Tournament</button>
@@ -112,37 +102,26 @@
       </div>
     </div>
 
-    <!-- MATCH REVIEWS TAB -->
+    <!-- MATCH REVIEWS -->
     <div id="tab-matches" class="admin-tab-content" style="display:none">
       <div id="pending-matches-list"><div class="spinner"></div></div>
     </div>
 
-    <!-- MATCH CODES TAB -->
+    <!-- MATCH CODES -->
     <div id="tab-codes" class="admin-tab-content" style="display:none">
       <div class="grid-2" style="margin-bottom:32px">
         <div class="card">
           <div class="card-header"><h3>Generate Match Code</h3><span class="tag tag-primary">Emails Both Players</span></div>
           <div class="card-body">
-            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Generate a unique lobby code for a fixture. Both players will receive it by email with opponent details.</p>
             <form id="code-form">
-              <div class="form-group">
-                <label>Tournament</label>
-                <select id="code-tournament" required>
-                  <option value="">Select tournament...</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Player 1</label>
-                <select id="code-p1" required><option value="">Select player...</option></select>
-              </div>
-              <div class="form-group">
-                <label>Player 2</label>
-                <select id="code-p2" required><option value="">Select player...</option></select>
-              </div>
-              <div class="form-group">
-                <label>Note for Players (optional)</label>
-                <textarea id="code-note" placeholder="e.g. Match must be played by Sunday midnight. No extra time in group stage." rows="2"></textarea>
-              </div>
+              <div class="form-group"><label>Tournament</label>
+                <select id="code-tournament" required><option value="">Select tournament...</option></select></div>
+              <div class="form-group"><label>Player 1</label>
+                <select id="code-p1" required><option value="">Select player...</option></select></div>
+              <div class="form-group"><label>Player 2</label>
+                <select id="code-p2" required><option value="">Select player...</option></select></div>
+              <div class="form-group"><label>Note for Players (optional)</label>
+                <textarea id="code-note" placeholder="e.g. Match must be played by Sunday midnight." rows="2"></textarea></div>
               <button type="submit" class="btn btn-primary">Generate &amp; Send Code</button>
             </form>
             <div id="code-result" style="display:none;margin-top:20px;background:var(--primary-dim);border:1px solid var(--primary);border-radius:10px;padding:20px;text-align:center">
@@ -154,24 +133,82 @@
         </div>
         <div class="card">
           <div class="card-header"><h3>Recent Match Codes</h3></div>
-          <div id="codes-list" style="max-height:400px;overflow-y:auto">
-            <div class="spinner"></div>
-          </div>
+          <div id="codes-list" style="max-height:400px;overflow-y:auto"><div class="spinner"></div></div>
         </div>
       </div>
     </div>
 
-    <!-- PLAYERS TAB -->
+    <!-- PAYOUTS -->
+    <div id="tab-payouts" class="admin-tab-content" style="display:none">
+      <div style="margin-bottom:24px">
+        <div class="form-group" style="max-width:400px">
+          <label>Select Tournament</label>
+          <select id="payout-tournament-select" onchange="loadPayoutPanel(this.value)">
+            <option value="">Choose a tournament to manage payouts...</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="payout-panel" style="display:none">
+        <!-- Prize pool setup + standings + payout actions all here -->
+        <div class="grid-2" style="margin-bottom:28px">
+          <div class="card">
+            <div class="card-header"><h3>Prize Pool Setup</h3><span class="tag tag-gold" id="pool-total-tag">₦0 Total</span></div>
+            <div class="card-body">
+              <p style="color:var(--muted);font-size:.84rem;margin-bottom:16px">Set prize amounts per finishing position. Revenue is automatically calculated from entry fees.</p>
+              <div id="pool-revenue-row" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--muted);font-size:.85rem">Gross Entry Revenue</span><strong id="pool-gross">₦0</strong></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--muted);font-size:.85rem">Platform Cut (<span id="pool-cut-pct">10</span>%)</span><strong style="color:var(--danger)" id="pool-cut">-₦0</strong></div>
+                <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:8px"><span style="font-weight:700">Available for Prizes</span><strong style="color:var(--primary)" id="pool-available">₦0</strong></div>
+              </div>
+              <form id="prize-pool-form">
+                <div id="prize-positions">
+                  <!-- Positions rendered by JS -->
+                </div>
+                <div class="form-row" style="margin-bottom:16px">
+                  <div class="form-group">
+                    <label>Platform Cut %</label>
+                    <input type="number" id="platform-cut" value="10" min="0" max="50" placeholder="10">
+                  </div>
+                  <div class="form-group" style="display:flex;align-items:flex-end">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="addPrizePosition()">+ Add Position</button>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Prize Pool</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>Payout Summary</h3><span class="tag tag-gold" id="payout-summary-tag">No payouts yet</span></div>
+            <div id="payout-summary" style="max-height:500px;overflow-y:auto"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Full standings + pay buttons -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Tournament Standings &amp; Payout Actions</h3>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary btn-sm" onclick="sendAllPayouts()">🚀 Send All Pending Payouts</button>
+            </div>
+          </div>
+          <div id="payout-standings" style="overflow-x:auto"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAYERS -->
     <div id="tab-users" class="admin-tab-content" style="display:none">
       <div id="users-list"><div class="spinner"></div></div>
     </div>
 
-    <!-- STREAMS TAB -->
+    <!-- STREAMS -->
     <div id="tab-streams" class="admin-tab-content" style="display:none">
       <div id="streams-list"><div class="spinner"></div></div>
     </div>
 
-    <!-- ADMIN TEAM TAB -->
+    <!-- ADMIN TEAM -->
     <div id="tab-team" class="admin-tab-content" style="display:none">
       <div class="grid-2">
         <div class="card">
@@ -181,12 +218,9 @@
         <div class="card">
           <div class="card-header"><h3>Invite Co-Admin</h3><span class="tag tag-blue">Email Invite</span></div>
           <div class="card-body">
-            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Send an invitation link to someone you trust. They'll receive an email to accept and set up their admin account. The link expires in 24 hours.</p>
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Send an invitation link to someone you trust. They receive an email to accept and set up their admin account. Expires in 24 hours.</p>
             <form id="invite-form">
-              <div class="form-group">
-                <label>Their Email Address</label>
-                <input type="email" id="invite-email" required placeholder="colleague@email.com">
-              </div>
+              <div class="form-group"><label>Their Email Address</label><input type="email" id="invite-email" required placeholder="colleague@email.com"></div>
               <button type="submit" class="btn btn-danger">Send Admin Invite</button>
             </form>
           </div>
@@ -196,18 +230,25 @@
   </div>
 </div>
 
-<footer><div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div><span class="footer-copy">Admin Panel &copy; 2026</span></footer>
+<footer>
+  <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
+  <span class="footer-copy">Admin Panel &copy; 2026</span>
+</footer>
 <div id="toast-container"></div>
 
 <style>
-.admin-tab { background:none; border:none; border-bottom:2px solid transparent; color:var(--muted); font-family:'Inter',sans-serif; font-size:.875rem; font-weight:600; padding:10px 18px; cursor:pointer; margin-bottom:-1px; transition:all .2s; }
+.admin-tab { background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:.875rem;font-weight:600;padding:10px 18px;cursor:pointer;margin-bottom:-1px;transition:all .2s; }
 .admin-tab:hover { color:var(--text); }
-.admin-tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+.admin-tab.active { color:var(--primary);border-bottom-color:var(--primary); }
+.payout-row { display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(30,45,69,.5);gap:12px;flex-wrap:wrap; }
+.payout-row:last-child { border-bottom:none; }
 </style>
 
 <script src="/js/app.js"></script>
 <script>
 let allTournaments = [];
+let currentPayoutTournamentId = null;
+let prizePositions = [{ pos: 1, amount: '' }, { pos: 2, amount: '' }, { pos: 3, amount: '' }];
 
 async function initAdmin() {
   const user = await loadUser();
@@ -224,8 +265,7 @@ function showAdminPanel() {
 
 document.getElementById('admin-login-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const btn = e.target.querySelector('button');
-  btn.textContent = 'Verifying...'; btn.disabled = true;
+  const btn = e.target.querySelector('button'); btn.textContent = 'Verifying...'; btn.disabled = true;
   try {
     await api('POST', '/admin/login', { password: document.getElementById('admin-pw').value });
     await loadUser();
@@ -248,7 +288,7 @@ function switchTab(name) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
   document.getElementById('tab-' + name).style.display = 'block';
-  const loaders = { tournaments: loadTournamentsTab, matches: loadPendingMatches, users: loadUsers, streams: loadStreams, team: loadAdminTeam, codes: loadCodesTab };
+  const loaders = { tournaments: loadTournamentsTab, matches: loadPendingMatches, users: loadUsers, streams: loadStreams, team: loadAdminTeam, codes: loadCodesTab, payouts: loadPayoutsTab };
   if (loaders[name]) loaders[name]();
 }
 
@@ -262,7 +302,7 @@ async function loadTournamentsTab() {
         <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700">${t.name}</div>
-            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${t.arena} · ${t.format} · ${naira(t.entry_fee)} · ${t.registered||0}/${t.max_players} players</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${t.arena} · ${t.format} · ${naira(t.entry_fee)} · ${t.registered||0}/${t.max_players} players · Pool: ${naira((t.registered||0)*t.entry_fee)}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             ${statusBadge(t.status)}
@@ -288,7 +328,7 @@ async function changeStatus(id, status) {
 }
 
 async function deleteTournament(id) {
-  if (!confirm('Delete this tournament and all its data? This cannot be undone.')) return;
+  if (!confirm('Delete this tournament and all its data? Cannot be undone.')) return;
   try { await api('DELETE', `/tournaments/${id}`); toast('Deleted', 'success'); loadTournamentsTab(); }
   catch(err) { toast(err.message, 'error'); }
 }
@@ -297,16 +337,8 @@ document.getElementById('create-form').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = e.target.querySelector('button'); btn.textContent = 'Creating...'; btn.disabled = true;
   try {
-    await api('POST', '/tournaments', {
-      name: document.getElementById('c-name').value,
-      arena: document.getElementById('c-arena').value,
-      format: document.getElementById('c-format').value,
-      max_players: document.getElementById('c-maxplayers').value,
-      entry_fee: document.getElementById('c-fee').value
-    });
-    toast('Tournament created!', 'success');
-    e.target.reset();
-    switchTab('tournaments');
+    await api('POST', '/tournaments', { name: document.getElementById('c-name').value, arena: document.getElementById('c-arena').value, format: document.getElementById('c-format').value, max_players: document.getElementById('c-maxplayers').value, entry_fee: document.getElementById('c-fee').value });
+    toast('Tournament created!', 'success'); e.target.reset(); switchTab('tournaments');
   } catch(err) { toast(err.message, 'error'); }
   finally { btn.textContent = 'Create Tournament'; btn.disabled = false; }
 });
@@ -323,14 +355,9 @@ async function loadPendingMatches() {
             <div>
               <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">${m.tournament_name}</div>
               <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700">
-                ${m.submitter_name} <span style="color:var(--primary)">${m.submitter_score}</span>
-                &ndash;
-                <span style="color:var(--danger)">${m.opponent_score}</span> ${m.opponent_name}
+                ${m.submitter_name} <span style="color:var(--primary)">${m.submitter_score}</span> &ndash; <span style="color:var(--danger)">${m.opponent_score}</span> ${m.opponent_name}
               </div>
               <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Submitted ${fmtDate(m.submitted_at)}</div>
-              ${m.ai_result ? `<div style="font-size:.78rem;margin-top:8px;padding:8px 12px;background:var(--surface);border-radius:6px;border:1px solid var(--border)">
-                <strong style="color:var(--muted)">Admin review note:</strong> ${m.ai_result.notes||''} · Confidence: ${m.ai_result.confidence||'–'}
-              </div>` : ''}
             </div>
             <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
               ${m.screenshot_path ? `<a href="/${m.screenshot_path}" target="_blank" class="btn btn-outline btn-sm">View Screenshot</a>` : ''}
@@ -351,9 +378,9 @@ async function reviewMatch(id, approved) {
   } catch(err) { toast(err.message, 'error'); }
 }
 
-// Match codes
+// ── MATCH CODES ──────────────────────────────────────────────────────────────
+
 async function loadCodesTab() {
-  // Populate tournament dropdown
   const tSelect = document.getElementById('code-tournament');
   tSelect.innerHTML = '<option value="">Select tournament...</option>';
   try {
@@ -367,10 +394,8 @@ async function loadCodesTab() {
 
 document.getElementById('code-tournament').addEventListener('change', async function() {
   const tid = this.value;
-  const p1 = document.getElementById('code-p1');
-  const p2 = document.getElementById('code-p2');
-  p1.innerHTML = '<option value="">Select player...</option>';
-  p2.innerHTML = '<option value="">Select player...</option>';
+  const p1 = document.getElementById('code-p1'); const p2 = document.getElementById('code-p2');
+  p1.innerHTML = '<option value="">Select player...</option>'; p2.innerHTML = '<option value="">Select player...</option>';
   if (!tid) return;
   try {
     const data = await api('GET', `/tournaments/${tid}`);
@@ -384,16 +409,10 @@ document.getElementById('code-tournament').addEventListener('change', async func
 document.getElementById('code-form').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = e.target.querySelector('button'); btn.textContent = 'Generating...'; btn.disabled = true;
-  const p1 = document.getElementById('code-p1').value;
-  const p2 = document.getElementById('code-p2').value;
-  if (p1 === p2) { toast('Player 1 and Player 2 cannot be the same person', 'error'); btn.textContent='Generate & Send Code'; btn.disabled=false; return; }
+  const p1 = document.getElementById('code-p1').value, p2 = document.getElementById('code-p2').value;
+  if (p1 === p2) { toast('Cannot select the same player twice', 'error'); btn.textContent='Generate & Send Code'; btn.disabled=false; return; }
   try {
-    const res = await api('POST', '/admin/match-code', {
-      tournament_id: document.getElementById('code-tournament').value,
-      player1_id: p1,
-      player2_id: p2,
-      note: document.getElementById('code-note').value
-    });
+    const res = await api('POST', '/admin/match-code', { tournament_id: document.getElementById('code-tournament').value, player1_id: p1, player2_id: p2, note: document.getElementById('code-note').value });
     document.getElementById('generated-code').textContent = res.code;
     document.getElementById('code-result').style.display = 'block';
     toast(`Code ${res.code} sent to ${res.player1} & ${res.player2}`, 'success');
@@ -419,16 +438,232 @@ async function loadCodes() {
   } catch {}
 }
 
+// ── PAYOUTS ──────────────────────────────────────────────────────────────────
+
+async function loadPayoutsTab() {
+  try {
+    const ts = await api('GET', '/tournaments');
+    const sel = document.getElementById('payout-tournament-select');
+    sel.innerHTML = '<option value="">Choose a tournament to manage payouts...</option>';
+    ts.forEach(t => {
+      sel.innerHTML += `<option value="${t.id}">${t.name} (${t.arena} · ${statusBadge(t.status).replace(/<[^>]+>/g,'').trim()})</option>`;
+    });
+  } catch {}
+}
+
+async function loadPayoutPanel(tournamentId) {
+  if (!tournamentId) { document.getElementById('payout-panel').style.display = 'none'; return; }
+  currentPayoutTournamentId = tournamentId;
+  document.getElementById('payout-panel').style.display = 'block';
+  document.getElementById('payout-standings').innerHTML = '<div class="spinner"></div>';
+  document.getElementById('payout-summary').innerHTML = '<div class="spinner"></div>';
+
+  try {
+    const data = await api('GET', `/payouts/prize-pool/${tournamentId}`);
+    renderPrizePoolForm(data);
+    renderPayoutStandings(data);
+    renderPayoutSummary(data);
+  } catch(err) { toast(err.message, 'error'); }
+}
+
+function renderPrizePoolForm(data) {
+  const gross = parseInt(data.tournament.registered || 0) * parseInt(data.tournament.entry_fee || 0);
+  const cutPct = data.prize_pool?.platform_cut_pct ?? 10;
+  const cut = Math.floor(gross * cutPct / 100);
+  const available = gross - cut;
+
+  document.getElementById('pool-gross').textContent = naira(gross);
+  document.getElementById('pool-cut-pct').textContent = cutPct;
+  document.getElementById('pool-cut').textContent = '-' + naira(cut);
+  document.getElementById('pool-available').textContent = naira(available);
+  document.getElementById('platform-cut').value = cutPct;
+
+  const existing = data.prize_pool?.positions || {};
+  const numPlayers = data.standings.length;
+  const maxPos = Math.min(numPlayers, 10);
+
+  // Set prizePositions from existing or defaults
+  prizePositions = [];
+  for (let i = 1; i <= Math.max(3, Object.keys(existing).length); i++) {
+    prizePositions.push({ pos: i, amount: existing[String(i)] || '' });
+  }
+  renderPrizePositionsUI();
+
+  // Update total tag
+  const total = prizePositions.reduce((s, p) => s + parseInt(p.amount||0), 0);
+  document.getElementById('pool-total-tag').textContent = naira(total) + ' allocated';
+}
+
+function renderPrizePositionsUI() {
+  const ordinal = n => n + (['th','st','nd','rd'][((n%100-20)%10)||n%100>10?0:n%10]||'th');
+  document.getElementById('prize-positions').innerHTML = prizePositions.map((p, i) => `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="min-width:90px;font-weight:700;color:${i===0?'var(--gold)':i===1?'var(--silver)':i===2?'var(--bronze)':'var(--muted)'}">
+        ${i===0?'🥇':i===1?'🥈':i===2?'🥉':'🏅'} ${ordinal(p.pos)}
+      </div>
+      <div style="display:flex;align-items:center;flex:1;background:#0a0f1a;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <span style="padding:0 12px;color:var(--muted);font-size:.9rem;border-right:1px solid var(--border)">₦</span>
+        <input type="number" min="0" placeholder="0" value="${p.amount||''}" oninput="prizePositions[${i}].amount=this.value;updatePoolTotal()"
+          style="flex:1;background:none;border:none;padding:10px 12px;color:var(--text);font-size:.9rem;outline:none">
+      </div>
+      ${prizePositions.length > 1 ? `<button type="button" onclick="removePrizePosition(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem">✕</button>` : ''}
+    </div>`).join('');
+}
+
+function addPrizePosition() {
+  prizePositions.push({ pos: prizePositions.length + 1, amount: '' });
+  renderPrizePositionsUI();
+}
+
+function removePrizePosition(idx) {
+  prizePositions.splice(idx, 1);
+  prizePositions.forEach((p, i) => p.pos = i + 1);
+  renderPrizePositionsUI();
+  updatePoolTotal();
+}
+
+function updatePoolTotal() {
+  const total = prizePositions.reduce((s, p) => s + parseInt(p.amount||0), 0);
+  document.getElementById('pool-total-tag').textContent = naira(total) + ' allocated';
+  const cutPct = parseInt(document.getElementById('platform-cut').value || 10);
+  document.getElementById('pool-cut-pct').textContent = cutPct;
+}
+
+document.getElementById('platform-cut').addEventListener('input', function() {
+  const gross = parseInt(document.getElementById('pool-gross').textContent.replace(/[^\d]/g,'')) || 0;
+  const cut = Math.floor(gross * parseInt(this.value||0) / 100);
+  document.getElementById('pool-cut').textContent = '-' + naira(cut);
+  document.getElementById('pool-available').textContent = naira(gross - cut);
+  document.getElementById('pool-cut-pct').textContent = this.value || 0;
+});
+
+document.getElementById('prize-pool-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type=submit]'); btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    const positions = {};
+    prizePositions.forEach(p => { if (parseInt(p.amount) > 0) positions[String(p.pos)] = parseInt(p.amount); });
+    await api('POST', `/payouts/prize-pool/${currentPayoutTournamentId}`, {
+      positions,
+      platform_cut_pct: parseInt(document.getElementById('platform-cut').value || 10)
+    });
+    toast('Prize pool saved!', 'success');
+    loadPayoutPanel(currentPayoutTournamentId);
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = 'Save Prize Pool'; btn.disabled = false; }
+});
+
+function renderPayoutStandings(data) {
+  const el = document.getElementById('payout-standings');
+  const positions = data.prize_pool?.positions || {};
+  const ordinal = n => n + (['th','st','nd','rd'][((n%100-20)%10)||n%100>10?0:n%10]||'th');
+  const medals = ['🥇','🥈','🥉'];
+
+  if (!data.standings.length) { el.innerHTML = '<p style="color:var(--muted);padding:20px">No players registered yet.</p>'; return; }
+
+  el.innerHTML = `<table class="standings-table">
+    <thead><tr><th>#</th><th>Player</th><th>Pts</th><th>W/D/L</th><th>Bank Account</th><th>Prize</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>
+    ${data.standings.map((s, i) => {
+      const pos = i + 1;
+      const prizeAmt = positions[String(pos)];
+      const payout = s.payout;
+      const hasBank = s.bank_verified && s.recipient_code;
+      const payoutStatus = payout?.status;
+      const statusColors = { sent:'var(--primary)', processing:'var(--gold)', pending:'var(--muted)', failed:'var(--danger)' };
+      const statusLabels = { sent:'✓ Paid', processing:'⏳ Processing', pending:'Queued', failed:'✕ Failed' };
+      return `<tr>
+        <td>${pos <= 3 ? medals[pos-1] : pos}</td>
+        <td><strong>${s.username}</strong><div style="font-size:.75rem;color:var(--muted)">${s.email}</div></td>
+        <td><strong style="color:var(--gold)">${s.points}</strong></td>
+        <td style="font-size:.82rem">${s.wins}W/${s.draws}D/${s.losses}L</td>
+        <td style="font-size:.82rem">
+          ${hasBank
+            ? `<div style="color:var(--primary)">✓ ${s.bank_name}</div><div style="color:var(--muted);font-size:.75rem">${s.account_name}</div>`
+            : '<span style="color:var(--danger);font-size:.8rem">⚠ No bank account</span>'}
+        </td>
+        <td><strong style="color:var(--primary)">${prizeAmt ? naira(prizeAmt) : '–'}</strong></td>
+        <td>
+          ${payoutStatus
+            ? `<span style="font-size:.75rem;font-weight:700;color:${statusColors[payoutStatus]}">${statusLabels[payoutStatus]}</span>`
+            : (prizeAmt ? '<span style="color:var(--muted);font-size:.78rem">Not sent</span>' : '–')}
+        </td>
+        <td>
+          ${prizeAmt && !['sent','processing'].includes(payoutStatus)
+            ? `<button class="btn btn-primary btn-sm" onclick="sendOnePayout('${s.user_id}',${pos},${prizeAmt},'${s.username}')">
+                ${hasBank ? 'Send ₦'+Number(prizeAmt).toLocaleString() : 'No Bank'}
+               </button>`
+            : (payoutStatus === 'sent' ? '<span style="color:var(--primary);font-size:.8rem">Done ✓</span>'
+              : payoutStatus === 'processing' ? '<span style="color:var(--gold);font-size:.8rem">Processing…</span>' : '–')}
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+function renderPayoutSummary(data) {
+  const el = document.getElementById('payout-summary');
+  const payouts = data.payouts || [];
+  if (!payouts.length) {
+    el.innerHTML = '<p style="color:var(--muted);padding:20px">No payouts sent yet.</p>';
+    document.getElementById('payout-summary-tag').textContent = 'No payouts yet';
+    return;
+  }
+  const sentTotal = payouts.filter(p => p.status === 'sent' || p.status === 'processing').reduce((s, p) => s + parseInt(p.amount||0), 0);
+  document.getElementById('payout-summary-tag').textContent = naira(sentTotal) + ' sent';
+  const statusColors = { sent:'var(--primary)', processing:'var(--gold)', pending:'var(--muted)', failed:'var(--danger)' };
+  el.innerHTML = payouts.map(p => `
+    <div class="payout-row">
+      <div>
+        <div style="font-weight:700">${p.username || p.user_id}</div>
+        <div style="font-size:.78rem;color:var(--muted)">Position ${p.position} · ${fmtDate(p.created_at)}</div>
+        ${p.failure_reason ? `<div style="font-size:.75rem;color:var(--danger);margin-top:2px">${p.failure_reason}</div>` : ''}
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:700;color:var(--primary)">${naira(p.amount)}</div>
+        <div style="font-size:.75rem;font-weight:700;color:${statusColors[p.status]||'var(--muted)'}">${p.status}</div>
+      </div>
+    </div>`).join('');
+}
+
+async function sendOnePayout(userId, position, amount, username) {
+  if (!confirm(`Send ${naira(amount)} to ${username} (Position ${position})? This will initiate a Paystack bank transfer.`)) return;
+  try {
+    const res = await api('POST', `/payouts/send/${currentPayoutTournamentId}/${userId}`, { position, amount });
+    toast(`₦${amount.toLocaleString()} sent to ${username}! Paystack reference: ${res.reference}`, 'success');
+    loadPayoutPanel(currentPayoutTournamentId);
+  } catch(err) { toast(err.message, 'error'); }
+}
+
+async function sendAllPayouts() {
+  if (!currentPayoutTournamentId) { toast('Select a tournament first', 'error'); return; }
+  if (!confirm('Send ALL pending prize payouts for this tournament? This will initiate real bank transfers via Paystack.')) return;
+  const btn = document.querySelector('[onclick="sendAllPayouts()"]');
+  btn.textContent = '⏳ Sending...'; btn.disabled = true;
+  try {
+    const res = await api('POST', `/payouts/send-all/${currentPayoutTournamentId}`, {});
+    const sent = res.results.filter(r => r.status === 'sent').length;
+    const failed = res.results.filter(r => r.status === 'failed').length;
+    const noBankAcct = res.results.filter(r => r.status === 'no_bank_account').length;
+    toast(`Done! ${sent} sent · ${failed} failed · ${noBankAcct} missing bank account`, sent > 0 ? 'success' : 'info');
+    loadPayoutPanel(currentPayoutTournamentId);
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = '🚀 Send All Pending Payouts'; btn.disabled = false; }
+}
+
+// ── PLAYERS ──────────────────────────────────────────────────────────────────
+
 async function loadUsers() {
   try {
     const users = await api('GET', '/admin/users');
-    const ul = document.getElementById('users-list');
-    ul.innerHTML = `<div style="overflow-x:auto"><table class="standings-table">
-      <thead><tr><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead>
+    document.getElementById('users-list').innerHTML = `<div style="overflow-x:auto"><table class="standings-table">
+      <thead><tr><th>Username</th><th>Email</th><th>Phone</th><th>Bank Account</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead>
       <tbody>${users.map(u => `<tr>
         <td><strong>${u.username}</strong></td>
         <td style="color:var(--muted)">${u.email}</td>
         <td style="color:var(--muted)">${u.phone||'–'}</td>
+        <td style="color:var(--muted);font-size:.8rem">${u.bank_account_name||'–'}</td>
         <td><span class="tag ${u.role==='admin'?'tag-danger':u.role==='banned'?'tag-muted':'tag-primary'}">${u.role}</span></td>
         <td style="color:var(--muted)">${fmtDate(u.created_at)}</td>
         <td>${u.role!=='admin'?`<select class="btn btn-sm btn-outline" style="cursor:pointer" onchange="changeRole('${u.id}',this.value);this.value=''">
@@ -457,7 +692,7 @@ async function loadStreams() {
         <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${s.title}</div>
-            <div style="font-size:.8rem;color:var(--muted)">${s.platform} · ${s.tournament_name} · <a href="${s.stream_url}" target="_blank" style="color:var(--action-blue)">${s.stream_url.slice(0,45)}…</a></div>
+            <div style="font-size:.8rem;color:var(--muted)">${s.platform} · ${s.tournament_name} · <a href="${s.stream_url}" target="_blank" style="color:var(--action-blue)">${s.stream_url.slice(0,50)}</a></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             ${s.is_live?'<span class="live-badge" style="background:rgba(255,26,26,.12);border:1px solid rgba(255,26,26,.3);color:#ff1a1a"><span class="live-dot"></span>LIVE</span>':''}
@@ -469,28 +704,18 @@ async function loadStreams() {
   } catch(err) { toast(err.message, 'error'); }
 }
 
-async function toggleLive(id, isLive) {
-  try { await api('PATCH', `/streams/${id}/live`, { is_live: isLive }); loadStreams(); }
-  catch(err) { toast(err.message, 'error'); }
-}
-
-async function deleteStream(id) {
-  try { await api('DELETE', `/streams/${id}`); toast('Stream removed', 'info'); loadStreams(); }
-  catch(err) { toast(err.message, 'error'); }
-}
+async function toggleLive(id, v) { try { await api('PATCH', `/streams/${id}/live`, { is_live:v }); loadStreams(); } catch(err) { toast(err.message,'error'); } }
+async function deleteStream(id) { try { await api('DELETE', `/streams/${id}`); toast('Stream removed','info'); loadStreams(); } catch(err) { toast(err.message,'error'); } }
 
 async function loadAdminTeam() {
   try {
     const admins = await api('GET', '/admin/admins');
     document.getElementById('admins-list').innerHTML = admins.map(a => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(30,45,69,.5)">
-        <div>
-          <div style="font-weight:700">${a.username}</div>
-          <div style="font-size:.8rem;color:var(--muted)">${a.email} · Joined ${fmtDate(a.created_at)}</div>
-        </div>
+        <div><div style="font-weight:700">${a.username}</div><div style="font-size:.8rem;color:var(--muted)">${a.email} · Joined ${fmtDate(a.created_at)}</div></div>
         <span class="tag tag-danger">Admin</span>
       </div>`).join('') || '<p style="color:var(--muted)">No admins found.</p>';
-  } catch(err) { toast(err.message, 'error'); }
+  } catch(err) { toast(err.message,'error'); }
 }
 
 document.getElementById('invite-form').addEventListener('submit', async e => {
@@ -501,7 +726,7 @@ document.getElementById('invite-form').addEventListener('submit', async e => {
     toast(res.message, 'success');
     document.getElementById('invite-email').value = '';
     loadAdminTeam();
-  } catch(err) { toast(err.message, 'error'); }
+  } catch(err) { toast(err.message,'error'); }
   finally { btn.textContent = 'Send Admin Invite'; btn.disabled = false; }
 });
 
