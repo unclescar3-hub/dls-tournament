@@ -15,6 +15,7 @@
     <a href="/dls.html">DLS Arena</a>
     <a href="/efootball.html">eFootball</a>
     <a href="/eafc.html">EA FC</a>
+    <a href="/leaderboard.html">Leaderboard</a>
     <a href="/hall-of-fame.html">Hall of Fame</a>
     <a href="/tv.html" class="nav-tv">&#9679; TV</a>
   </div>
@@ -35,7 +36,7 @@
   <h1>UNCLESCAR <span style="color:var(--primary)">STUDIOS</span></h1>
   <p>Nigeria's premier grassroots esports tournament platform. Compete, earn, and become a legend.</p>
   <div style="display:flex;justify-content:center;gap:48px;flex-wrap:wrap;margin-top:40px">
-    <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:1.75rem;font-weight:700" id="stat-arenas">3</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Active Arenas</div></div>
+    <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:1.75rem;font-weight:700">3</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Active Arenas</div></div>
     <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:1.75rem;font-weight:700" id="stat-players">0</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Registered Players</div></div>
     <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:1.75rem;font-weight:700" id="stat-tournaments">0</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Live Tournaments</div></div>
   </div>
@@ -46,26 +47,22 @@
   <p class="section-label">Choose Your Game</p>
   <h2 class="section-title">Select an Arena</h2>
   <div class="grid-3">
-    <div class="arena-card" style="--ac:var(--primary)">
-      <style>.arena-card:nth-child(1)::before{background:var(--primary)}</style>
+    <div class="arena-card" style="border-top:3px solid var(--primary)">
       <span class="tag tag-primary">Dream League Soccer</span>
       <h3>DLS Arena</h3>
       <p>Compete in the ₦100 Proving Grounds, the ₦500 Academy bracket, or the prestigious 20-manager Premier League.</p>
-      <div id="dls-tournaments"></div>
       <a href="/dls.html" class="btn btn-primary btn-block" style="margin-top:8px">Enter DLS Arena</a>
     </div>
     <div class="arena-card" style="border-top:3px solid var(--ef)">
       <span class="tag tag-ef">Konami Division</span>
       <h3>eFootball Arena</h3>
       <p>Enter the ₦200 Proving Grounds ladder or fight for the ultimate crown in the Launch Cup.</p>
-      <div id="ef-tournaments"></div>
       <a href="/efootball.html" class="btn btn-ef btn-block" style="margin-top:8px">Enter eFootball</a>
     </div>
     <div class="arena-card" style="border-top:3px solid var(--eafc)">
       <span class="tag tag-eafc">Mobile Elite</span>
       <h3>EA FC Arena</h3>
       <p>Android and iOS crossplay divisions. Enter the ₦150 ladder and prove your skill on the world's game.</p>
-      <div id="eafc-tournaments"></div>
       <a href="/eafc.html" class="btn btn-eafc btn-block" style="margin-top:8px">Enter EA FC</a>
     </div>
   </div>
@@ -80,20 +77,29 @@
       <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:var(--primary);opacity:.4;margin-bottom:12px">01</div>
         <h3 style="font-size:1.2rem;margin-bottom:8px">Create Account</h3>
-        <p style="color:var(--muted);font-size:.88rem;line-height:1.6">Sign up with your username, email and phone number. Free and instant.</p>
+        <p style="color:var(--muted);font-size:.88rem;line-height:1.6">Sign up free with your username and email. No extra app needed.</p>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:var(--primary);opacity:.4;margin-bottom:12px">02</div>
-        <h3 style="font-size:1.2rem;margin-bottom:8px">Register & Pay</h3>
-        <p style="color:var(--muted);font-size:.88rem;line-height:1.6">Choose your tournament and pay the entry fee securely via Paystack.</p>
+        <h3 style="font-size:1.2rem;margin-bottom:8px">Register &amp; Pay</h3>
+        <p style="color:var(--muted);font-size:.88rem;line-height:1.6">Pick your tournament and pay the entry fee securely via Paystack.</p>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:var(--primary);opacity:.4;margin-bottom:12px">03</div>
-        <h3 style="font-size:1.2rem;margin-bottom:8px">Play & Submit</h3>
-        <p style="color:var(--muted);font-size:.88rem;line-height:1.6">Play your matches, screenshot the result and submit for AI verification.</p>
+        <h3 style="font-size:1.2rem;margin-bottom:8px">Play &amp; Submit</h3>
+        <p style="color:var(--muted);font-size:.88rem;line-height:1.6">Play your match, screenshot the result and submit it. Our admin team — supported by smart tools — reviews every result fairly.</p>
       </div>
     </div>
   </div>
+</div>
+
+<!-- LEADERBOARD TEASER -->
+<div class="section" style="text-align:center">
+  <p class="section-label">Rankings</p>
+  <h2 class="section-title" style="margin-bottom:8px">Top Players This Season</h2>
+  <p style="color:var(--muted);margin-bottom:32px">See who is leading across all three arenas.</p>
+  <div id="top-players" class="grid-3" style="text-align:left;margin-bottom:32px"></div>
+  <a href="/leaderboard.html" class="btn btn-primary">View Full Leaderboard</a>
 </div>
 
 <footer>
@@ -107,11 +113,20 @@
   <div class="modal">
     <button class="modal-close" onclick="closeModal('login-modal')">&times;</button>
     <h2>Log In</h2>
-    <form id="login-form">
-      <div class="form-group"><label>Email</label><input type="email" id="login-email" required placeholder="your@email.com"></div>
-      <div class="form-group"><label>Password</label><input type="password" id="login-password" required placeholder="••••••••"></div>
+    <form id="login-form" autocomplete="on">
+      <div class="form-group">
+        <label>Email or Username</label>
+        <input type="text" id="login-email" required placeholder="Email or username" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password">
+      </div>
       <button type="submit" class="btn btn-primary btn-block">Log In</button>
-      <p style="text-align:center;margin-top:16px;color:var(--muted);font-size:.85rem">No account? <a href="#" onclick="closeModal('login-modal');openModal('register-modal');return false;" style="color:var(--primary)">Sign Up</a></p>
+      <div style="display:flex;justify-content:space-between;margin-top:14px">
+        <a href="#" onclick="closeModal('login-modal');openModal('register-modal');return false;" style="color:var(--primary);font-size:.85rem">Create account</a>
+        <a href="#" onclick="closeModal('login-modal');openModal('forgot-modal');return false;" style="color:var(--muted);font-size:.85rem">Forgot password?</a>
+      </div>
     </form>
   </div>
 </div>
@@ -121,15 +136,50 @@
   <div class="modal">
     <button class="modal-close" onclick="closeModal('register-modal')">&times;</button>
     <h2>Create Account</h2>
-    <form id="register-form">
-      <div class="form-group"><label>Username</label><input type="text" id="reg-username" required placeholder="YourGameTag" maxlength="30"></div>
-      <div class="form-row">
-        <div class="form-group"><label>Email</label><input type="email" id="reg-email" required placeholder="your@email.com"></div>
-        <div class="form-group"><label>Phone</label><input type="tel" id="reg-phone" placeholder="08012345678"></div>
+    <form id="register-form" autocomplete="on">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="reg-username" required placeholder="YourGameTag" maxlength="30" autocomplete="username">
       </div>
-      <div class="form-group"><label>Password</label><input type="password" id="reg-password" required placeholder="Min 6 characters"></div>
-      <button type="submit" class="btn btn-primary btn-block">Create Account</button>
-      <p style="text-align:center;margin-top:16px;color:var(--muted);font-size:.85rem">Already have an account? <a href="#" onclick="closeModal('register-modal');openModal('login-modal');return false;" style="color:var(--primary)">Log In</a></p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="reg-email" required placeholder="your@email.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="reg-phone" placeholder="08012345678" autocomplete="tel">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" required placeholder="Min 6 characters" autocomplete="new-password">
+      </div>
+      <div id="reg-error" style="display:none;background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:12px"></div>
+      <button type="submit" class="btn btn-primary btn-block" id="reg-btn">Create Account</button>
+      <p style="text-align:center;margin-top:16px;color:var(--muted);font-size:.85rem">
+        Already have an account? <a href="#" onclick="closeModal('register-modal');openModal('login-modal');return false;" style="color:var(--primary)">Log In</a>
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-overlay" id="forgot-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('forgot-modal')">&times;</button>
+    <h2>Reset Password</h2>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Enter your email address and we'll send you a link to reset your password.</p>
+    <form id="forgot-form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="forgot-email" required placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div id="forgot-success" style="display:none;background:var(--primary-dim);border:1px solid var(--primary);color:var(--primary);padding:12px 16px;border-radius:8px;font-size:.85rem;margin-bottom:12px"></div>
+      <button type="submit" class="btn btn-primary btn-block" id="forgot-btn">Send Reset Link</button>
+      <p style="text-align:center;margin-top:14px">
+        <a href="#" onclick="closeModal('forgot-modal');openModal('login-modal');return false;" style="color:var(--muted);font-size:.85rem">Back to Log In</a>
+      </p>
     </form>
   </div>
 </div>
@@ -139,17 +189,41 @@
 <script>
 async function loadStats() {
   try {
-    const ts = await api('GET', '/tournaments');
-    document.getElementById('stat-tournaments').textContent = ts.filter(t=>t.status==='open').length;
+    const [ts, lb] = await Promise.all([
+      api('GET', '/tournaments'),
+      api('GET', '/admin/leaderboard')
+    ]);
+    document.getElementById('stat-tournaments').textContent = ts.filter(t => t.status === 'open').length;
+    // total unique players from leaderboard
+    document.getElementById('stat-players').textContent = lb.length;
+
+    // Top 3 players teaser
+    const top = lb.slice(0, 3);
+    const medals = ['🥇','🥈','🥉'];
+    if (top.length) {
+      document.getElementById('top-players').innerHTML = top.map((p, i) => `
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;align-items:center;gap:14px">
+          <div style="font-size:2rem">${medals[i]}</div>
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700">${p.username}</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:2px">${p.total_wins||0}W · ${p.total_draws||0}D · <strong style="color:var(--gold)">${p.total_points||0} pts</strong></div>
+          </div>
+        </div>`).join('');
+    } else {
+      document.getElementById('top-players').innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">No players ranked yet — be the first!</p>';
+    }
   } catch {}
 }
 
 document.getElementById('login-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const btn = e.target.querySelector('button');
+  const btn = e.target.querySelector('button[type=submit]');
   btn.textContent = 'Logging in...'; btn.disabled = true;
   try {
-    const data = await api('POST', '/auth/login', { email: document.getElementById('login-email').value, password: document.getElementById('login-password').value });
+    const data = await api('POST', '/auth/login', {
+      email: document.getElementById('login-email').value.trim(),
+      password: document.getElementById('login-password').value
+    });
     currentUser = data.user; updateNavAuth();
     closeModal('login-modal');
     toast('Welcome back, ' + data.user.username + '!', 'success');
@@ -160,20 +234,42 @@ document.getElementById('login-form').addEventListener('submit', async e => {
 
 document.getElementById('register-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const btn = e.target.querySelector('button');
-  btn.textContent = 'Creating...'; btn.disabled = true;
+  const btn = document.getElementById('reg-btn');
+  const errBox = document.getElementById('reg-error');
+  errBox.style.display = 'none';
+  btn.textContent = 'Creating account...'; btn.disabled = true;
   try {
     const data = await api('POST', '/auth/register', {
-      username: document.getElementById('reg-username').value,
-      email: document.getElementById('reg-email').value,
-      phone: document.getElementById('reg-phone').value,
+      username: document.getElementById('reg-username').value.trim(),
+      email: document.getElementById('reg-email').value.trim(),
+      phone: document.getElementById('reg-phone').value.trim(),
       password: document.getElementById('reg-password').value
     });
     currentUser = data.user; updateNavAuth();
     closeModal('register-modal');
-    toast('Account created! Welcome, ' + data.user.username + '!', 'success');
-  } catch(err) { toast(err.message, 'error'); }
+    toast('Welcome to Unclescar Studios, ' + data.user.username + '! Check your email.', 'success');
+    loadStats();
+  } catch(err) {
+    errBox.textContent = err.message;
+    errBox.style.display = 'block';
+  }
   finally { btn.textContent = 'Create Account'; btn.disabled = false; }
+});
+
+document.getElementById('forgot-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('forgot-btn');
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  try {
+    const data = await api('POST', '/auth/forgot-password', {
+      email: document.getElementById('forgot-email').value.trim()
+    });
+    const box = document.getElementById('forgot-success');
+    box.textContent = data.message;
+    box.style.display = 'block';
+    btn.style.display = 'none';
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = 'Send Reset Link'; btn.disabled = false; }
 });
 
 document.addEventListener('DOMContentLoaded', loadStats);

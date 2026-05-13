@@ -15,6 +15,7 @@
     <a href="/dls.html">DLS Arena</a>
     <a href="/efootball.html">eFootball</a>
     <a href="/eafc.html" class="active">EA FC</a>
+    <a href="/leaderboard.html">Leaderboard</a>
     <a href="/hall-of-fame.html">Hall of Fame</a>
     <a href="/tv.html" class="nav-tv">&#9679; TV</a>
   </div>
@@ -41,7 +42,19 @@
   <div id="eafc-list" class="grid-3"><div class="spinner"></div></div>
 </div>
 
+<!-- EA FC Leaderboard -->
 <div style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:48px 32px">
+  <div style="max-width:900px;margin:0 auto">
+    <p class="section-label">EA FC Rankings</p>
+    <h2 class="section-title">Top EA FC Players</h2>
+    <div id="eafc-top-players"><div class="spinner"></div></div>
+    <div style="text-align:center;margin-top:24px">
+      <a href="/leaderboard.html" class="btn btn-eafc">View Full EA FC Leaderboard</a>
+    </div>
+  </div>
+</div>
+
+<div style="padding:48px 32px">
   <div style="max-width:900px;margin:0 auto">
     <p class="section-label">Division Guide</p>
     <h2 class="section-title">EA FC Pathway</h2>
@@ -69,8 +82,47 @@
 </div>
 
 <footer><div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div><span class="footer-copy">&copy; 2026 Unclescar Studios.</span><a href="/rules.html" class="footer-link">Rulebook</a></footer>
-<div class="modal-overlay" id="login-modal"><div class="modal"><button class="modal-close" onclick="closeModal('login-modal')">&times;</button><h2>Log In</h2><form id="login-form"><div class="form-group"><label>Email</label><input type="email" id="login-email" required></div><div class="form-group"><label>Password</label><input type="password" id="login-password" required></div><button type="submit" class="btn btn-eafc btn-block">Log In</button></form></div></div>
-<div class="modal-overlay" id="register-modal"><div class="modal"><button class="modal-close" onclick="closeModal('register-modal')">&times;</button><h2>Sign Up</h2><form id="register-form"><div class="form-group"><label>Username</label><input type="text" id="reg-username" required></div><div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="reg-email" required></div><div class="form-group"><label>Phone</label><input type="tel" id="reg-phone"></div></div><div class="form-group"><label>Password</label><input type="password" id="reg-password" required></div><button type="submit" class="btn btn-eafc btn-block">Create Account</button></form></div></div>
+
+<div class="modal-overlay" id="login-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('login-modal')">&times;</button>
+    <h2>Log In</h2>
+    <form id="login-form">
+      <div class="form-group"><label>Email or Username</label><input type="text" id="login-email" required autocomplete="username"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-password" required autocomplete="current-password"></div>
+      <button type="submit" class="btn btn-eafc btn-block">Log In</button>
+      <div style="display:flex;justify-content:space-between;margin-top:14px">
+        <a href="#" onclick="closeModal('login-modal');openModal('register-modal');return false;" style="color:var(--eafc);font-size:.85rem">Create account</a>
+        <a href="#" onclick="closeModal('login-modal');openModal('forgot-modal');return false;" style="color:var(--muted);font-size:.85rem">Forgot password?</a>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="modal-overlay" id="register-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('register-modal')">&times;</button>
+    <h2>Sign Up</h2>
+    <form id="register-form">
+      <div class="form-group"><label>Username</label><input type="text" id="reg-username" required autocomplete="username"></div>
+      <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="reg-email" required autocomplete="email"></div><div class="form-group"><label>Phone</label><input type="tel" id="reg-phone" autocomplete="tel"></div></div>
+      <div class="form-group"><label>Password</label><input type="password" id="reg-password" required autocomplete="new-password"></div>
+      <div id="reg-error" style="display:none;background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:12px"></div>
+      <button type="submit" class="btn btn-eafc btn-block" id="reg-btn">Create Account</button>
+    </form>
+  </div>
+</div>
+<div class="modal-overlay" id="forgot-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('forgot-modal')">&times;</button>
+    <h2>Reset Password</h2>
+    <form id="forgot-form">
+      <div class="form-group"><label>Email Address</label><input type="email" id="forgot-email" required autocomplete="email"></div>
+      <div id="forgot-success" style="display:none;background:rgba(255,26,94,.1);border:1px solid var(--eafc);color:var(--eafc);padding:12px 16px;border-radius:8px;font-size:.85rem;margin-bottom:12px"></div>
+      <button type="submit" class="btn btn-eafc btn-block" id="forgot-btn">Send Reset Link</button>
+    </form>
+  </div>
+</div>
+
 <div id="toast-container"></div>
 <script src="/js/app.js"></script>
 <script>
@@ -78,7 +130,7 @@ async function loadEAFC() {
   try {
     const ts = await api('GET', '/tournaments?arena=eafc');
     const el = document.getElementById('eafc-list');
-    if (!ts.length) { el.innerHTML='<p style="color:var(--muted)">No EA FC tournaments open right now. Check back soon!</p>'; return; }
+    if (!ts.length) { el.innerHTML='<p style="color:var(--muted)">No EA FC tournaments open right now.</p>'; return; }
     el.innerHTML = ts.map(t => `<div class="arena-card" style="border-top:3px solid var(--eafc)">
       <span class="tag tag-eafc">${t.format.replace(/-/g,' ')}</span>
       <h3>${t.name}</h3>
@@ -91,9 +143,30 @@ async function loadEAFC() {
     </div>`).join('');
   } catch { document.getElementById('eafc-list').innerHTML='<p style="color:var(--muted)">Could not load tournaments.</p>'; }
 }
-document.getElementById('login-form').addEventListener('submit',async e=>{e.preventDefault();try{const d=await api('POST','/auth/login',{email:document.getElementById('login-email').value,password:document.getElementById('login-password').value});currentUser=d.user;updateNavAuth();closeModal('login-modal');toast('Welcome back!','success');}catch(err){toast(err.message,'error');}});
-document.getElementById('register-form').addEventListener('submit',async e=>{e.preventDefault();try{const d=await api('POST','/auth/register',{username:document.getElementById('reg-username').value,email:document.getElementById('reg-email').value,phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value});currentUser=d.user;updateNavAuth();closeModal('register-modal');toast('Account created!','success');}catch(err){toast(err.message,'error');}});
-document.addEventListener('DOMContentLoaded', loadEAFC);
+
+async function loadEAFCLeaderboard() {
+  try {
+    const rows = await api('GET', '/admin/leaderboard/eafc');
+    const el = document.getElementById('eafc-top-players');
+    if (!rows.length) { el.innerHTML='<p style="color:var(--muted);text-align:center">No EA FC rankings yet.</p>'; return; }
+    const medals = ['🥇','🥈','🥉'];
+    el.innerHTML = `<div style="overflow-x:auto"><table class="standings-table">
+      <thead><tr><th>#</th><th>Player</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead>
+      <tbody>${rows.slice(0,10).map((r,i)=>`<tr>
+        <td>${i<3?medals[i]:i+1}</td><td><strong>${r.username}</strong></td>
+        <td style="color:var(--eafc)">${r.total_wins||0}</td><td>${r.total_draws||0}</td>
+        <td style="color:var(--danger)">${r.total_losses||0}</td>
+        <td>${(parseInt(r.total_gd)||0)>=0?'+'+(r.total_gd||0):r.total_gd||0}</td>
+        <td><strong style="color:var(--gold)">${r.total_points||0}</strong></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  } catch { document.getElementById('eafc-top-players').innerHTML='<p style="color:var(--muted);text-align:center">Could not load rankings.</p>'; }
+}
+
+document.getElementById('login-form').addEventListener('submit',async e=>{e.preventDefault();const btn=e.target.querySelector('button[type=submit]');btn.textContent='...';btn.disabled=true;try{const d=await api('POST','/auth/login',{email:document.getElementById('login-email').value.trim(),password:document.getElementById('login-password').value});currentUser=d.user;updateNavAuth();closeModal('login-modal');toast('Welcome back!','success');}catch(err){toast(err.message,'error');}finally{btn.textContent='Log In';btn.disabled=false;}});
+document.getElementById('register-form').addEventListener('submit',async e=>{e.preventDefault();const btn=document.getElementById('reg-btn');const errBox=document.getElementById('reg-error');errBox.style.display='none';btn.textContent='Creating...';btn.disabled=true;try{const d=await api('POST','/auth/register',{username:document.getElementById('reg-username').value.trim(),email:document.getElementById('reg-email').value.trim(),phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value});currentUser=d.user;updateNavAuth();closeModal('register-modal');toast('Account created!','success');}catch(err){errBox.textContent=err.message;errBox.style.display='block';}finally{btn.textContent='Create Account';btn.disabled=false;}});
+document.getElementById('forgot-form').addEventListener('submit',async e=>{e.preventDefault();const btn=document.getElementById('forgot-btn');btn.textContent='Sending...';btn.disabled=true;try{const d=await api('POST','/auth/forgot-password',{email:document.getElementById('forgot-email').value.trim()});document.getElementById('forgot-success').textContent=d.message;document.getElementById('forgot-success').style.display='block';btn.style.display='none';}catch(err){toast(err.message,'error');}finally{btn.textContent='Send Reset Link';btn.disabled=false;}});
+document.addEventListener('DOMContentLoaded', () => { loadEAFC(); loadEAFCLeaderboard(); });
 </script>
 </body>
 </html>

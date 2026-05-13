@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard | Unclescar Studios</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+  <div class="nav-links">
+    <a href="/">Hub</a>
+    <a href="/dls.html">DLS Arena</a>
+    <a href="/efootball.html">eFootball</a>
+    <a href="/eafc.html">EA FC</a>
+    <a href="/leaderboard.html" class="active">Leaderboard</a>
+    <a href="/hall-of-fame.html">Hall of Fame</a>
+    <a href="/tv.html" class="nav-tv">&#9679; TV</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" class="nav-btn nav-btn-outline" id="nav-login-btn" onclick="openModal('login-modal');return false;">Log In</a>
+    <a href="#" class="nav-btn nav-btn-primary" id="nav-register-btn" onclick="openModal('register-modal');return false;">Sign Up</a>
+    <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
+      <span style="color:var(--muted);font-size:.85rem;">Hi, <strong id="nav-username"></strong></span>
+      <a href="/dashboard.html" id="nav-dashboard-link" class="nav-btn nav-btn-outline">Dashboard</a>
+      <button onclick="logout()" class="nav-btn nav-btn-outline">Log Out</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero" style="background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(255,193,7,.07) 0%,transparent 70%)">
+  <div class="hero-eyebrow tag tag-gold">All-Time Rankings</div>
+  <h1>LEADERBOARD</h1>
+  <p>The definitive ranking of every player across all three arenas. Sorted by total points.</p>
+</div>
+
+<div class="section">
+  <!-- Arena filter tabs -->
+  <div style="display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap">
+    <button class="arena-tab active" data-arena="all" onclick="switchArena('all',this)">&#127942; All Arenas</button>
+    <button class="arena-tab" data-arena="dls" onclick="switchArena('dls',this)">DLS Arena</button>
+    <button class="arena-tab" data-arena="efootball" onclick="switchArena('efootball',this)">eFootball</button>
+    <button class="arena-tab" data-arena="eafc" onclick="switchArena('eafc',this)">EA FC</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 id="lb-title">Global Rankings</h3>
+      <span class="tag tag-gold" id="lb-count"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="standings-table" id="lb-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Played</th>
+            <th>W</th>
+            <th>D</th>
+            <th>L</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>GD</th>
+            <th>Pts</th>
+            <th>Tournaments</th>
+          </tr>
+        </thead>
+        <tbody id="lb-body">
+          <tr><td colspan="11" style="text-align:center;padding:40px"><div class="spinner" style="margin:0 auto"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Per-arena breakdown cards -->
+  <div style="margin-top:48px">
+    <p class="section-label">Arena Rankings</p>
+    <h2 class="section-title">Top 5 Per Arena</h2>
+    <div class="grid-3" id="arena-tops"></div>
+  </div>
+</div>
+
+<footer><div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div><span class="footer-copy">&copy; 2026 Unclescar Studios.</span><a href="/rules.html" class="footer-link">Rulebook</a></footer>
+<div class="modal-overlay" id="login-modal"><div class="modal"><button class="modal-close" onclick="closeModal('login-modal')">&times;</button><h2>Log In</h2><form id="login-form"><div class="form-group"><label>Email or Username</label><input type="text" id="login-email" required autocomplete="username"></div><div class="form-group"><label>Password</label><input type="password" id="login-password" required autocomplete="current-password"></div><button type="submit" class="btn btn-primary btn-block">Log In</button></form></div></div>
+<div class="modal-overlay" id="register-modal"><div class="modal"><button class="modal-close" onclick="closeModal('register-modal')">&times;</button><h2>Sign Up</h2><form id="register-form"><div class="form-group"><label>Username</label><input type="text" id="reg-username" required autocomplete="username"></div><div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="reg-email" required autocomplete="email"></div><div class="form-group"><label>Phone</label><input type="tel" id="reg-phone" autocomplete="tel"></div></div><div class="form-group"><label>Password</label><input type="password" id="reg-password" required autocomplete="new-password"></div><button type="submit" class="btn btn-primary btn-block">Create Account</button></form></div></div>
+<div id="toast-container"></div>
+
+<style>
+.arena-tab {
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+  padding: 8px 20px; border-radius: 8px; font-family: 'Inter', sans-serif;
+  font-size: .85rem; font-weight: 600; cursor: pointer; transition: all .2s;
+}
+.arena-tab:hover { color: var(--text); border-color: var(--text); }
+.arena-tab.active { background: var(--primary); color: #000; border-color: var(--primary); }
+.arena-tab[data-arena="dls"].active { background: var(--primary); border-color: var(--primary); }
+.arena-tab[data-arena="efootball"].active { background: var(--ef); border-color: var(--ef); }
+.arena-tab[data-arena="eafc"].active { background: var(--eafc); border-color: var(--eafc); color: #fff; }
+</style>
+
+<script src="/js/app.js"></script>
+<script>
+const medals = ['&#127947;', '&#129352;', '&#129353;'];
+const arenaColors = { dls: 'var(--primary)', efootball: 'var(--ef)', eafc: 'var(--eafc)' };
+const arenaTags = { dls: 'tag-primary', efootball: 'tag-ef', eafc: 'tag-eafc' };
+const arenaNames = { dls: 'DLS Arena', efootball: 'eFootball Arena', eafc: 'EA FC Arena' };
+
+function renderTable(rows) {
+  if (!rows.length) {
+    document.getElementById('lb-body').innerHTML =
+      '<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--muted)">No data yet — be the first to compete!</td></tr>';
+    document.getElementById('lb-count').textContent = '0 players';
+    return;
+  }
+  document.getElementById('lb-count').textContent = rows.length + ' players';
+  document.getElementById('lb-body').innerHTML = rows.map((r, i) => {
+    const played = (parseInt(r.total_wins)||0) + (parseInt(r.total_draws)||0) + (parseInt(r.total_losses)||0);
+    const gd = parseInt(r.total_gd) || 0;
+    const rankEl = i < 3
+      ? `<span style="font-size:1.2rem">${medals[i]}</span>`
+      : `<span style="${i < 10 ? 'color:var(--text);font-weight:700' : 'color:var(--muted)'}">${i+1}</span>`;
+    return `<tr>
+      <td>${rankEl}</td>
+      <td><strong>${r.username}</strong></td>
+      <td>${played}</td>
+      <td style="color:var(--primary)">${r.total_wins||0}</td>
+      <td>${r.total_draws||0}</td>
+      <td style="color:var(--danger)">${r.total_losses||0}</td>
+      <td>${r.total_gf||0}</td>
+      <td>${r.total_ga||0}</td>
+      <td>${gd >= 0 ? '+'+gd : gd}</td>
+      <td><strong style="color:var(--gold);font-size:1rem">${r.total_points||0}</strong></td>
+      <td style="color:var(--muted)">${r.tournaments_played||0}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function switchArena(arena, btn) {
+  document.querySelectorAll('.arena-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const titles = { all: 'Global Rankings', dls: 'DLS Arena Rankings', efootball: 'eFootball Rankings', eafc: 'EA FC Rankings' };
+  document.getElementById('lb-title').textContent = titles[arena];
+  document.getElementById('lb-body').innerHTML =
+    '<tr><td colspan="11" style="text-align:center;padding:40px"><div class="spinner" style="margin:0 auto"></div></td></tr>';
+  try {
+    const path = arena === 'all' ? '/admin/leaderboard' : `/admin/leaderboard/${arena}`;
+    const rows = await api('GET', path);
+    renderTable(rows);
+  } catch { renderTable([]); }
+}
+
+async function loadArenaTops() {
+  const el = document.getElementById('arena-tops');
+  const arenas = ['dls', 'efootball', 'eafc'];
+  const results = await Promise.all(arenas.map(a => api('GET', `/admin/leaderboard/${a}`).catch(() => [])));
+  el.innerHTML = arenas.map((arena, idx) => {
+    const rows = results[idx].slice(0, 5);
+    const color = arenaColors[arena];
+    return `<div class="card" style="border-top:3px solid ${color}">
+      <div class="card-header">
+        <h3>${arenaNames[arena]}</h3>
+        <span class="tag ${arenaTags[arena]}">${rows.length} players</span>
+      </div>
+      <div class="card-body" style="padding:0">
+        ${rows.length ? rows.map((r,i) => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(30,45,69,.5)">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:${i<3?'1.1':'0.9'}rem">${i<3?medals[i]:i+1}</span>
+              <span style="font-weight:${i<3?700:400}">${r.username}</span>
+            </div>
+            <strong style="color:${color}">${r.total_points||0} pts</strong>
+          </div>`).join('')
+          : `<div style="padding:24px;color:var(--muted);text-align:center">No players yet</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    const d = await api('POST','/auth/login',{email:document.getElementById('login-email').value,password:document.getElementById('login-password').value});
+    currentUser=d.user; updateNavAuth(); closeModal('login-modal'); toast('Welcome back!','success');
+  } catch(err) { toast(err.message,'error'); }
+});
+document.getElementById('register-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button'); btn.textContent='Creating...'; btn.disabled=true;
+  try {
+    const d = await api('POST','/auth/register',{username:document.getElementById('reg-username').value,email:document.getElementById('reg-email').value,phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value});
+    currentUser=d.user; updateNavAuth(); closeModal('register-modal'); toast('Account created! Welcome, '+d.user.username,'success');
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.textContent='Create Account'; btn.disabled=false; }
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadUser();
+  switchArena('all', document.querySelector('.arena-tab[data-arena="all"]'));
+  loadArenaTops();
+});
+</script>
+</body>
+</html>

@@ -15,13 +15,13 @@
     <a href="/dls.html">DLS Arena</a>
     <a href="/efootball.html">eFootball</a>
     <a href="/eafc.html">EA FC</a>
-    <a href="/hall-of-fame.html">Hall of Fame</a>
+    <a href="/leaderboard.html">Leaderboard</a>
     <a href="/tv.html" class="nav-tv">&#9679; TV</a>
   </div>
   <div class="nav-right">
     <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
       <span style="color:var(--muted);font-size:.85rem;">Hi, <strong id="nav-username" style="color:var(--text)"></strong></span>
-      <a href="/dashboard.html" id="nav-dashboard-link" class="nav-btn nav-btn-outline active">Dashboard</a>
+      <a href="/dashboard.html" id="nav-dashboard-link" class="nav-btn nav-btn-outline">Dashboard</a>
       <button onclick="logout()" class="nav-btn nav-btn-outline">Log Out</button>
     </div>
   </div>
@@ -41,7 +41,7 @@
   </div>
 
   <div id="dash-content" style="display:none">
-    <!-- Stats Row -->
+    <!-- Stats -->
     <div class="grid-3" style="margin-bottom:40px">
       <div class="card"><div class="card-body" style="text-align:center">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--primary)" id="my-reg-count">0</div>
@@ -65,9 +65,12 @@
 
     <!-- Submit Match Result -->
     <div class="card" style="margin-bottom:40px">
-      <div class="card-header"><h3>Submit Match Result</h3><span class="tag tag-primary">AI Verified</span></div>
+      <div class="card-header">
+        <h3>Submit Match Result</h3>
+        <span class="tag tag-primary">Admin Reviewed</span>
+      </div>
       <div class="card-body">
-        <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Upload your match screenshot. Our AI will verify the score automatically. High-confidence results are approved instantly.</p>
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Upload your match screenshot. Our admin team reviews every result to ensure fair play.</p>
         <form id="submit-match-form" enctype="multipart/form-data">
           <div class="form-row">
             <div class="form-group">
@@ -89,7 +92,7 @@
             <label>Match Screenshot (required)</label>
             <input type="file" id="match-screenshot" accept="image/*" required class="input-file">
           </div>
-          <button type="submit" class="btn btn-primary">Submit Result for AI Verification</button>
+          <button type="submit" class="btn btn-primary">Submit Result</button>
         </form>
         <div id="match-result-box" style="display:none;margin-top:20px;padding:16px;border-radius:10px;border:1px solid var(--border)"></div>
       </div>
@@ -117,8 +120,8 @@
               </select>
             </div>
           </div>
-          <div class="form-group"><label>Stream Title</label><input type="text" id="stream-title" placeholder="e.g. DLS Academy Grand Final – NairobiFC vs GoatFC" required></div>
-          <div class="form-group"><label>Stream URL / Link</label><input type="url" id="stream-url" placeholder="https://youtube.com/live/..." required></div>
+          <div class="form-group"><label>Stream Title</label><input type="text" id="stream-title" placeholder="e.g. DLS Academy Grand Final" required></div>
+          <div class="form-group"><label>Stream URL</label><input type="url" id="stream-url" placeholder="https://youtube.com/live/..." required></div>
           <button type="submit" class="btn btn-ef">Submit Stream Link</button>
         </form>
       </div>
@@ -139,18 +142,22 @@ let myRegistrations = [];
 
 async function initDashboard() {
   const user = await loadUser();
-  if (!user) { document.getElementById('not-logged-in').style.display='block'; return; }
-  document.getElementById('dash-content').style.display='block';
+  if (!user) { document.getElementById('not-logged-in').style.display = 'block'; return; }
+  document.getElementById('dash-content').style.display = 'block';
   document.getElementById('dash-welcome').textContent = `Welcome back, ${user.username}! Track your tournaments and submit results.`;
+  if (user.role === 'admin') { window.location.href = '/admin.html'; return; }
   await Promise.all([loadMyTournaments(), loadStandingsStats()]);
 }
 
 async function loadMyTournaments() {
   try {
     myRegistrations = await api('GET', '/tournaments/my/registrations');
-    document.getElementById('my-reg-count').textContent = myRegistrations.length;
+    document.getElementById('my-reg-count').textContent = myRegistrations.filter(r => r.payment_status === 'paid').length;
     const list = document.getElementById('my-tournaments-list');
-    if (!myRegistrations.length) { list.innerHTML = '<p style="color:var(--muted)">No tournaments joined yet. <a href="/" style="color:var(--primary)">Browse arenas</a></p>'; return; }
+    if (!myRegistrations.length) {
+      list.innerHTML = '<p style="color:var(--muted)">No tournaments joined yet. <a href="/" style="color:var(--primary)">Browse arenas</a></p>';
+      return;
+    }
 
     const tSelect = document.getElementById('match-tournament');
     const sSelect = document.getElementById('stream-tournament');
@@ -158,35 +165,34 @@ async function loadMyTournaments() {
     sSelect.innerHTML = '<option value="">Select tournament...</option>';
 
     list.innerHTML = myRegistrations.map(r => `
-      <div class="card" style="margin-bottom:16px">
+      <div class="card" style="margin-bottom:14px">
         <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700">${r.name}</div>
-            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${r.arena} &middot; ${r.format} &middot; Entry: ${naira(r.entry_fee)}</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${r.arena} · ${r.format} · Entry: ${naira(r.entry_fee)}</div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             ${statusBadge(r.tournament_status)}
-            ${r.payment_status==='paid'?'<span class="tag tag-primary">Paid</span>':'<span class="tag tag-danger">Unpaid</span>'}
+            ${r.payment_status === 'paid' ? '<span class="tag tag-primary">✓ Paid</span>' : '<span class="tag tag-danger">Unpaid</span>'}
             <a href="/tournament.html?id=${r.tournament_id}" class="btn btn-outline btn-sm">View</a>
           </div>
         </div>
       </div>`).join('');
 
-    myRegistrations.filter(r=>r.payment_status==='paid').forEach(r => {
+    myRegistrations.filter(r => r.payment_status === 'paid').forEach(r => {
       tSelect.innerHTML += `<option value="${r.tournament_id}">${r.name}</option>`;
       sSelect.innerHTML += `<option value="${r.tournament_id}">${r.name}</option>`;
     });
-  } catch(err) { toast(err.message,'error'); }
+  } catch(err) { toast(err.message, 'error'); }
 }
 
 async function loadStandingsStats() {
   try {
     let totalWins = 0, totalPoints = 0;
-    for (const r of myRegistrations) {
-      if (r.payment_status !== 'paid') continue;
+    for (const r of myRegistrations.filter(r => r.payment_status === 'paid')) {
       const data = await api('GET', `/tournaments/${r.tournament_id}`);
       const me = data.standings.find(s => s.user_id === currentUser.id);
-      if (me) { totalWins += me.wins; totalPoints += me.points; }
+      if (me) { totalWins += parseInt(me.wins)||0; totalPoints += parseInt(me.points)||0; }
     }
     document.getElementById('my-wins').textContent = totalWins;
     document.getElementById('my-points').textContent = totalPoints;
@@ -196,16 +202,13 @@ async function loadStandingsStats() {
 document.getElementById('submit-match-form').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = e.target.querySelector('button');
-  btn.textContent = 'Verifying with AI...'; btn.disabled = true;
-
+  btn.textContent = 'Submitting...'; btn.disabled = true;
   const opponentUsername = document.getElementById('match-opponent').value.trim();
   const tournamentId = document.getElementById('match-tournament').value;
-
   try {
-    // Resolve opponent username to ID
     const tData = await api('GET', `/tournaments/${tournamentId}`);
     const oppEntry = tData.standings.find(s => s.username.toLowerCase() === opponentUsername.toLowerCase());
-    if (!oppEntry) throw new Error('Opponent not found in this tournament. Check their username.');
+    if (!oppEntry) throw new Error('Opponent not found in this tournament. Check their username spelling.');
 
     const fd = new FormData();
     fd.append('tournament_id', tournamentId);
@@ -217,17 +220,19 @@ document.getElementById('submit-match-form').addEventListener('submit', async e 
     const result = await api('POST', '/matches/submit', fd, true);
     const box = document.getElementById('match-result-box');
     box.style.display = 'block';
-    const ai = result.ai;
-    const color = result.status === 'ai_approved' ? 'var(--primary)' : 'var(--gold)';
-    box.style.borderColor = color;
+    const approved = result.status === 'ai_approved';
+    box.style.borderColor = approved ? 'var(--primary)' : 'var(--gold)';
     box.innerHTML = `
-      <div style="font-weight:700;color:${color};margin-bottom:8px">${result.status==='ai_approved'?'✓ AI Approved':'⚠ Pending Admin Review'}</div>
-      <div style="font-size:.85rem;color:var(--muted)">${ai.notes || ''}</div>
-      <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Confidence: ${ai.confidence || 'unknown'}</div>`;
-    toast(result.status==='ai_approved'?'Result approved!':'Submitted — awaiting admin review', result.status==='ai_approved'?'success':'info');
+      <div style="font-weight:700;color:${approved ? 'var(--primary)':'var(--gold)'};margin-bottom:6px">
+        ${approved ? '✓ Result submitted and approved' : '⏳ Submitted — pending admin review'}
+      </div>
+      <div style="font-size:.85rem;color:var(--muted)">
+        ${approved ? 'Standings have been updated.' : 'Our admin team will review your screenshot and update standings shortly.'}
+      </div>`;
+    toast(approved ? 'Result approved!' : 'Submitted — admin will review shortly', approved ? 'success' : 'info');
     e.target.reset();
-  } catch(err) { toast(err.message,'error'); }
-  finally { btn.textContent='Submit Result for AI Verification'; btn.disabled=false; }
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = 'Submit Result'; btn.disabled = false; }
 });
 
 document.getElementById('stream-form').addEventListener('submit', async e => {
@@ -241,13 +246,12 @@ document.getElementById('stream-form').addEventListener('submit', async e => {
     });
     toast('Stream link submitted! Admin will feature it on TV.', 'success');
     e.target.reset();
-  } catch(err) { toast(err.message,'error'); }
+  } catch(err) { toast(err.message, 'error'); }
 });
 
-// Handle payment success redirect
 const params = new URLSearchParams(location.search);
 if (params.get('payment') === 'success') toast('Payment confirmed! You are now registered.', 'success');
-if (params.get('error')) toast('Payment issue: ' + params.get('error'), 'error');
+if (params.get('error')) toast('Payment issue: ' + params.get('error').replace(/_/g,' '), 'error');
 
 document.addEventListener('DOMContentLoaded', initDashboard);
 </script>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accept Admin Invite | Unclescar Studios</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+  <div class="nav-right"><a href="/" class="nav-btn nav-btn-outline">Back to Hub</a></div>
+</nav>
+
+<div style="min-height:80vh;display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="width:100%;max-width:440px">
+
+    <div id="checking" style="text-align:center;padding:40px">
+      <div class="spinner"></div>
+      <p style="color:var(--muted);margin-top:16px">Verifying invite...</p>
+    </div>
+
+    <div id="invalid" style="display:none" class="card">
+      <div class="card-body" style="text-align:center;padding:40px">
+        <div style="font-size:3rem;margin-bottom:16px">&#9888;</div>
+        <h2 style="color:var(--danger);margin-bottom:12px">Invalid Invite</h2>
+        <p style="color:var(--muted)">This invite link is invalid or has expired. Ask the main admin to send a new one.</p>
+        <a href="/" class="btn btn-outline btn-block" style="margin-top:24px">Back to Homepage</a>
+      </div>
+    </div>
+
+    <div id="invite-form-box" style="display:none" class="card">
+      <div class="card-body">
+        <span class="tag tag-danger" style="margin-bottom:16px;display:inline-block">Admin Invitation</span>
+        <h2 style="margin-bottom:8px">Join as Co-Admin</h2>
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:24px" id="invite-email-note">You've been invited to co-admin Unclescar Studios.</p>
+        <form id="invite-form">
+          <div id="new-user-fields">
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" id="inv-username" placeholder="Your game tag / display name" autocomplete="username">
+            </div>
+            <div class="form-group">
+              <label>Phone (optional)</label>
+              <input type="tel" id="inv-phone" placeholder="08012345678" autocomplete="tel">
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="inv-password" placeholder="Min 6 characters" autocomplete="new-password">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-danger btn-block">Accept &amp; Activate Admin Access</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="invite-success" style="display:none" class="card">
+      <div class="card-body" style="text-align:center;padding:40px">
+        <div style="font-size:3rem;margin-bottom:16px">&#127942;</div>
+        <h2 style="color:var(--primary);margin-bottom:12px">Welcome, Admin!</h2>
+        <p style="color:var(--muted);margin-bottom:24px">Your admin access is active. You can now manage tournaments, review results, and run the platform.</p>
+        <a href="/admin.html" class="btn btn-danger btn-block">Open Admin Panel</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<script>
+const token = new URLSearchParams(location.search).get('token');
+
+function show(id) {
+  ['checking','invalid','invite-form-box','invite-success'].forEach(s =>
+    document.getElementById(s).style.display = s === id ? 'block' : 'none'
+  );
+}
+
+async function init() {
+  if (!token) { show('invalid'); return; }
+  // We'll find out on submit if token is valid; just show the form
+  show('invite-form-box');
+}
+
+document.getElementById('invite-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.textContent = 'Activating...'; btn.disabled = true;
+  try {
+    const d = await api('POST', '/auth/accept-invite', {
+      token,
+      username: document.getElementById('inv-username').value,
+      phone: document.getElementById('inv-phone').value,
+      password: document.getElementById('inv-password').value
+    });
+    currentUser = d.user;
+    show('invite-success');
+    toast('Admin access activated!', 'success');
+  } catch(err) {
+    toast(err.message, 'error');
+    if (err.message.includes('expired') || err.message.includes('invalid')) show('invalid');
+  }
+  finally { btn.textContent = 'Accept & Activate Admin Access'; btn.disabled = false; }
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

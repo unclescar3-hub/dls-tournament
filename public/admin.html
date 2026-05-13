@@ -16,19 +16,19 @@
   <div class="nav-right">
     <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
       <span class="tag tag-danger">ADMIN</span>
-      <span style="color:var(--muted);font-size:.85rem"><strong id="nav-username" style="color:var(--text)"></strong></span>
+      <strong id="nav-username" style="color:var(--text);font-size:.85rem"></strong>
       <button onclick="logout()" class="nav-btn nav-btn-outline">Log Out</button>
     </div>
   </div>
 </nav>
 
 <!-- Admin Login Gate -->
-<div id="admin-login-screen" style="display:none;min-height:80vh;display:flex;align-items:center;justify-content:center">
+<div id="admin-login-screen" style="min-height:80vh;display:flex;align-items:center;justify-content:center">
   <div class="modal" style="position:static;max-width:400px;margin:0 auto">
     <h2 style="margin-bottom:8px">Admin Access</h2>
     <p style="color:var(--muted);font-size:.88rem;margin-bottom:24px">Enter your admin password to continue.</p>
     <form id="admin-login-form">
-      <div class="form-group"><label>Admin Password</label><input type="password" id="admin-pw" required placeholder="••••••••"></div>
+      <div class="form-group"><label>Admin Password</label><input type="password" id="admin-pw" required placeholder="••••••••" autocomplete="current-password"></div>
       <button type="submit" class="btn btn-danger btn-block">Access Admin Panel</button>
     </form>
   </div>
@@ -39,24 +39,26 @@
   <div class="page-hero" style="background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,68,68,.06) 0%,transparent 70%)">
     <div class="hero-eyebrow tag tag-danger">Control Center</div>
     <h1>ADMIN DASHBOARD</h1>
-    <p>Manage tournaments, review matches, and control the entire platform.</p>
+    <p>Manage tournaments, review matches, send match codes, and control the platform.</p>
   </div>
 
   <div class="section">
     <!-- Stats -->
-    <div class="grid-3" style="margin-bottom:40px" id="admin-stats">
+    <div class="grid-3" style="margin-bottom:40px">
       <div class="card"><div class="card-body" style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--primary)" id="s-users">–</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Total Players</div></div></div>
       <div class="card"><div class="card-body" style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--gold)" id="s-regs">–</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Paid Registrations</div></div></div>
       <div class="card"><div class="card-body" style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--danger)" id="s-pending">–</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Pending Reviews</div></div></div>
     </div>
 
     <!-- TABS -->
-    <div style="display:flex;gap:8px;margin-bottom:28px;border-bottom:1px solid var(--border);padding-bottom:0">
+    <div style="display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid var(--border);flex-wrap:wrap">
       <button class="admin-tab active" data-tab="tournaments" onclick="switchTab('tournaments')">Tournaments</button>
-      <button class="admin-tab" data-tab="create" onclick="switchTab('create')">Create Tournament</button>
+      <button class="admin-tab" data-tab="create" onclick="switchTab('create')">Create</button>
       <button class="admin-tab" data-tab="matches" onclick="switchTab('matches')">Match Reviews</button>
+      <button class="admin-tab" data-tab="codes" onclick="switchTab('codes')">Match Codes</button>
       <button class="admin-tab" data-tab="users" onclick="switchTab('users')">Players</button>
       <button class="admin-tab" data-tab="streams" onclick="switchTab('streams')">Streams</button>
+      <button class="admin-tab" data-tab="team" onclick="switchTab('team')">Admin Team</button>
     </div>
 
     <!-- TOURNAMENTS TAB -->
@@ -115,7 +117,51 @@
       <div id="pending-matches-list"><div class="spinner"></div></div>
     </div>
 
-    <!-- USERS TAB -->
+    <!-- MATCH CODES TAB -->
+    <div id="tab-codes" class="admin-tab-content" style="display:none">
+      <div class="grid-2" style="margin-bottom:32px">
+        <div class="card">
+          <div class="card-header"><h3>Generate Match Code</h3><span class="tag tag-primary">Emails Both Players</span></div>
+          <div class="card-body">
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Generate a unique lobby code for a fixture. Both players will receive it by email with opponent details.</p>
+            <form id="code-form">
+              <div class="form-group">
+                <label>Tournament</label>
+                <select id="code-tournament" required>
+                  <option value="">Select tournament...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Player 1</label>
+                <select id="code-p1" required><option value="">Select player...</option></select>
+              </div>
+              <div class="form-group">
+                <label>Player 2</label>
+                <select id="code-p2" required><option value="">Select player...</option></select>
+              </div>
+              <div class="form-group">
+                <label>Note for Players (optional)</label>
+                <textarea id="code-note" placeholder="e.g. Match must be played by Sunday midnight. No extra time in group stage." rows="2"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Generate &amp; Send Code</button>
+            </form>
+            <div id="code-result" style="display:none;margin-top:20px;background:var(--primary-dim);border:1px solid var(--primary);border-radius:10px;padding:20px;text-align:center">
+              <div style="font-size:.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Generated Code</div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;letter-spacing:6px;color:var(--primary)" id="generated-code"></div>
+              <div style="color:var(--muted);font-size:.82rem;margin-top:8px">Emailed to both players ✓</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Recent Match Codes</h3></div>
+          <div id="codes-list" style="max-height:400px;overflow-y:auto">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAYERS TAB -->
     <div id="tab-users" class="admin-tab-content" style="display:none">
       <div id="users-list"><div class="spinner"></div></div>
     </div>
@@ -124,28 +170,49 @@
     <div id="tab-streams" class="admin-tab-content" style="display:none">
       <div id="streams-list"><div class="spinner"></div></div>
     </div>
+
+    <!-- ADMIN TEAM TAB -->
+    <div id="tab-team" class="admin-tab-content" style="display:none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3>Current Admin Team</h3><span class="tag tag-danger">All Admins</span></div>
+          <div id="admins-list" class="card-body"><div class="spinner"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Invite Co-Admin</h3><span class="tag tag-blue">Email Invite</span></div>
+          <div class="card-body">
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Send an invitation link to someone you trust. They'll receive an email to accept and set up their admin account. The link expires in 24 hours.</p>
+            <form id="invite-form">
+              <div class="form-group">
+                <label>Their Email Address</label>
+                <input type="email" id="invite-email" required placeholder="colleague@email.com">
+              </div>
+              <button type="submit" class="btn btn-danger">Send Admin Invite</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <footer><div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div><span class="footer-copy">Admin Panel &copy; 2026</span></footer>
 <div id="toast-container"></div>
-<script src="/js/app.js"></script>
+
 <style>
-.admin-tab { background:none; border:none; color:var(--muted); font-family:'Inter',sans-serif; font-size:.875rem; font-weight:600; padding:10px 18px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .2s; }
+.admin-tab { background:none; border:none; border-bottom:2px solid transparent; color:var(--muted); font-family:'Inter',sans-serif; font-size:.875rem; font-weight:600; padding:10px 18px; cursor:pointer; margin-bottom:-1px; transition:all .2s; }
 .admin-tab:hover { color:var(--text); }
 .admin-tab.active { color:var(--primary); border-bottom-color:var(--primary); }
 </style>
+
+<script src="/js/app.js"></script>
 <script>
-let isAdmin = false;
+let allTournaments = [];
 
 async function initAdmin() {
   const user = await loadUser();
-  if (user && user.role === 'admin') {
-    isAdmin = true;
-    showAdminPanel();
-  } else {
-    document.getElementById('admin-login-screen').style.display = 'flex';
-  }
+  if (user && user.role === 'admin') showAdminPanel();
+  else document.getElementById('admin-login-screen').style.display = 'flex';
 }
 
 function showAdminPanel() {
@@ -162,7 +229,6 @@ document.getElementById('admin-login-form').addEventListener('submit', async e =
   try {
     await api('POST', '/admin/login', { password: document.getElementById('admin-pw').value });
     await loadUser();
-    isAdmin = true;
     showAdminPanel();
     toast('Welcome, Admin!', 'success');
   } catch(err) { toast(err.message, 'error'); }
@@ -182,29 +248,27 @@ function switchTab(name) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
   document.getElementById('tab-' + name).style.display = 'block';
-  if (name === 'tournaments') loadTournamentsTab();
-  if (name === 'matches') loadPendingMatches();
-  if (name === 'users') loadUsers();
-  if (name === 'streams') loadStreams();
+  const loaders = { tournaments: loadTournamentsTab, matches: loadPendingMatches, users: loadUsers, streams: loadStreams, team: loadAdminTeam, codes: loadCodesTab };
+  if (loaders[name]) loaders[name]();
 }
 
 async function loadTournamentsTab() {
   try {
-    const ts = await api('GET', '/tournaments');
+    allTournaments = await api('GET', '/tournaments');
     const list = document.getElementById('tournaments-list');
-    if (!ts.length) { list.innerHTML = '<p style="color:var(--muted)">No tournaments yet. Create one!</p>'; return; }
-    list.innerHTML = ts.map(t => `
+    if (!allTournaments.length) { list.innerHTML = '<p style="color:var(--muted)">No tournaments yet. Create one!</p>'; return; }
+    list.innerHTML = allTournaments.map(t => `
       <div class="card" style="margin-bottom:14px">
         <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700">${t.name}</div>
-            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${t.arena} &middot; ${t.format} &middot; ${naira(t.entry_fee)} &middot; ${t.registered||0}/${t.max_players} players</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${t.arena} · ${t.format} · ${naira(t.entry_fee)} · ${t.registered||0}/${t.max_players} players</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             ${statusBadge(t.status)}
-            <a href="/tournament.html?id=${t.id}" class="btn btn-outline btn-sm">View</a>
-            <select class="btn btn-sm btn-outline" onchange="changeStatus('${t.id}',this.value)">
-              <option value="">Change Status</option>
+            <a href="/tournament.html?id=${t.id}" target="_blank" class="btn btn-outline btn-sm">View</a>
+            <select class="btn btn-sm btn-outline" style="cursor:pointer" onchange="changeStatus('${t.id}',this.value);this.value=''">
+              <option value="">Status…</option>
               <option value="open">Open</option>
               <option value="ongoing">Ongoing</option>
               <option value="closed">Closed</option>
@@ -214,25 +278,24 @@ async function loadTournamentsTab() {
           </div>
         </div>
       </div>`).join('');
-  } catch(err) { toast(err.message,'error'); }
+  } catch(err) { toast(err.message, 'error'); }
 }
 
 async function changeStatus(id, status) {
   if (!status) return;
-  try { await api('PATCH', `/tournaments/${id}`, { status }); toast('Status updated','success'); loadTournamentsTab(); loadStats(); }
-  catch(err) { toast(err.message,'error'); }
+  try { await api('PATCH', `/tournaments/${id}`, { status }); toast('Status updated', 'success'); loadTournamentsTab(); loadStats(); }
+  catch(err) { toast(err.message, 'error'); }
 }
 
 async function deleteTournament(id) {
-  if (!confirm('Delete this tournament and all its data?')) return;
-  try { await api('DELETE', `/tournaments/${id}`); toast('Deleted','success'); loadTournamentsTab(); }
-  catch(err) { toast(err.message,'error'); }
+  if (!confirm('Delete this tournament and all its data? This cannot be undone.')) return;
+  try { await api('DELETE', `/tournaments/${id}`); toast('Deleted', 'success'); loadTournamentsTab(); }
+  catch(err) { toast(err.message, 'error'); }
 }
 
 document.getElementById('create-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const btn = e.target.querySelector('button');
-  btn.textContent = 'Creating...'; btn.disabled = true;
+  const btn = e.target.querySelector('button'); btn.textContent = 'Creating...'; btn.disabled = true;
   try {
     await api('POST', '/tournaments', {
       name: document.getElementById('c-name').value,
@@ -244,15 +307,15 @@ document.getElementById('create-form').addEventListener('submit', async e => {
     toast('Tournament created!', 'success');
     e.target.reset();
     switchTab('tournaments');
-  } catch(err) { toast(err.message,'error'); }
-  finally { btn.textContent='Create Tournament'; btn.disabled=false; }
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = 'Create Tournament'; btn.disabled = false; }
 });
 
 async function loadPendingMatches() {
   try {
     const matches = await api('GET', '/matches/pending');
     const ml = document.getElementById('pending-matches-list');
-    if (!matches.length) { ml.innerHTML='<p style="color:var(--muted)">No pending match reviews.</p>'; return; }
+    if (!matches.length) { ml.innerHTML = '<p style="color:var(--muted)">No pending match reviews. All clear!</p>'; return; }
     ml.innerHTML = matches.map(m => `
       <div class="card" style="margin-bottom:16px">
         <div class="card-body">
@@ -266,26 +329,94 @@ async function loadPendingMatches() {
               </div>
               <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Submitted ${fmtDate(m.submitted_at)}</div>
               ${m.ai_result ? `<div style="font-size:.78rem;margin-top:8px;padding:8px 12px;background:var(--surface);border-radius:6px;border:1px solid var(--border)">
-                <strong>AI:</strong> ${m.ai_result.notes||''} &middot; Confidence: ${m.ai_result.confidence||'–'}
+                <strong style="color:var(--muted)">Admin review note:</strong> ${m.ai_result.notes||''} · Confidence: ${m.ai_result.confidence||'–'}
               </div>` : ''}
             </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
               ${m.screenshot_path ? `<a href="/${m.screenshot_path}" target="_blank" class="btn btn-outline btn-sm">View Screenshot</a>` : ''}
-              <button class="btn btn-primary btn-sm" onclick="reviewMatch('${m.id}',true)">&#10003; Approve</button>
-              <button class="btn btn-danger btn-sm" onclick="reviewMatch('${m.id}',false)">&#10007; Reject</button>
+              <button class="btn btn-primary btn-sm" onclick="reviewMatch('${m.id}',true)">✓ Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="reviewMatch('${m.id}',false)">✕ Reject</button>
             </div>
           </div>
         </div>
       </div>`).join('');
-  } catch(err) { toast(err.message,'error'); }
+  } catch(err) { toast(err.message, 'error'); }
 }
 
 async function reviewMatch(id, approved) {
   try {
     await api('PATCH', `/matches/${id}/review`, { approved });
-    toast(approved ? 'Match approved & standings updated' : 'Match rejected', approved ? 'success' : 'info');
+    toast(approved ? 'Match approved — standings updated' : 'Match rejected', approved ? 'success' : 'info');
     loadPendingMatches(); loadStats();
-  } catch(err) { toast(err.message,'error'); }
+  } catch(err) { toast(err.message, 'error'); }
+}
+
+// Match codes
+async function loadCodesTab() {
+  // Populate tournament dropdown
+  const tSelect = document.getElementById('code-tournament');
+  tSelect.innerHTML = '<option value="">Select tournament...</option>';
+  try {
+    const ts = await api('GET', '/tournaments');
+    ts.filter(t => t.status === 'open' || t.status === 'ongoing').forEach(t => {
+      tSelect.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+    });
+  } catch {}
+  loadCodes();
+}
+
+document.getElementById('code-tournament').addEventListener('change', async function() {
+  const tid = this.value;
+  const p1 = document.getElementById('code-p1');
+  const p2 = document.getElementById('code-p2');
+  p1.innerHTML = '<option value="">Select player...</option>';
+  p2.innerHTML = '<option value="">Select player...</option>';
+  if (!tid) return;
+  try {
+    const data = await api('GET', `/tournaments/${tid}`);
+    data.standings.forEach(s => {
+      p1.innerHTML += `<option value="${s.user_id}">${s.username}</option>`;
+      p2.innerHTML += `<option value="${s.user_id}">${s.username}</option>`;
+    });
+  } catch {}
+});
+
+document.getElementById('code-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button'); btn.textContent = 'Generating...'; btn.disabled = true;
+  const p1 = document.getElementById('code-p1').value;
+  const p2 = document.getElementById('code-p2').value;
+  if (p1 === p2) { toast('Player 1 and Player 2 cannot be the same person', 'error'); btn.textContent='Generate & Send Code'; btn.disabled=false; return; }
+  try {
+    const res = await api('POST', '/admin/match-code', {
+      tournament_id: document.getElementById('code-tournament').value,
+      player1_id: p1,
+      player2_id: p2,
+      note: document.getElementById('code-note').value
+    });
+    document.getElementById('generated-code').textContent = res.code;
+    document.getElementById('code-result').style.display = 'block';
+    toast(`Code ${res.code} sent to ${res.player1} & ${res.player2}`, 'success');
+    loadCodes();
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = 'Generate & Send Code'; btn.disabled = false; }
+});
+
+async function loadCodes() {
+  try {
+    const codes = await api('GET', '/admin/match-codes');
+    const el = document.getElementById('codes-list');
+    if (!codes.length) { el.innerHTML = '<p style="color:var(--muted);padding:20px">No codes generated yet.</p>'; return; }
+    el.innerHTML = codes.map(c => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(30,45,69,.5)">
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--primary);letter-spacing:3px">${c.code}</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:2px">${c.player1_name} vs ${c.player2_name}</div>
+          <div style="font-size:.7rem;color:var(--muted)">${c.tournament_name}</div>
+        </div>
+        <div style="font-size:.72rem;color:var(--muted)">${fmtDate(c.created_at)}</div>
+      </div>`).join('');
+  } catch {}
 }
 
 async function loadUsers() {
@@ -294,41 +425,39 @@ async function loadUsers() {
     const ul = document.getElementById('users-list');
     ul.innerHTML = `<div style="overflow-x:auto"><table class="standings-table">
       <thead><tr><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead>
-      <tbody>${users.map(u=>`<tr>
+      <tbody>${users.map(u => `<tr>
         <td><strong>${u.username}</strong></td>
-        <td>${u.email}</td>
-        <td>${u.phone||'–'}</td>
+        <td style="color:var(--muted)">${u.email}</td>
+        <td style="color:var(--muted)">${u.phone||'–'}</td>
         <td><span class="tag ${u.role==='admin'?'tag-danger':u.role==='banned'?'tag-muted':'tag-primary'}">${u.role}</span></td>
-        <td>${fmtDate(u.created_at)}</td>
-        <td>
-          ${u.role!=='admin'?`<select class="btn btn-sm btn-outline" onchange="changeRole('${u.id}',this.value)">
-            <option value="">Change Role</option>
-            <option value="player">Player</option>
-            <option value="banned">Ban</option>
-          </select>`:'–'}
-        </td>
+        <td style="color:var(--muted)">${fmtDate(u.created_at)}</td>
+        <td>${u.role!=='admin'?`<select class="btn btn-sm btn-outline" style="cursor:pointer" onchange="changeRole('${u.id}',this.value);this.value=''">
+          <option value="">Action…</option>
+          <option value="player">Set Player</option>
+          <option value="banned">Ban</option>
+        </select>`:'–'}</td>
       </tr>`).join('')}</tbody>
     </table></div>`;
-  } catch(err) { toast(err.message,'error'); }
+  } catch(err) { toast(err.message, 'error'); }
 }
 
 async function changeRole(id, role) {
   if (!role) return;
-  try { await api('PATCH', `/admin/users/${id}/role`, { role }); toast('Role updated','success'); loadUsers(); }
-  catch(err) { toast(err.message,'error'); }
+  try { await api('PATCH', `/admin/users/${id}/role`, { role }); toast('Role updated', 'success'); loadUsers(); }
+  catch(err) { toast(err.message, 'error'); }
 }
 
 async function loadStreams() {
   try {
     const streams = await api('GET', '/streams');
     const sl = document.getElementById('streams-list');
-    if (!streams.length) { sl.innerHTML='<p style="color:var(--muted)">No streams submitted yet.</p>'; return; }
-    sl.innerHTML = streams.map(s=>`
+    if (!streams.length) { sl.innerHTML = '<p style="color:var(--muted)">No streams submitted yet.</p>'; return; }
+    sl.innerHTML = streams.map(s => `
       <div class="card" style="margin-bottom:12px">
         <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${s.title}</div>
-            <div style="font-size:.8rem;color:var(--muted)">${s.platform} &middot; ${s.tournament_name} &middot; <a href="${s.stream_url}" target="_blank" style="color:var(--action-blue)">${s.stream_url.slice(0,40)}…</a></div>
+            <div style="font-size:.8rem;color:var(--muted)">${s.platform} · ${s.tournament_name} · <a href="${s.stream_url}" target="_blank" style="color:var(--action-blue)">${s.stream_url.slice(0,45)}…</a></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             ${s.is_live?'<span class="live-badge" style="background:rgba(255,26,26,.12);border:1px solid rgba(255,26,26,.3);color:#ff1a1a"><span class="live-dot"></span>LIVE</span>':''}
@@ -337,18 +466,44 @@ async function loadStreams() {
           </div>
         </div>
       </div>`).join('');
-  } catch(err) { toast(err.message,'error'); }
+  } catch(err) { toast(err.message, 'error'); }
 }
 
 async function toggleLive(id, isLive) {
   try { await api('PATCH', `/streams/${id}/live`, { is_live: isLive }); loadStreams(); }
-  catch(err) { toast(err.message,'error'); }
+  catch(err) { toast(err.message, 'error'); }
 }
 
 async function deleteStream(id) {
-  try { await api('DELETE', `/streams/${id}`); toast('Stream removed','info'); loadStreams(); }
-  catch(err) { toast(err.message,'error'); }
+  try { await api('DELETE', `/streams/${id}`); toast('Stream removed', 'info'); loadStreams(); }
+  catch(err) { toast(err.message, 'error'); }
 }
+
+async function loadAdminTeam() {
+  try {
+    const admins = await api('GET', '/admin/admins');
+    document.getElementById('admins-list').innerHTML = admins.map(a => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(30,45,69,.5)">
+        <div>
+          <div style="font-weight:700">${a.username}</div>
+          <div style="font-size:.8rem;color:var(--muted)">${a.email} · Joined ${fmtDate(a.created_at)}</div>
+        </div>
+        <span class="tag tag-danger">Admin</span>
+      </div>`).join('') || '<p style="color:var(--muted)">No admins found.</p>';
+  } catch(err) { toast(err.message, 'error'); }
+}
+
+document.getElementById('invite-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button'); btn.textContent = 'Sending...'; btn.disabled = true;
+  try {
+    const res = await api('POST', '/admin/invite', { email: document.getElementById('invite-email').value });
+    toast(res.message, 'success');
+    document.getElementById('invite-email').value = '';
+    loadAdminTeam();
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = 'Send Admin Invite'; btn.disabled = false; }
+});
 
 document.addEventListener('DOMContentLoaded', initAdmin);
 </script>
