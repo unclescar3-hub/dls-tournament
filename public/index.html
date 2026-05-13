@@ -102,10 +102,30 @@
   <a href="/leaderboard.html" class="btn btn-primary">View Full Leaderboard</a>
 </div>
 
+<!-- ADMIN BANNER -->
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:40px 32px" id="admin-section">
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="background:linear-gradient(135deg,rgba(255,68,68,.08),rgba(255,68,68,.02));border:1px solid rgba(255,68,68,.3);border-radius:14px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--danger);margin-bottom:8px">&#9881; Platform Administration</div>
+        <h3 style="font-size:1.3rem;margin-bottom:6px">Admin &amp; Operator Access</h3>
+        <p style="color:var(--muted);font-size:.85rem;line-height:1.6;max-width:480px">Log in to manage tournaments, review match results, send match codes to players, and invite co-admins to help run the platform.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:180px">
+        <a href="/admin.html" class="btn btn-danger" style="text-align:center">&#128274; Admin Login</a>
+        <div style="font-size:.75rem;color:var(--muted);text-align:center">Use your ADMIN_PASSWORD to access</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
   <span class="footer-copy">&copy; 2026 Unclescar Studios. All rights reserved.</span>
-  <a href="/rules.html" class="footer-link">Official Rulebook</a>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <a href="/rules.html" class="footer-link">Official Rulebook</a>
+    <a href="/admin.html" class="footer-admin-link">&#9881; Admin Panel</a>
+  </div>
 </footer>
 
 <!-- LOGIN MODAL -->

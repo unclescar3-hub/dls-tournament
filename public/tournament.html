@@ -6,6 +6,20 @@
   <title>Tournament | Unclescar Studios</title>
   <link rel="stylesheet" href="/css/main.css">
   <script>window.PAYSTACK_PUBLIC_KEY = 'pk_test_aa93807a3f2361403a4f3df0a124210f67962f77';</script>
+  <style>
+    .bracket-round { min-width: 200px; }
+    .bracket-match { background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden; }
+    .bracket-player { padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:.88rem; }
+    .bracket-player:first-child { border-bottom:1px solid var(--border); }
+    .bracket-player.winner { background:rgba(0,230,118,.08);font-weight:700;color:var(--primary); }
+    .bracket-player.eliminated { color:var(--muted);text-decoration:line-through; }
+    .round-label { font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:14px;font-weight:700; }
+    .reg-bar { background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;height:8px;margin-top:8px; }
+    .reg-fill { height:100%;background:var(--primary);border-radius:12px;transition:width .6s ease; }
+    .tab-btn { background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:.875rem;font-weight:600;padding:10px 18px;cursor:pointer;margin-bottom:-1px;transition:all .2s; }
+    .tab-btn:hover { color:var(--text); }
+    .tab-btn.active { color:var(--primary);border-bottom-color:var(--primary); }
+  </style>
 </head>
 <body>
 <nav>
@@ -15,243 +29,392 @@
     <a href="/dls.html">DLS Arena</a>
     <a href="/efootball.html">eFootball</a>
     <a href="/eafc.html">EA FC</a>
-    <a href="/hall-of-fame.html">Hall of Fame</a>
+    <a href="/leaderboard.html">Leaderboard</a>
     <a href="/tv.html" class="nav-tv">&#9679; TV</a>
   </div>
   <div class="nav-right">
     <a href="#" class="nav-btn nav-btn-outline" id="nav-login-btn" onclick="openModal('login-modal');return false;">Log In</a>
     <a href="#" class="nav-btn nav-btn-primary" id="nav-register-btn" onclick="openModal('register-modal');return false;">Sign Up</a>
     <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
-      <span style="color:var(--muted);font-size:.85rem;">Hi, <strong id="nav-username"></strong></span>
+      <span style="color:var(--muted);font-size:.85rem;">Hi, <strong id="nav-username" style="color:var(--text)"></strong></span>
       <a href="/dashboard.html" id="nav-dashboard-link" class="nav-btn nav-btn-outline">Dashboard</a>
       <button onclick="logout()" class="nav-btn nav-btn-outline">Log Out</button>
     </div>
   </div>
 </nav>
 
-<div id="tournament-hero" class="page-hero">
+<div id="loading-screen" style="min-height:80vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px">
   <div class="spinner"></div>
+  <p style="color:var(--muted)">Loading tournament...</p>
 </div>
 
-<div class="section section-sm" id="tournament-body" style="display:none">
-  <!-- Info + Register -->
-  <div class="grid-2" style="margin-bottom:32px">
-    <div class="info-card">
-      <div class="info-card-header">
-        <div class="accent-bar" id="info-accent" style="background:var(--primary)"></div>
-        <h2>Tournament Details</h2>
-      </div>
-      <div class="info-card-body">
-        <ul id="tournament-details-list"></ul>
-      </div>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;display:flex;flex-direction:column;justify-content:center;gap:16px">
-      <div id="reg-status-box">
-        <div class="spinner"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Standings / Bracket -->
-  <div class="card">
-    <div class="card-header">
-      <h3 id="standings-heading">Standings</h3>
-      <span class="tag tag-primary" id="standings-count"></span>
-    </div>
-    <div class="card-body" style="padding:0;overflow-x:auto">
-      <table class="standings-table" id="standings-table">
-        <thead>
-          <tr>
-            <th>#</th><th>Player</th><th>P</th><th>W</th><th>D</th><th>L</th>
-            <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
-          </tr>
-        </thead>
-        <tbody id="standings-body">
-          <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--muted)">No players registered yet</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Match History -->
-  <div style="margin-top:32px">
-    <h2 class="section-title">Match Results</h2>
-    <div id="match-list"><div class="spinner"></div></div>
+<div id="not-found" style="display:none;min-height:70vh;align-items:center;justify-content:center;text-align:center;padding:40px">
+  <div>
+    <div style="font-size:4rem;margin-bottom:16px">&#9888;</div>
+    <h2>Tournament Not Found</h2>
+    <p style="color:var(--muted);margin-bottom:24px">This tournament doesn't exist or has been removed.</p>
+    <a href="/" class="btn btn-primary">Back to Hub</a>
   </div>
 </div>
 
-<!-- Login/Register modals (same as index) -->
+<div id="tournament-content" style="display:none">
+  <div class="page-hero" id="t-hero">
+    <div class="hero-eyebrow"><span id="t-arena-tag" class="tag">Arena</span></div>
+    <h1 id="t-name">Tournament</h1>
+    <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:28px">
+      <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700" id="t-fee">₦0</div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px">Entry Fee</div></div>
+      <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700" id="t-format-display">–</div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px">Format</div></div>
+      <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700"><span id="t-reg-count">0</span> / <span id="t-max">0</span></div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px">Players</div></div>
+      <div style="text-align:center"><div id="t-status-badge"></div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:6px">Status</div></div>
+    </div>
+    <div style="max-width:400px;margin:24px auto 0"><div class="reg-bar"><div class="reg-fill" id="t-reg-bar" style="width:0%"></div></div></div>
+  </div>
+
+  <div class="section">
+    <!-- CTAs -->
+    <div id="register-cta" style="display:none;margin-bottom:28px">
+      <div class="card" style="border:1px solid var(--primary);background:linear-gradient(135deg,rgba(0,230,118,.06),rgba(0,230,118,.02))">
+        <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+          <div>
+            <h3 style="margin-bottom:4px" id="cta-title">Register Now</h3>
+            <p style="color:var(--muted);font-size:.85rem" id="cta-sub">Secure your spot before it fills up.</p>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--primary)" id="cta-fee">₦0</span>
+            <button class="btn btn-primary" id="register-btn" onclick="handleRegister()">Register &amp; Pay</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="already-registered" style="display:none;margin-bottom:28px">
+      <div class="card" style="border:1px solid var(--primary)">
+        <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <span style="font-size:1.5rem">&#10003;</span>
+          <div><strong>You're registered!</strong><p style="color:var(--muted);font-size:.85rem;margin:4px 0 0">You are in this tournament. Submit results via your dashboard.</p></div>
+          <a href="/dashboard.html" class="btn btn-outline btn-sm" style="margin-left:auto">Go to Dashboard</a>
+        </div>
+      </div>
+    </div>
+    <div id="tournament-full" style="display:none;margin-bottom:28px">
+      <div class="card" style="border:1px solid var(--muted)">
+        <div class="card-body" style="display:flex;align-items:center;gap:14px">
+          <span style="font-size:1.5rem">&#128274;</span>
+          <div><strong>Tournament Full</strong><p style="color:var(--muted);font-size:.85rem;margin:4px 0 0">All spots taken. Watch for the next edition.</p></div>
+        </div>
+      </div>
+    </div>
+    <div id="login-to-register" style="display:none;margin-bottom:28px">
+      <div class="card" style="border:1px solid var(--border)">
+        <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <div><strong>Want to compete?</strong><p style="color:var(--muted);font-size:.85rem;margin:4px 0 0">Create a free account to register for this tournament.</p></div>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm" onclick="openModal('login-modal')">Log In</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('register-modal')">Sign Up Free</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--border);flex-wrap:wrap">
+      <button class="tab-btn active" onclick="switchTab('standings',this)">Standings</button>
+      <button class="tab-btn" onclick="switchTab('bracket',this)">Bracket / Draw</button>
+      <button class="tab-btn" onclick="switchTab('matches',this)">Match Results</button>
+    </div>
+
+    <div id="tab-standings"><div id="standings-content"><div class="spinner"></div></div></div>
+    <div id="tab-bracket" style="display:none"><div id="bracket-content"></div></div>
+    <div id="tab-matches" style="display:none"><div id="matches-content"></div></div>
+  </div>
+</div>
+
+<!-- Modals -->
 <div class="modal-overlay" id="login-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('login-modal')">&times;</button>
     <h2>Log In</h2>
     <form id="login-form">
-      <div class="form-group"><label>Email</label><input type="email" id="login-email" required></div>
-      <div class="form-group"><label>Password</label><input type="password" id="login-password" required></div>
+      <div class="form-group"><label>Email or Username</label><input type="text" id="login-email" required autocomplete="username" placeholder="Email or username"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••"></div>
       <button type="submit" class="btn btn-primary btn-block">Log In</button>
+      <div style="display:flex;justify-content:space-between;margin-top:14px">
+        <a href="#" onclick="closeModal('login-modal');openModal('register-modal');return false;" style="color:var(--primary);font-size:.85rem">Create account</a>
+        <a href="#" onclick="closeModal('login-modal');openModal('forgot-modal');return false;" style="color:var(--muted);font-size:.85rem">Forgot password?</a>
+      </div>
     </form>
   </div>
 </div>
 <div class="modal-overlay" id="register-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('register-modal')">&times;</button>
-    <h2>Create Account</h2>
+    <h2>Sign Up</h2>
     <form id="register-form">
-      <div class="form-group"><label>Username</label><input type="text" id="reg-username" required></div>
+      <div class="form-group"><label>Username</label><input type="text" id="reg-username" required autocomplete="username"></div>
       <div class="form-row">
-        <div class="form-group"><label>Email</label><input type="email" id="reg-email" required></div>
-        <div class="form-group"><label>Phone</label><input type="tel" id="reg-phone"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="reg-email" required autocomplete="email"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="reg-phone" autocomplete="tel"></div>
       </div>
-      <div class="form-group"><label>Password</label><input type="password" id="reg-password" required></div>
-      <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+      <div class="form-group"><label>Password</label><input type="password" id="reg-password" required autocomplete="new-password"></div>
+      <div id="reg-error" style="display:none;background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:12px"></div>
+      <button type="submit" class="btn btn-primary btn-block" id="reg-btn">Create Account</button>
     </form>
   </div>
 </div>
+<div class="modal-overlay" id="forgot-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('forgot-modal')">&times;</button>
+    <h2>Reset Password</h2>
+    <form id="forgot-form">
+      <div class="form-group"><label>Email Address</label><input type="email" id="forgot-email" required autocomplete="email"></div>
+      <div id="forgot-success" style="display:none;background:var(--primary-dim);border:1px solid var(--primary);color:var(--primary);padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:12px"></div>
+      <button type="submit" class="btn btn-primary btn-block" id="forgot-btn">Send Reset Link</button>
+    </form>
+  </div>
+</div>
+<div class="modal-overlay" id="pay-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('pay-modal')">&times;</button>
+    <h2>Confirm Registration</h2>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="color:var(--muted)">Tournament</span><strong id="pm-name"></strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="color:var(--muted)">Arena</span><strong id="pm-arena"></strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Entry Fee</span><strong style="color:var(--primary);font-size:1.2rem" id="pm-fee"></strong></div>
+    </div>
+    <p style="color:var(--muted);font-size:.85rem;margin-bottom:20px">You'll be redirected to Paystack to complete payment securely.</p>
+    <button class="btn btn-primary btn-block" id="pay-confirm-btn" onclick="confirmPay()">Proceed to Payment</button>
+  </div>
+</div>
 
-<footer><div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div><span class="footer-copy">&copy; 2026</span><a href="/rules.html" class="footer-link">Rulebook</a></footer>
 <div id="toast-container"></div>
-<script src="/js/app.js"></script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="/js/app.js"></script>
 <script>
-const tid = new URLSearchParams(location.search).get('id');
-let tournament = null;
+const tournamentId = new URLSearchParams(location.search).get('id');
+let tournament = null, standings = [];
 
-async function loadTournament() {
-  if (!tid) { document.getElementById('tournament-hero').innerHTML='<h1>Tournament not found</h1>'; return; }
-  const data = await api('GET', `/tournaments/${tid}`);
-  tournament = data.tournament;
-  const standings = data.standings;
+const arenaColors = { dls:'var(--primary)', efootball:'var(--ef)', eafc:'var(--eafc)' };
+const arenaTagClass = { dls:'tag-primary', efootball:'tag-ef', eafc:'tag-eafc' };
+const arenaNames = { dls:'DLS Arena', efootball:'eFootball Arena', eafc:'EA FC Arena' };
+const medals = ['🥇','🥈','🥉'];
 
-  const arenaColors = { dls:'var(--primary)', efootball:'var(--ef)', eafc:'var(--eafc)' };
-  const color = arenaColors[tournament.arena] || 'var(--primary)';
-  document.getElementById('info-accent').style.background = color;
-
-  document.getElementById('tournament-hero').innerHTML = `
-    <div class="hero-eyebrow tag" style="background:rgba(0,0,0,.2);border:1px solid ${color}33;color:${color}">${tournament.arena.toUpperCase()}</div>
-    <h1>${tournament.name}</h1>
-    <p>${tournament.format} &middot; Entry: ${naira(tournament.entry_fee)} &middot; ${statusBadge(tournament.status)}</p>`;
-  document.getElementById('tournament-hero').style.background = `radial-gradient(ellipse 70% 50% at 50% 0%,${color}10 0%,transparent 70%)`;
-
-  document.getElementById('tournament-details-list').innerHTML = `
-    <li><strong>Arena:</strong> ${tournament.arena}</li>
-    <li><strong>Format:</strong> ${tournament.format}</li>
-    <li><strong>Entry Fee:</strong> ${naira(tournament.entry_fee)}</li>
-    <li><strong>Capacity:</strong> ${standings.length} / ${tournament.max_players} players</li>
-    <li><strong>Status:</strong> ${tournament.status}</li>`;
-
-  renderStandings(standings, tournament.format);
-  renderRegStatus(standings, color);
-  await loadMatches();
-  document.getElementById('tournament-body').style.display = 'block';
+function show(id) {
+  document.getElementById('loading-screen').style.display = id === 'loading-screen' ? 'flex' : 'none';
+  document.getElementById('not-found').style.display = id === 'not-found' ? 'flex' : 'none';
+  document.getElementById('tournament-content').style.display = id === 'tournament-content' ? 'block' : 'none';
 }
 
-function renderStandings(standings, format) {
-  const isKnockout = format && format.toLowerCase().includes('elimination');
-  if (isKnockout) document.getElementById('standings-heading').textContent = 'Bracket';
-  document.getElementById('standings-count').textContent = standings.length + ' players';
-
-  if (!standings.length) return;
-  const plays = standings.map(s => s.wins + s.draws + s.losses);
-  document.getElementById('standings-body').innerHTML = standings.map((s, i) => {
-    const rank = i < 3 ? `<span class="rank-${i+1}">${i+1}</span>` : i+1;
-    const elim = s.eliminated ? `<span class="tag tag-danger" style="font-size:.6rem">OUT</span>` : '';
-    return `<tr>
-      <td>${rank}</td>
-      <td><strong>${s.username}</strong> ${elim}</td>
-      <td>${plays[i]}</td>
-      <td>${s.wins}</td><td>${s.draws}</td><td>${s.losses}</td>
-      <td>${s.goals_for}</td><td>${s.goals_against}</td>
-      <td>${s.goal_diff >= 0 ? '+' : ''}${s.goal_diff}</td>
-      <td><strong style="color:var(--primary)">${s.points}</strong></td>
-    </tr>`;
-  }).join('');
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ['standings','bracket','matches'].forEach(t => document.getElementById('tab-'+t).style.display = t===name?'block':'none');
+  if (name==='bracket') renderBracket();
+  if (name==='matches') loadMatches();
 }
 
-async function renderRegStatus(standings, color) {
-  const user = currentUser;
-  const isRegistered = user && standings.some(s => s.user_id === user.id);
+async function init() {
+  if (!tournamentId) { show('not-found'); return; }
+  try {
+    const data = await api('GET', `/tournaments/${tournamentId}`);
+    tournament = data.tournament;
+    standings = data.standings;
+
+    document.title = tournament.name + ' | Unclescar Studios';
+    document.getElementById('t-name').textContent = tournament.name;
+    document.getElementById('t-fee').textContent = naira(tournament.entry_fee);
+    document.getElementById('cta-fee').textContent = naira(tournament.entry_fee);
+    document.getElementById('cta-title').textContent = 'Register for ' + tournament.name;
+    document.getElementById('t-format-display').textContent = tournament.format.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    document.getElementById('t-reg-count').textContent = standings.length;
+    document.getElementById('t-max').textContent = tournament.max_players;
+    document.getElementById('t-status-badge').innerHTML = statusBadge(tournament.status);
+    document.getElementById('pm-name').textContent = tournament.name;
+    document.getElementById('pm-arena').textContent = arenaNames[tournament.arena] || tournament.arena;
+    document.getElementById('pm-fee').textContent = naira(tournament.entry_fee);
+
+    const pct = Math.min(100, (standings.length / tournament.max_players) * 100);
+    document.getElementById('t-reg-bar').style.width = pct + '%';
+
+    const color = arenaColors[tournament.arena] || 'var(--primary)';
+    document.getElementById('t-hero').style.background =
+      `radial-gradient(ellipse 70% 60% at 50% 0%, ${color.replace('var(--primary)','rgba(0,230,118').replace('var(--ef)','rgba(0,229,255').replace('var(--eafc)','rgba(255,26,94')},.08) 0%, transparent 70%)`;
+
+    const tag = document.getElementById('t-arena-tag');
+    tag.textContent = arenaNames[tournament.arena] || tournament.arena;
+    tag.className = 'tag ' + (arenaTagClass[tournament.arena] || 'tag-primary');
+
+    renderStandings();
+    showRegistrationCTA();
+    show('tournament-content');
+  } catch (err) {
+    console.error(err);
+    show('not-found');
+  }
+}
+
+function showRegistrationCTA() {
   const isFull = standings.length >= tournament.max_players;
   const isOpen = tournament.status === 'open';
-  const box = document.getElementById('reg-status-box');
 
-  if (isRegistered) {
-    box.innerHTML = `<div class="tag tag-primary" style="margin-bottom:12px">&#10003; You are registered</div><p style="color:var(--muted);font-size:.88rem">You are in this tournament. Go to your dashboard to submit match results.</p><a href="/dashboard.html" class="btn btn-primary btn-block" style="margin-top:16px">Go to Dashboard</a>`;
-  } else if (!isOpen) {
-    box.innerHTML = `<div class="tag tag-muted" style="margin-bottom:12px">Registration Closed</div><p style="color:var(--muted);font-size:.88rem">This tournament is no longer accepting registrations.</p>`;
-  } else if (isFull) {
-    box.innerHTML = `<div class="tag tag-danger" style="margin-bottom:12px">Tournament Full</div><p style="color:var(--muted);font-size:.88rem">All ${tournament.max_players} spots have been filled.</p>`;
-  } else if (!user) {
-    box.innerHTML = `<p style="color:var(--muted);font-size:.88rem;margin-bottom:16px">Create a free account to register for this tournament.</p>
-      <button class="btn btn-primary btn-block" onclick="openModal('register-modal')">Sign Up to Register</button>
-      <button class="btn btn-outline btn-block" style="margin-top:10px" onclick="openModal('login-modal')">Log In</button>`;
-  } else {
-    box.innerHTML = `
-      <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:${color};margin-bottom:4px">${naira(tournament.entry_fee)}</div>
-      <p style="color:var(--muted);font-size:.85rem;margin-bottom:16px">Entry fee — paid securely via Paystack</p>
-      <button class="btn btn-primary btn-block" id="pay-btn" onclick="registerNow()">Register & Pay ${naira(tournament.entry_fee)}</button>`;
+  if (!currentUser) {
+    if (isOpen && !isFull) document.getElementById('login-to-register').style.display = 'block';
+    return;
+  }
+
+  // Check if user is already in standings
+  const alreadyIn = standings.some(s => s.user_id === currentUser.id);
+  if (alreadyIn) { document.getElementById('already-registered').style.display = 'block'; return; }
+  if (isFull) { document.getElementById('tournament-full').style.display = 'block'; return; }
+  if (isOpen) { document.getElementById('register-cta').style.display = 'block'; }
+}
+
+function handleRegister() {
+  if (!currentUser) { toast('Please log in to register', 'info'); openModal('login-modal'); return; }
+  openModal('pay-modal');
+}
+
+async function confirmPay() {
+  const btn = document.getElementById('pay-confirm-btn');
+  btn.textContent = 'Redirecting...'; btn.disabled = true;
+  try {
+    const data = await api('POST', `/tournaments/${tournamentId}/pay`, {});
+    if (data.authorization_url) window.location.href = data.authorization_url;
+  } catch(err) {
+    toast(err.message, 'error');
+    btn.textContent = 'Proceed to Payment'; btn.disabled = false;
   }
 }
 
-async function registerNow() {
-  const btn = document.getElementById('pay-btn');
-  btn.textContent = 'Initializing...'; btn.disabled = true;
-  try {
-    const data = await api('POST', `/tournaments/${tid}/pay`);
-    window.location.href = data.authorization_url;
-  } catch(err) {
-    toast(err.message, 'error');
-    btn.textContent = `Register & Pay ${naira(tournament.entry_fee)}`; btn.disabled = false;
+function renderStandings() {
+  const el = document.getElementById('standings-content');
+  if (!standings.length) {
+    el.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px 0">No players registered yet. Be the first to join!</p>';
+    return;
   }
+  const isRR = tournament.format.includes('round-robin') || tournament.format.includes('ladder');
+  el.innerHTML = `<div style="overflow-x:auto"><table class="standings-table">
+    <thead><tr>
+      <th>#</th><th>Player</th><th>Played</th><th>W</th><th>D</th><th>L</th>
+      ${isRR?'<th>GF</th><th>GA</th><th>GD</th>':''}
+      <th>Pts</th>${!isRR?'<th>Status</th>':''}
+    </tr></thead>
+    <tbody>${standings.map((s,i)=>{
+      const played=(parseInt(s.wins)||0)+(parseInt(s.draws)||0)+(parseInt(s.losses)||0);
+      const gd=parseInt(s.goal_diff)||0;
+      const isMe=currentUser&&s.user_id===currentUser.id;
+      const rank=i<3?`<span style="font-size:1.1rem">${medals[i]}</span>`:`<span style="${i<10?'color:var(--text);font-weight:700':'color:var(--muted)'}">${i+1}</span>`;
+      return `<tr style="${isMe?'background:rgba(0,230,118,.05);':''}${s.eliminated?'opacity:.5':''}">
+        <td>${rank}</td>
+        <td><strong>${s.username}</strong>${isMe?' <span style="font-size:.7rem;color:var(--primary)">(you)</span>':''}</td>
+        <td>${played}</td>
+        <td style="color:var(--primary)">${s.wins||0}</td>
+        <td>${s.draws||0}</td>
+        <td style="color:var(--danger)">${s.losses||0}</td>
+        ${isRR?`<td>${s.goals_for||0}</td><td>${s.goals_against||0}</td><td>${gd>=0?'+'+gd:gd}</td>`:''}
+        <td><strong style="color:var(--gold)">${s.points||0}</strong></td>
+        ${!isRR?`<td>${s.eliminated?'<span class="tag tag-muted" style="font-size:.7rem">Out</span>':'<span style="color:var(--primary);font-size:.75rem">&#10003; Active</span>'}</td>`:''}
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+function renderBracket() {
+  const el = document.getElementById('bracket-content');
+  const isRR = tournament.format.includes('round-robin') || tournament.format.includes('ladder');
+  if (isRR) {
+    el.innerHTML = `<div style="text-align:center;padding:40px"><div style="font-size:2.5rem;margin-bottom:12px">📊</div>
+      <h3>League / Ladder Format</h3><p style="color:var(--muted);margin-top:8px">This format uses a standings table — no bracket draw. See the Standings tab.</p></div>`;
+    return;
+  }
+  if (!standings.length) {
+    el.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px">Bracket will show once players register.</p>';
+    return;
+  }
+  const active = standings.filter(s => !s.eliminated);
+  const eliminated = standings.filter(s => s.eliminated);
+  el.innerHTML = `<div style="overflow-x:auto;padding-bottom:20px"><div style="display:flex;gap:24px;align-items:flex-start">
+    <div class="bracket-round">
+      <div class="round-label">All Participants (${standings.length})</div>
+      ${standings.map(s=>`<div class="bracket-match"><div class="bracket-player ${s.eliminated?'eliminated':''}">
+        <span>${s.username}</span><span style="color:var(--gold);font-weight:700">${s.points||0}pts</span>
+      </div></div>`).join('')}
+    </div>
+    ${active.length?`<div class="bracket-round">
+      <div class="round-label">Still Active (${active.length})</div>
+      ${active.map(s=>`<div class="bracket-match"><div class="bracket-player winner">
+        <span>${s.username}</span><span>${s.wins||0}W / ${s.losses||0}L</span>
+      </div></div>`).join('')}
+    </div>`:''}
+    ${eliminated.length?`<div class="bracket-round">
+      <div class="round-label">Eliminated (${eliminated.length})</div>
+      ${eliminated.map(s=>`<div class="bracket-match"><div class="bracket-player eliminated">
+        <span>${s.username}</span><span style="font-size:.75rem">Knocked out</span>
+      </div></div>`).join('')}
+    </div>`:''}
+  </div></div>`;
 }
 
 async function loadMatches() {
+  const el = document.getElementById('matches-content');
+  el.innerHTML = '<div class="spinner"></div>';
   try {
-    const matches = await api('GET', `/matches/tournament/${tid}`);
-    const ml = document.getElementById('match-list');
-    if (!matches.length) { ml.innerHTML='<p style="color:var(--muted)">No match results submitted yet.</p>'; return; }
-    ml.innerHTML = matches.map(m => {
-      const win = m.submitter_score > m.opponent_score;
-      const draw = m.submitter_score === m.opponent_score;
-      const statusColor = m.status === 'approved' || m.status === 'ai_approved' ? 'var(--primary)' : m.status === 'rejected' ? 'var(--danger)' : 'var(--gold)';
-      return `<div class="card" style="margin-bottom:12px">
-        <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div>
-            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">
-              ${m.submitter_name} <span style="color:var(--primary)">${m.submitter_score}</span>
-              &ndash;
-              <span style="color:var(--danger)">${m.opponent_score}</span> ${m.opponent_name}
-            </div>
-            <div style="font-size:.78rem;color:var(--muted);margin-top:3px">${fmtDate(m.submitted_at)}</div>
+    const matches = await api('GET', `/matches/tournament/${tournamentId}`);
+    if (!matches.length) { el.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px">No confirmed results yet — check back after matches are reviewed.</p>'; return; }
+    el.innerHTML = matches.map(m => {
+      const wc = m.submitter_score > m.opponent_score ? 'color:var(--primary)' : '';
+      const lc = m.opponent_score > m.submitter_score ? 'color:var(--primary)' : '';
+      return `<div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;gap:16px">
+          <span style="${wc||'color:var(--text)'};font-weight:700">${m.submitter_name}</span>
+          <div style="text-align:center">
+            <span style="font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;${wc}">${m.submitter_score}</span>
+            <span style="color:var(--muted);margin:0 8px">–</span>
+            <span style="font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;${lc}">${m.opponent_score}</span>
           </div>
-          <span style="font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${statusColor}">${m.status.replace('_',' ')}</span>
+          <span style="${lc||'color:var(--text)'};font-weight:700">${m.opponent_name}</span>
         </div>
-      </div>`;
+        <div style="font-size:.78rem;color:var(--muted)">${fmtDate(m.submitted_at)}</div>
+      </div></div>`;
     }).join('');
-  } catch {}
+  } catch { el.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px">Could not load results.</p>'; }
 }
 
-// Auth form handlers
+// Auth forms
 document.getElementById('login-form').addEventListener('submit', async e => {
   e.preventDefault();
+  const btn=e.target.querySelector('button[type=submit]');btn.textContent='Logging in...';btn.disabled=true;
   try {
-    const d = await api('POST','/auth/login',{email:document.getElementById('login-email').value,password:document.getElementById('login-password').value});
-    currentUser=d.user; updateNavAuth(); closeModal('login-modal');
-    toast('Welcome back!','success'); location.reload();
+    const d=await api('POST','/auth/login',{email:document.getElementById('login-email').value.trim(),password:document.getElementById('login-password').value});
+    currentUser=d.user;updateNavAuth();closeModal('login-modal');
+    toast('Welcome back, '+d.user.username+'!','success');
+    ['register-cta','login-to-register','already-registered','tournament-full'].forEach(id=>document.getElementById(id).style.display='none');
+    showRegistrationCTA();
   } catch(err){toast(err.message,'error');}
+  finally{btn.textContent='Log In';btn.disabled=false;}
 });
 document.getElementById('register-form').addEventListener('submit', async e => {
   e.preventDefault();
+  const btn=document.getElementById('reg-btn'),errBox=document.getElementById('reg-error');errBox.style.display='none';btn.textContent='Creating...';btn.disabled=true;
   try {
-    const d = await api('POST','/auth/register',{username:document.getElementById('reg-username').value,email:document.getElementById('reg-email').value,phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value});
-    currentUser=d.user; updateNavAuth(); closeModal('register-modal');
-    toast('Account created!','success'); location.reload();
-  } catch(err){toast(err.message,'error');}
+    const d=await api('POST','/auth/register',{username:document.getElementById('reg-username').value.trim(),email:document.getElementById('reg-email').value.trim(),phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value});
+    currentUser=d.user;updateNavAuth();closeModal('register-modal');
+    toast('Account created! You can now register for this tournament.','success');
+    ['register-cta','login-to-register','already-registered','tournament-full'].forEach(id=>document.getElementById(id).style.display='none');
+    showRegistrationCTA();
+  } catch(err){errBox.textContent=err.message;errBox.style.display='block';}
+  finally{btn.textContent='Create Account';btn.disabled=false;}
+});
+document.getElementById('forgot-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn=document.getElementById('forgot-btn');btn.textContent='Sending...';btn.disabled=true;
+  try{const d=await api('POST','/auth/forgot-password',{email:document.getElementById('forgot-email').value.trim()});document.getElementById('forgot-success').textContent=d.message;document.getElementById('forgot-success').style.display='block';btn.style.display='none';}
+  catch(err){toast(err.message,'error');}
+  finally{btn.textContent='Send Reset Link';btn.disabled=false;}
 });
 
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadUser();
-  await loadTournament();
-});
+const params=new URLSearchParams(location.search);
+if(params.get('payment')==='success') toast('Payment confirmed! You are now registered.','success');
+
+document.addEventListener('DOMContentLoaded', async () => { await loadUser(); await init(); });
 </script>
 </body>
 </html>
