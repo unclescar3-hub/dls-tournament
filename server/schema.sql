@@ -46,7 +46,8 @@ CREATE TABLE IF NOT EXISTS bracket_entries (
   goals_against INT DEFAULT 0,
   goal_diff INT GENERATED ALWAYS AS (goals_for - goals_against) STORED,
   round INT DEFAULT 1,
-  eliminated BOOLEAN DEFAULT FALSE
+  eliminated BOOLEAN DEFAULT FALSE,
+  UNIQUE(tournament_id, user_id)
 );
 
 -- Match Results (screenshots)
@@ -65,6 +66,39 @@ CREATE TABLE IF NOT EXISTS match_results (
   submitted_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Match Codes (lobby codes for players to join each other)
+CREATE TABLE IF NOT EXISTS match_codes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tournament_id UUID REFERENCES tournaments(id) ON DELETE CASCADE,
+  player1_id UUID REFERENCES users(id),
+  player2_id UUID REFERENCES users(id),
+  code VARCHAR(20) NOT NULL,
+  note TEXT,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Password Reset Tokens
+CREATE TABLE IF NOT EXISTS password_resets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  token VARCHAR(128) UNIQUE NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Admin Invites
+CREATE TABLE IF NOT EXISTS admin_invites (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) NOT NULL,
+  token VARCHAR(128) UNIQUE NOT NULL,
+  invited_by UUID REFERENCES users(id),
+  used BOOLEAN DEFAULT FALSE,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Streams
 CREATE TABLE IF NOT EXISTS streams (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -76,7 +110,10 @@ CREATE TABLE IF NOT EXISTS streams (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Index for performance
+-- Indexes
 CREATE INDEX IF NOT EXISTS idx_registrations_tournament ON registrations(tournament_id);
 CREATE INDEX IF NOT EXISTS idx_bracket_tournament ON bracket_entries(tournament_id);
 CREATE INDEX IF NOT EXISTS idx_match_tournament ON match_results(tournament_id);
+CREATE INDEX IF NOT EXISTS idx_bracket_user ON bracket_entries(user_id);
+CREATE INDEX IF NOT EXISTS idx_reset_token ON password_resets(token);
+CREATE INDEX IF NOT EXISTS idx_invite_token ON admin_invites(token);

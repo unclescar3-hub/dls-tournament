@@ -1,12 +1,11 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { v4: uuidv4 } = require('uuid');
 const pool = require('./db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'unclescar-fallback-secret';
 
 function signToken(user) {
-  return jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ id: user.id, email: user.email, role: user.role, username: user.username }, JWT_SECRET, { expiresIn: '7d' });
 }
 
 function verifyToken(token) {
@@ -46,12 +45,16 @@ async function register(username, email, password, phone) {
   return result.rows[0];
 }
 
-async function login(email, password) {
-  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-  if (!result.rows.length) throw new Error('Invalid credentials');
+async function login(emailOrUsername, password) {
+  // Support login by email OR username
+  const result = await pool.query(
+    'SELECT * FROM users WHERE LOWER(email)=LOWER($1) OR LOWER(username)=LOWER($1)',
+    [emailOrUsername]
+  );
+  if (!result.rows.length) throw new Error('No account found with that email or username');
   const user = result.rows[0];
   const valid = await bcrypt.compare(password, user.password_hash);
-  if (!valid) throw new Error('Invalid credentials');
+  if (!valid) throw new Error('Incorrect password. Try again or reset your password.');
   return user;
 }
 
