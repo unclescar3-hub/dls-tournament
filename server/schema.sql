@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS streams (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Player Bank Accounts (for payouts)
+-- Player Bank Accounts
 CREATE TABLE IF NOT EXISTS bank_accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE,
@@ -152,6 +152,61 @@ CREATE TABLE IF NOT EXISTS payouts (
   UNIQUE(tournament_id, user_id)
 );
 
+-- Match Fixtures (scheduled matches with date/time)
+CREATE TABLE IF NOT EXISTS fixtures (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tournament_id UUID REFERENCES tournaments(id) ON DELETE CASCADE,
+  player1_id UUID REFERENCES users(id),
+  player2_id UUID REFERENCES users(id),
+  scheduled_at TIMESTAMP NOT NULL,
+  round_label VARCHAR(100),
+  match_code VARCHAR(20),
+  status VARCHAR(20) DEFAULT 'scheduled',
+  reminder_sent BOOLEAN DEFAULT FALSE,
+  note TEXT,
+  created_by UUID REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- In-app Notifications
+CREATE TABLE IF NOT EXISTS notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  type VARCHAR(50) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  body TEXT,
+  link VARCHAR(500),
+  read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Announcements
+CREATE TABLE IF NOT EXISTS announcements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(255) NOT NULL,
+  body TEXT NOT NULL,
+  arena VARCHAR(50),
+  type VARCHAR(30) DEFAULT 'news',
+  pinned BOOLEAN DEFAULT FALSE,
+  created_by UUID REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Match Disputes
+CREATE TABLE IF NOT EXISTS disputes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  match_result_id UUID REFERENCES match_results(id),
+  tournament_id UUID REFERENCES tournaments(id),
+  raised_by UUID REFERENCES users(id),
+  reason TEXT NOT NULL,
+  evidence_path VARCHAR(500),
+  status VARCHAR(20) DEFAULT 'open',
+  admin_note TEXT,
+  resolved_by UUID REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  resolved_at TIMESTAMP
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_registrations_tournament ON registrations(tournament_id);
 CREATE INDEX IF NOT EXISTS idx_bracket_tournament ON bracket_entries(tournament_id);
@@ -162,3 +217,8 @@ CREATE INDEX IF NOT EXISTS idx_invite_token ON admin_invites(token);
 CREATE INDEX IF NOT EXISTS idx_bank_accounts_user ON bank_accounts(user_id);
 CREATE INDEX IF NOT EXISTS idx_payouts_tournament ON payouts(tournament_id);
 CREATE INDEX IF NOT EXISTS idx_payouts_user ON payouts(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id, read);
+CREATE INDEX IF NOT EXISTS idx_fixtures_tournament ON fixtures(tournament_id);
+CREATE INDEX IF NOT EXISTS idx_fixtures_players ON fixtures(player1_id, player2_id);
+CREATE INDEX IF NOT EXISTS idx_disputes_tournament ON disputes(tournament_id);

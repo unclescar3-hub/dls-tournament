@@ -15,6 +15,7 @@
     <a href="/dls.html">DLS Arena</a>
     <a href="/efootball.html">eFootball</a>
     <a href="/eafc.html">EA FC</a>
+    <a href="/fixtures.html">Fixtures</a>
     <a href="/leaderboard.html">Leaderboard</a>
     <a href="/tv.html" class="nav-tv">&#9679; TV</a>
   </div>
@@ -41,29 +42,32 @@
   </div>
 
   <div id="dash-content" style="display:none">
-    <!-- Stats row -->
+    <!-- Stats -->
     <div class="grid-3" style="margin-bottom:40px">
       <div class="card"><div class="card-body" style="text-align:center">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--primary)" id="my-reg-count">0</div>
-        <div style="font-size:.78rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Tournaments Joined</div>
+        <div style="font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Tournaments Joined</div>
       </div></div>
       <div class="card"><div class="card-body" style="text-align:center">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--gold)" id="my-wins">0</div>
-        <div style="font-size:.78rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Total Wins</div>
+        <div style="font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Total Wins</div>
       </div></div>
       <div class="card"><div class="card-body" style="text-align:center">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--action-blue)" id="my-points">0</div>
-        <div style="font-size:.78rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Total Points</div>
+        <div style="font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Total Points</div>
       </div></div>
     </div>
 
     <!-- TABS -->
-    <div style="display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid var(--border);flex-wrap:wrap">
-      <button class="dash-tab active" onclick="switchDashTab('tournaments',this)">My Tournaments</button>
-      <button class="dash-tab" onclick="switchDashTab('payout',this)">💳 Payout Details</button>
+    <div style="display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid var(--border);flex-wrap:wrap;overflow-x:auto">
+      <button class="dash-tab active" onclick="switchDashTab('tournaments',this)">🏟 Tournaments</button>
+      <button class="dash-tab" onclick="switchDashTab('fixtures',this)">📅 My Fixtures</button>
+      <button class="dash-tab" onclick="switchDashTab('notifications',this)">🔔 Notifications <span id="dash-notif-badge" style="display:none;background:var(--danger);color:#fff;font-size:.6rem;padding:1px 6px;border-radius:10px;margin-left:4px"></span></button>
+      <button class="dash-tab" onclick="switchDashTab('payout',this)">💳 Bank &amp; Payouts</button>
       <button class="dash-tab" onclick="switchDashTab('earnings',this)">💰 Earnings</button>
-      <button class="dash-tab" onclick="switchDashTab('submit',this)">Submit Result</button>
-      <button class="dash-tab" onclick="switchDashTab('stream',this)">Share Stream</button>
+      <button class="dash-tab" onclick="switchDashTab('disputes',this)">⚠ Disputes</button>
+      <button class="dash-tab" onclick="switchDashTab('submit',this)">📤 Submit Result</button>
+      <button class="dash-tab" onclick="switchDashTab('stream',this)">📡 Stream</button>
     </div>
 
     <!-- MY TOURNAMENTS -->
@@ -71,35 +75,33 @@
       <div id="my-tournaments-list"><div class="spinner"></div></div>
     </div>
 
-    <!-- PAYOUT DETAILS -->
+    <!-- MY FIXTURES -->
+    <div id="dtab-fixtures" style="display:none">
+      <div id="my-fixtures-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div id="dtab-notifications" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <h3 style="font-size:1.1rem;font-weight:700">Notifications</h3>
+        <button onclick="markAllRead()" class="btn btn-outline btn-sm">Mark All Read</button>
+      </div>
+      <div id="notifications-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- PAYOUT / BANK -->
     <div id="dtab-payout" style="display:none">
       <div class="grid-2">
-        <!-- Current account -->
         <div class="card">
-          <div class="card-header">
-            <h3>My Bank Account</h3>
-            <span class="tag tag-primary" id="bank-status-tag" style="display:none">Verified ✓</span>
-          </div>
-          <div class="card-body" id="bank-current">
-            <div class="spinner"></div>
-          </div>
+          <div class="card-header"><h3>My Bank Account</h3><span class="tag tag-primary" id="bank-status-tag" style="display:none">Verified ✓</span></div>
+          <div class="card-body" id="bank-current"><div class="spinner"></div></div>
         </div>
-
-        <!-- Add / update account -->
         <div class="card">
-          <div class="card-header">
-            <h3>Add / Update Bank Details</h3>
-            <span class="tag tag-gold">Required to receive prizes</span>
-          </div>
+          <div class="card-header"><h3>Add / Update Bank</h3><span class="tag tag-gold">Required for prizes</span></div>
           <div class="card-body">
-            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Your details are used exclusively for prize transfers via Paystack. We never store card details.</p>
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Your details are used exclusively for prize transfers via Paystack.</p>
             <form id="bank-form">
-              <div class="form-group">
-                <label>Bank</label>
-                <select id="bank-select" required>
-                  <option value="">Loading banks...</option>
-                </select>
-              </div>
+              <div class="form-group"><label>Bank</label><select id="bank-select" required><option value="">Loading banks...</option></select></div>
               <div class="form-group">
                 <label>Account Number</label>
                 <div style="display:flex;gap:8px">
@@ -117,54 +119,56 @@
           </div>
         </div>
       </div>
-
-      <!-- Info box -->
       <div class="card" style="margin-top:20px;border-color:rgba(0,230,118,.2)">
         <div class="card-body" style="display:flex;gap:16px;align-items:flex-start">
           <span style="font-size:1.5rem;flex-shrink:0">🔒</span>
           <div>
             <strong>How prize payouts work</strong>
-            <p style="color:var(--muted);font-size:.85rem;margin-top:6px;line-height:1.7">
-              When a tournament ends, the admin calculates prize positions and triggers payouts via Paystack Transfer. The money goes <strong style="color:var(--text)">directly into your bank account</strong> — no manual collection needed. You'll receive an email confirmation when your payout is sent. Funds typically arrive within minutes.
-            </p>
+            <p style="color:var(--muted);font-size:.85rem;margin-top:6px;line-height:1.7">When a tournament ends, the admin triggers payouts via Paystack Transfer. The money goes <strong style="color:var(--text)">directly into your bank account</strong>. You'll receive an email confirmation and an in-app notification. Funds typically arrive within minutes.</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- EARNINGS -->
-    <div id="dtab-earnings" style="display:none">
-      <div id="earnings-list"><div class="spinner"></div></div>
+    <div id="dtab-earnings" style="display:none"><div id="earnings-list"><div class="spinner"></div></div></div>
+
+    <!-- DISPUTES -->
+    <div id="dtab-disputes" style="display:none">
+      <div id="my-disputes-list"><div class="spinner"></div></div>
+      <div class="card" style="margin-top:24px">
+        <div class="card-header"><h3>Raise a Dispute</h3><span class="tag tag-danger">Admin Reviewed</span></div>
+        <div class="card-body">
+          <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">If you believe a match result is incorrect, you can raise a formal dispute. The admin team will review your evidence and make a final decision.</p>
+          <form id="dispute-form" enctype="multipart/form-data">
+            <div class="form-group">
+              <label>Select Match to Dispute</label>
+              <select id="dispute-match" required><option value="">Loading your matches...</option></select>
+            </div>
+            <div class="form-group"><label>Reason (be specific)</label><textarea id="dispute-reason" required rows="3" placeholder="Explain clearly what went wrong — e.g. screenshot shows wrong score, opponent disconnected, etc."></textarea></div>
+            <div class="form-group"><label>Evidence Screenshot (optional)</label><input type="file" id="dispute-evidence" accept="image/*" class="input-file"></div>
+            <button type="submit" class="btn btn-danger">Submit Dispute</button>
+          </form>
+        </div>
+      </div>
     </div>
 
     <!-- SUBMIT RESULT -->
     <div id="dtab-submit" style="display:none">
       <div class="card">
-        <div class="card-header">
-          <h3>Submit Match Result</h3>
-          <span class="tag tag-primary">Admin Reviewed</span>
-        </div>
+        <div class="card-header"><h3>Submit Match Result</h3><span class="tag tag-primary">Admin Reviewed</span></div>
         <div class="card-body">
-          <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Upload your match screenshot. Our admin team reviews every result to ensure fair play.</p>
+          <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Upload your match screenshot. Our admin team reviews every result. AI assists but humans make the final call.</p>
           <form id="submit-match-form" enctype="multipart/form-data">
             <div class="form-row">
-              <div class="form-group">
-                <label>Tournament</label>
-                <select id="match-tournament" required><option value="">Select your tournament...</option></select>
-              </div>
-              <div class="form-group">
-                <label>Opponent Username</label>
-                <input type="text" id="match-opponent" placeholder="Opponent's exact username" required>
-              </div>
+              <div class="form-group"><label>Tournament</label><select id="match-tournament" required><option value="">Select your tournament...</option></select></div>
+              <div class="form-group"><label>Opponent Username</label><input type="text" id="match-opponent" placeholder="Opponent's exact username" required></div>
             </div>
             <div class="form-row">
               <div class="form-group"><label>Your Score</label><input type="number" id="match-my-score" min="0" required placeholder="0"></div>
               <div class="form-group"><label>Opponent Score</label><input type="number" id="match-opp-score" min="0" required placeholder="0"></div>
             </div>
-            <div class="form-group">
-              <label>Match Screenshot (required)</label>
-              <input type="file" id="match-screenshot" accept="image/*" required class="input-file">
-            </div>
+            <div class="form-group"><label>Match Screenshot (required)</label><input type="file" id="match-screenshot" accept="image/*" required class="input-file"></div>
             <button type="submit" class="btn btn-primary">Submit Result</button>
           </form>
           <div id="match-result-box" style="display:none;margin-top:20px;padding:16px;border-radius:10px;border:1px solid var(--border)"></div>
@@ -177,23 +181,10 @@
       <div class="card">
         <div class="card-header"><h3>Share Your Stream</h3><span class="tag tag-ef">Broadcast</span></div>
         <div class="card-body">
-          <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Playing a Grand Final? Share your stream link and we'll feature it on Unclescar TV.</p>
           <form id="stream-form">
             <div class="form-row">
-              <div class="form-group">
-                <label>Tournament</label>
-                <select id="stream-tournament" required><option value="">Select tournament...</option></select>
-              </div>
-              <div class="form-group">
-                <label>Platform</label>
-                <select id="stream-platform">
-                  <option value="youtube">YouTube</option>
-                  <option value="twitch">Twitch</option>
-                  <option value="tiktok">TikTok Live</option>
-                  <option value="facebook">Facebook Live</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+              <div class="form-group"><label>Tournament</label><select id="stream-tournament" required><option value="">Select tournament...</option></select></div>
+              <div class="form-group"><label>Platform</label><select id="stream-platform"><option value="youtube">YouTube</option><option value="twitch">Twitch</option><option value="tiktok">TikTok Live</option><option value="facebook">Facebook Live</option><option value="other">Other</option></select></div>
             </div>
             <div class="form-group"><label>Stream Title</label><input type="text" id="stream-title" placeholder="e.g. DLS Academy Grand Final" required></div>
             <div class="form-group"><label>Stream URL</label><input type="url" id="stream-url" placeholder="https://youtube.com/live/..." required></div>
@@ -219,9 +210,13 @@
 <script src="https://js.paystack.co/v1/inline.js"></script>
 
 <style>
-.dash-tab { background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:.875rem;font-weight:600;padding:10px 16px;cursor:pointer;margin-bottom:-1px;transition:all .2s; }
+.dash-tab { background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;padding:10px 12px;cursor:pointer;margin-bottom:-1px;transition:all .2s;white-space:nowrap; }
 .dash-tab:hover { color:var(--text); }
 .dash-tab.active { color:var(--primary);border-bottom-color:var(--primary); }
+.notif-item { display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid rgba(30,45,69,.5); }
+.notif-item:last-child { border-bottom:none; }
+.notif-item.unread { background:rgba(0,230,118,.02);margin:0 -8px;padding:14px 8px;border-radius:8px; }
+.notif-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px; }
 </style>
 
 <script>
@@ -232,40 +227,55 @@ let verifiedAccountData = null;
 function switchDashTab(name, btn) {
   document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  ['tournaments','payout','earnings','submit','stream'].forEach(t =>
-    document.getElementById('dtab-' + t).style.display = t === name ? 'block' : 'none'
+  ['tournaments','fixtures','notifications','payout','earnings','disputes','submit','stream'].forEach(t =>
+    document.getElementById('dtab-'+t).style.display = t===name?'block':'none'
   );
-  if (name === 'payout') loadBankTab();
-  if (name === 'earnings') loadEarnings();
+  if (name==='payout') loadBankTab();
+  if (name==='earnings') loadEarnings();
+  if (name==='notifications') loadNotifications();
+  if (name==='fixtures') loadMyFixtures();
+  if (name==='disputes') loadMyDisputesTab();
 }
 
 async function initDashboard() {
   const user = await loadUser();
-  if (!user) { document.getElementById('not-logged-in').style.display = 'block'; return; }
-  document.getElementById('dash-content').style.display = 'block';
-  document.getElementById('dash-welcome').textContent = `Welcome back, ${user.username}! Track your tournaments, bank details, and earnings.`;
-  if (user.role === 'admin') { window.location.href = '/admin.html'; return; }
-  await Promise.all([loadMyTournaments(), loadStandingsStats()]);
+  if (!user) { document.getElementById('not-logged-in').style.display='block'; return; }
+  document.getElementById('dash-content').style.display='block';
+  document.getElementById('dash-welcome').textContent=`Welcome back, ${user.username}! Track your tournaments, fixtures, and earnings.`;
+  if (user.role==='admin') { window.location.href='/admin.html'; return; }
+  await Promise.all([loadMyTournaments(), loadStandingsStats(), loadNotifBadge()]);
+
+  // Handle hash navigation
+  if (location.hash==='#notifications') {
+    const btn = document.querySelectorAll('.dash-tab')[2];
+    switchDashTab('notifications', btn);
+  }
+}
+
+async function loadNotifBadge() {
+  try {
+    const data = await api('GET', '/notifications/count');
+    const badge = document.getElementById('dash-notif-badge');
+    if (data.count>0) { badge.textContent=data.count; badge.style.display='inline'; }
+  } catch {}
 }
 
 async function loadMyTournaments() {
   try {
     myRegistrations = await api('GET', '/tournaments/my/registrations');
-    document.getElementById('my-reg-count').textContent = myRegistrations.filter(r => r.payment_status === 'paid').length;
+    document.getElementById('my-reg-count').textContent = myRegistrations.filter(r=>r.payment_status==='paid').length;
     const list = document.getElementById('my-tournaments-list');
-
     const tSelect = document.getElementById('match-tournament');
     const sSelect = document.getElementById('stream-tournament');
-    tSelect.innerHTML = '<option value="">Select tournament...</option>';
-    sSelect.innerHTML = '<option value="">Select tournament...</option>';
+    tSelect.innerHTML='<option value="">Select tournament...</option>';
+    sSelect.innerHTML='<option value="">Select tournament...</option>';
 
     if (!myRegistrations.length) {
-      list.innerHTML = '<p style="color:var(--muted)">You haven\'t joined any tournaments yet. <a href="/" style="color:var(--primary)">Browse arenas</a> to find one.</p>';
-      return;
+      list.innerHTML='<p style="color:var(--muted)">No tournaments yet. <a href="/" style="color:var(--primary)">Browse arenas</a> to find one.</p>'; return;
     }
 
     list.innerHTML = myRegistrations.map(r => `
-      <div class="card" style="margin-bottom:14px">
+      <div class="card" style="margin-bottom:12px">
         <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700">${r.name}</div>
@@ -273,232 +283,277 @@ async function loadMyTournaments() {
           </div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             ${statusBadge(r.tournament_status)}
-            ${r.payment_status === 'paid' ? '<span class="tag tag-primary">✓ Paid</span>' : '<span class="tag tag-danger">Unpaid</span>'}
-            <a href="/tournament.html?id=${r.tournament_id}" class="btn btn-outline btn-sm">View Tournament</a>
+            ${r.payment_status==='paid'?'<span class="tag tag-primary">✓ Paid</span>':'<span class="tag tag-danger">Unpaid</span>'}
+            <a href="/player.html?u=${currentUser.username}" class="btn btn-outline btn-sm">My Profile</a>
+            <a href="/tournament.html?id=${r.tournament_id}" class="btn btn-outline btn-sm">View</a>
           </div>
         </div>
       </div>`).join('');
 
-    myRegistrations.filter(r => r.payment_status === 'paid').forEach(r => {
-      tSelect.innerHTML += `<option value="${r.tournament_id}">${r.name}</option>`;
-      sSelect.innerHTML += `<option value="${r.tournament_id}">${r.name}</option>`;
+    myRegistrations.filter(r=>r.payment_status==='paid').forEach(r => {
+      tSelect.innerHTML+=`<option value="${r.tournament_id}">${r.name}</option>`;
+      sSelect.innerHTML+=`<option value="${r.tournament_id}">${r.name}</option>`;
     });
-  } catch(err) { toast(err.message, 'error'); }
+  } catch(err) { toast(err.message,'error'); }
 }
 
 async function loadStandingsStats() {
   try {
-    let totalWins = 0, totalPoints = 0;
-    for (const r of myRegistrations.filter(r => r.payment_status === 'paid')) {
+    let totalWins=0, totalPoints=0;
+    for (const r of myRegistrations.filter(r=>r.payment_status==='paid')) {
       const data = await api('GET', `/tournaments/${r.tournament_id}`);
-      const me = data.standings.find(s => s.user_id === currentUser.id);
-      if (me) { totalWins += parseInt(me.wins)||0; totalPoints += parseInt(me.points)||0; }
+      const me = data.standings.find(s=>s.user_id===currentUser.id);
+      if (me) { totalWins+=parseInt(me.wins)||0; totalPoints+=parseInt(me.points)||0; }
     }
-    document.getElementById('my-wins').textContent = totalWins;
-    document.getElementById('my-points').textContent = totalPoints;
+    document.getElementById('my-wins').textContent=totalWins;
+    document.getElementById('my-points').textContent=totalPoints;
   } catch {}
 }
 
-// ── BANK ACCOUNT ────────────────────────────────────────────────────────────
+// ── MY FIXTURES ───────────────────────────────────────────────────────────────
+
+async function loadMyFixtures() {
+  const el = document.getElementById('my-fixtures-list');
+  try {
+    const fixtures = await api('GET', '/fixtures/mine');
+    if (!fixtures.length) {
+      el.innerHTML=`<div style="text-align:center;padding:60px 0"><div style="font-size:3rem;margin-bottom:16px">📅</div><h3 style="margin-bottom:8px">No fixtures scheduled</h3><p style="color:var(--muted)">When the admin schedules your matches, they'll appear here with countdown timers.</p></div>`;
+      return;
+    }
+    el.innerHTML = fixtures.map(f => {
+      const isPast = new Date(f.scheduled_at) < Date.now();
+      const isMe1 = currentUser?.id === f.player1_id;
+      const opponent = isMe1 ? f.player2_name : f.player1_name;
+      return `<div class="card" style="margin-bottom:12px;border-left:3px solid ${isPast?'var(--muted)':'var(--ef)'}">
+        <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-size:.72rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">${f.tournament_name}${f.round_label?' · '+f.round_label:''}</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700"><span style="color:var(--ef)">You</span> vs ${opponent}</div>
+            ${f.match_code?`<div style="font-size:.82rem;margin-top:4px">Lobby Code: <strong style="font-family:monospace;color:var(--primary);letter-spacing:3px">${f.match_code}</strong></div>`:''}
+            ${f.note?`<div style="font-size:.82rem;color:var(--muted);margin-top:4px">📋 ${f.note}</div>`:''}
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:.85rem;color:var(--muted)">🕐 ${fmtDateTime(f.scheduled_at)}</div>
+            ${!isPast&&f.status==='scheduled'?`<div style="font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:var(--ef);margin-top:4px">⏱ ${timeUntil(f.scheduled_at)}</div>`:
+              `<div style="font-size:.8rem;color:var(--muted);margin-top:4px">${f.status}</div>`}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch { el.innerHTML='<p style="color:var(--muted)">Could not load fixtures.</p>'; }
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
+
+async function loadNotifications() {
+  const el = document.getElementById('notifications-list');
+  try {
+    const notifs = await api('GET', '/notifications');
+    document.getElementById('dash-notif-badge').style.display='none';
+    if (!notifs.length) { el.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px 0">No notifications yet.</p>'; return; }
+    const typeColors = { fixture:'var(--ef)',reminder:'var(--gold)',code:'var(--primary)',match:'var(--primary)',payout:'var(--primary)',dispute:'var(--danger)',announcement:'var(--action-blue)' };
+    el.innerHTML = `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px">${notifs.map(n => `
+      <div class="notif-item ${!n.read?'unread':''}" onclick="readNotif('${n.id}',this)">
+        <div class="notif-dot" style="background:${!n.read?(typeColors[n.type]||'var(--primary)'):'var(--border)'}"></div>
+        <div style="flex:1">
+          <div style="font-weight:${n.read?'400':'700'};font-size:.9rem">${n.title}</div>
+          ${n.body?`<div style="color:var(--muted);font-size:.82rem;margin-top:3px;line-height:1.5">${n.body}</div>`:''}
+          <div style="font-size:.72rem;color:var(--muted);margin-top:4px">${fmtDate(n.created_at)}</div>
+        </div>
+        ${n.link&&n.link!==location.pathname?`<a href="${n.link}" style="font-size:.75rem;color:var(--action-blue);white-space:nowrap;flex-shrink:0">View →</a>`:''}
+      </div>`).join('')}</div>`;
+  } catch { el.innerHTML='<p style="color:var(--muted)">Could not load notifications.</p>'; }
+}
+
+async function readNotif(id, el) {
+  el.classList.remove('unread');
+  el.querySelector('.notif-dot').style.background='var(--border)';
+  el.querySelector('div[style*="font-weight:700"]')?.setAttribute('style','font-weight:400;font-size:.9rem');
+  try { await api('PATCH', `/notifications/${id}/read`, {}); } catch {}
+}
+
+async function markAllRead() {
+  try {
+    await api('PATCH', '/notifications/read-all', {});
+    toast('All notifications marked as read','success');
+    loadNotifications();
+  } catch(err) { toast(err.message,'error'); }
+}
+
+// ── BANK ACCOUNT ──────────────────────────────────────────────────────────────
 
 async function loadBankTab() {
-  // Load banks list
   if (!allBanks.length) {
     try {
       allBanks = await api('GET', '/payouts/banks');
       const sel = document.getElementById('bank-select');
-      sel.innerHTML = '<option value="">Select your bank...</option>';
-      allBanks.forEach(b => {
-        sel.innerHTML += `<option value="${b.code}" data-name="${b.name}">${b.name}</option>`;
-      });
-    } catch { document.getElementById('bank-select').innerHTML = '<option value="">Could not load banks</option>'; }
+      sel.innerHTML='<option value="">Select your bank...</option>';
+      allBanks.forEach(b => sel.innerHTML+=`<option value="${b.code}" data-name="${b.name}">${b.name}</option>`);
+    } catch { document.getElementById('bank-select').innerHTML='<option value="">Could not load banks</option>'; }
   }
-
-  // Load existing account
   try {
     const acct = await api('GET', '/payouts/my-account');
     const el = document.getElementById('bank-current');
     if (acct) {
-      document.getElementById('bank-status-tag').style.display = 'inline-block';
-      el.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px">
-            <div style="font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">Account Name</div>
-            <div style="font-weight:700;font-size:1.05rem">${acct.account_name}</div>
-          </div>
-          <div style="display:flex;gap:10px">
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;flex:1">
-              <div style="font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">Bank</div>
-              <div style="font-weight:600">${acct.bank_name}</div>
-            </div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;flex:1">
-              <div style="font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">Account No.</div>
-              <div style="font-weight:600;letter-spacing:2px">${acct.account_number}</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--primary-dim);border:1px solid var(--primary);border-radius:8px">
-            <span style="color:var(--primary);font-size:1.1rem">&#10003;</span>
-            <span style="color:var(--primary);font-size:.85rem;font-weight:600">Bank account verified — you can receive prize payouts</span>
-          </div>
-        </div>`;
-    } else {
-      el.innerHTML = `<div style="text-align:center;padding:24px">
-        <div style="font-size:2.5rem;margin-bottom:12px">🏦</div>
-        <h4 style="margin-bottom:8px">No bank account saved</h4>
-        <p style="color:var(--muted);font-size:.85rem">Add your bank details on the right to receive prize payouts directly to your account.</p>
+      document.getElementById('bank-status-tag').style.display='inline-block';
+      el.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px"><div style="font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">Account Name</div><div style="font-weight:700;font-size:1.05rem">${acct.account_name}</div></div>
+        <div style="display:flex;gap:10px">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;flex:1"><div style="font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">Bank</div><div style="font-weight:600">${acct.bank_name}</div></div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;flex:1"><div style="font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">Account No.</div><div style="font-weight:600;letter-spacing:2px">${acct.account_number}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--primary-dim);border:1px solid var(--primary);border-radius:8px">
+          <span style="color:var(--primary)">✓</span><span style="color:var(--primary);font-size:.85rem;font-weight:600">Bank verified — ready to receive prize payouts</span>
+        </div>
       </div>`;
+    } else {
+      el.innerHTML=`<div style="text-align:center;padding:24px"><div style="font-size:2.5rem;margin-bottom:12px">🏦</div><h4 style="margin-bottom:8px">No bank account saved</h4><p style="color:var(--muted);font-size:.85rem">Add your details to receive prize money directly.</p></div>`;
     }
-  } catch { document.getElementById('bank-current').innerHTML = '<p style="color:var(--muted)">Could not load account info.</p>'; }
+  } catch { document.getElementById('bank-current').innerHTML='<p style="color:var(--muted)">Could not load account.</p>'; }
 }
 
 async function verifyAccount() {
-  const accountNumber = document.getElementById('account-number').value.trim();
-  const bankSelect = document.getElementById('bank-select');
-  const bankCode = bankSelect.value;
-  const errEl = document.getElementById('bank-error');
-  errEl.style.display = 'none';
-
-  if (!accountNumber || accountNumber.length !== 10) { errEl.textContent = 'Please enter a valid 10-digit account number'; errEl.style.display = 'block'; return; }
-  if (!bankCode) { errEl.textContent = 'Please select your bank first'; errEl.style.display = 'block'; return; }
-
-  const btn = document.getElementById('verify-btn');
-  btn.textContent = 'Verifying...'; btn.disabled = true;
-  document.getElementById('verified-account').style.display = 'none';
-  document.getElementById('bank-save-btn').disabled = true;
-  verifiedAccountData = null;
-
+  const accountNumber=document.getElementById('account-number').value.trim();
+  const bankSelect=document.getElementById('bank-select');
+  const bankCode=bankSelect.value;
+  const errEl=document.getElementById('bank-error');
+  errEl.style.display='none';
+  if (!accountNumber||accountNumber.length!==10) { errEl.textContent='Please enter a valid 10-digit account number'; errEl.style.display='block'; return; }
+  if (!bankCode) { errEl.textContent='Please select your bank first'; errEl.style.display='block'; return; }
+  const btn=document.getElementById('verify-btn');
+  btn.textContent='Verifying...'; btn.disabled=true;
+  document.getElementById('verified-account').style.display='none';
+  document.getElementById('bank-save-btn').disabled=true;
+  verifiedAccountData=null;
   try {
     const data = await api('GET', `/payouts/verify-account?account_number=${accountNumber}&bank_code=${bankCode}`);
-    document.getElementById('verified-name').textContent = data.account_name;
-    document.getElementById('verified-account').style.display = 'block';
-    document.getElementById('bank-save-btn').disabled = false;
-    verifiedAccountData = {
-      account_name: data.account_name,
-      account_number: accountNumber,
-      bank_code: bankCode,
-      bank_name: bankSelect.options[bankSelect.selectedIndex].dataset.name
-    };
-    toast('Account verified: ' + data.account_name, 'success');
-  } catch(err) {
-    errEl.textContent = err.message;
-    errEl.style.display = 'block';
-  }
-  finally { btn.textContent = 'Verify'; btn.disabled = false; }
+    document.getElementById('verified-name').textContent=data.account_name;
+    document.getElementById('verified-account').style.display='block';
+    document.getElementById('bank-save-btn').disabled=false;
+    verifiedAccountData = { account_name:data.account_name, account_number:accountNumber, bank_code:bankCode, bank_name:bankSelect.options[bankSelect.selectedIndex].dataset.name };
+    toast('Account verified: '+data.account_name,'success');
+  } catch(err) { errEl.textContent=err.message; errEl.style.display='block'; }
+  finally { btn.textContent='Verify'; btn.disabled=false; }
 }
 
 document.getElementById('bank-form').addEventListener('submit', async e => {
   e.preventDefault();
-  if (!verifiedAccountData) { toast('Please verify your account number first', 'error'); return; }
-  const btn = document.getElementById('bank-save-btn');
-  btn.textContent = 'Saving...'; btn.disabled = true;
+  if (!verifiedAccountData) { toast('Please verify your account number first','error'); return; }
+  const btn=document.getElementById('bank-save-btn'); btn.textContent='Saving...'; btn.disabled=true;
   try {
     await api('POST', '/payouts/account', verifiedAccountData);
-    toast('Bank account saved! You can now receive prize payouts.', 'success');
+    toast('Bank account saved! You can now receive prize payouts.','success');
     loadBankTab();
-  } catch(err) { toast(err.message, 'error'); }
-  finally { btn.textContent = 'Save Bank Account'; btn.disabled = false; }
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.textContent='Save Bank Account'; btn.disabled=false; }
 });
 
-// ── EARNINGS ────────────────────────────────────────────────────────────────
+// ── EARNINGS ─────────────────────────────────────────────────────────────────
 
 async function loadEarnings() {
-  const el = document.getElementById('earnings-list');
+  const el=document.getElementById('earnings-list');
   try {
     const payouts = await api('GET', '/payouts/my-payouts');
     if (!payouts.length) {
-      el.innerHTML = `<div style="text-align:center;padding:60px 0">
-        <div style="font-size:3rem;margin-bottom:16px">💰</div>
-        <h3 style="margin-bottom:8px">No earnings yet</h3>
-        <p style="color:var(--muted)">Win tournaments to earn prize money — it'll appear here once an admin sends your payout.</p>
-      </div>`;
+      el.innerHTML=`<div style="text-align:center;padding:60px 0"><div style="font-size:3rem;margin-bottom:16px">💰</div><h3 style="margin-bottom:8px">No earnings yet</h3><p style="color:var(--muted)">Win tournaments to earn prize money — it appears here when admin sends your payout.</p></div>`;
       return;
     }
-    const totalEarned = payouts.filter(p => p.status === 'sent' || p.status === 'processing').reduce((a, p) => a + parseInt(p.amount || 0), 0);
-    el.innerHTML = `
-      <div class="card" style="margin-bottom:20px;border-color:var(--primary)">
-        <div class="card-body" style="text-align:center">
-          <div style="font-size:.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Total Prize Earnings</div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:var(--primary)">₦${totalEarned.toLocaleString()}</div>
+    const totalEarned=payouts.filter(p=>p.status==='sent'||p.status==='processing').reduce((a,p)=>a+parseInt(p.amount||0),0);
+    const ordinal=n=>n+(['th','st','nd','rd'][((n%100-20)%10)||n%100>10?0:n%10]||'th');
+    const statusColor={sent:'var(--primary)',processing:'var(--gold)',pending:'var(--muted)',failed:'var(--danger)'};
+    const statusLabel={sent:'✓ Paid',processing:'⏳ Processing',pending:'Pending',failed:'✕ Failed'};
+    el.innerHTML=`<div class="card" style="margin-bottom:20px;border-color:var(--primary)"><div class="card-body" style="text-align:center">
+      <div style="font-size:.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Total Prize Earnings</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:var(--primary)">₦${totalEarned.toLocaleString()}</div>
+    </div></div>
+    ${payouts.map(p=>`<div class="card" style="margin-bottom:12px">
+      <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${p.tournament_name}</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${p.arena} · ${ordinal(p.position)} place · ${fmtDate(p.created_at)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:var(--primary)">₦${Number(p.amount).toLocaleString()}</div>
+          <span style="font-size:.72rem;font-weight:700;color:${statusColor[p.status]||'var(--muted)'};background:${statusColor[p.status]||'var(--muted)'}20;border:1px solid ${statusColor[p.status]||'var(--muted)'}40;padding:5px 12px;border-radius:6px">${statusLabel[p.status]||p.status}</span>
         </div>
       </div>
-      ${payouts.map(p => {
-        const ordinal = n => n + (['th','st','nd','rd'][((n%100-20)%10)||n%100>10?0:n%10]||'th');
-        const statusColor = { sent:'var(--primary)', processing:'var(--gold)', pending:'var(--muted)', failed:'var(--danger)' };
-        const statusLabel = { sent:'✓ Paid', processing:'⏳ Processing', pending:'Pending', failed:'✕ Failed' };
-        return `<div class="card" style="margin-bottom:12px">
-          <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
-            <div>
-              <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${p.tournament_name}</div>
-              <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${p.arena} · ${ordinal(p.position)} place · ${fmtDate(p.created_at)}</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:16px">
-              <div style="text-align:right">
-                <div style="font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:var(--primary)">₦${Number(p.amount).toLocaleString()}</div>
-              </div>
-              <span style="font-size:.75rem;font-weight:700;color:${statusColor[p.status]||'var(--muted)'};background:${statusColor[p.status]||'var(--muted)'}20;border:1px solid ${statusColor[p.status]||'var(--muted)'}40;padding:5px 12px;border-radius:6px">${statusLabel[p.status]||p.status}</span>
-            </div>
-          </div>
-          ${p.status==='failed'&&p.failure_reason?`<div style="padding:10px 20px;background:var(--danger-dim);border-top:1px solid var(--border);font-size:.8rem;color:var(--danger)">Issue: ${p.failure_reason}</div>`:''}
-        </div>`;
-      }).join('')}`;
-  } catch { el.innerHTML = '<p style="color:var(--muted)">Could not load earnings.</p>'; }
+      ${p.status==='failed'&&p.failure_reason?`<div style="padding:10px 20px;background:var(--danger-dim);border-top:1px solid var(--border);font-size:.8rem;color:var(--danger)">Issue: ${p.failure_reason}</div>`:''}
+    </div>`).join('')}`;
+  } catch { el.innerHTML='<p style="color:var(--muted)">Could not load earnings.</p>'; }
 }
 
-// ── MATCH SUBMIT ─────────────────────────────────────────────────────────────
+// ── DISPUTES ─────────────────────────────────────────────────────────────────
+
+async function loadMyDisputesTab() {
+  const el=document.getElementById('my-disputes-list');
+  try {
+    // Load my submitted matches for the dispute form
+    const matches = await api('GET', '/matches/mine');
+    const dSelect = document.getElementById('dispute-match');
+    dSelect.innerHTML='<option value="">Select a match...</option>';
+    matches.filter(m=>['approved','ai_approved'].includes(m.status)).forEach(m => {
+      dSelect.innerHTML+=`<option value="${m.id}">${m.tournament_name}: You ${m.submitter_score}–${m.opponent_score} vs ${m.opponent_name}</option>`;
+    });
+    el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Your submitted disputes will appear here once you raise one below.</p>';
+  } catch { el.innerHTML='<p style="color:var(--muted)">Could not load matches.</p>'; }
+}
+
+document.getElementById('dispute-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const matchId=document.getElementById('dispute-match').value;
+  if (!matchId) { toast('Select a match to dispute','error'); return; }
+  const btn=e.target.querySelector('button'); btn.textContent='Submitting...'; btn.disabled=true;
+  const fd=new FormData();
+  fd.append('reason', document.getElementById('dispute-reason').value);
+  const evi=document.getElementById('dispute-evidence').files[0];
+  if (evi) fd.append('evidence', evi);
+  try {
+    await api('POST', `/matches/${matchId}/dispute`, fd, true);
+    toast('Dispute submitted. Admin will review shortly.','success');
+    e.target.reset();
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.textContent='Submit Dispute'; btn.disabled=false; }
+});
+
+// ── SUBMIT RESULT ─────────────────────────────────────────────────────────────
 
 document.getElementById('submit-match-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const btn = e.target.querySelector('button');
-  btn.textContent = 'Submitting...'; btn.disabled = true;
-  const opponentUsername = document.getElementById('match-opponent').value.trim();
-  const tournamentId = document.getElementById('match-tournament').value;
+  const btn=e.target.querySelector('button'); btn.textContent='Submitting...'; btn.disabled=true;
+  const opponentUsername=document.getElementById('match-opponent').value.trim();
+  const tournamentId=document.getElementById('match-tournament').value;
   try {
     const tData = await api('GET', `/tournaments/${tournamentId}`);
-    const oppEntry = tData.standings.find(s => s.username.toLowerCase() === opponentUsername.toLowerCase());
+    const oppEntry = tData.standings.find(s=>s.username.toLowerCase()===opponentUsername.toLowerCase());
     if (!oppEntry) throw new Error('Opponent not found in this tournament. Check their username.');
-
-    const fd = new FormData();
-    fd.append('tournament_id', tournamentId);
-    fd.append('opponent_id', oppEntry.user_id);
-    fd.append('my_score', document.getElementById('match-my-score').value);
-    fd.append('opponent_score', document.getElementById('match-opp-score').value);
-    fd.append('screenshot', document.getElementById('match-screenshot').files[0]);
-
+    const fd=new FormData();
+    fd.append('tournament_id',tournamentId); fd.append('opponent_id',oppEntry.user_id);
+    fd.append('my_score',document.getElementById('match-my-score').value);
+    fd.append('opponent_score',document.getElementById('match-opp-score').value);
+    fd.append('screenshot',document.getElementById('match-screenshot').files[0]);
     const result = await api('POST', '/matches/submit', fd, true);
-    const box = document.getElementById('match-result-box');
-    box.style.display = 'block';
-    const approved = result.status === 'ai_approved';
-    box.style.borderColor = approved ? 'var(--primary)' : 'var(--gold)';
-    box.innerHTML = `<div style="font-weight:700;color:${approved?'var(--primary)':'var(--gold)'};margin-bottom:6px">
-      ${approved ? '✓ Result submitted and approved' : '⏳ Submitted — pending admin review'}
-    </div>
-    <div style="font-size:.85rem;color:var(--muted)">${approved ? 'Standings have been updated.' : 'Our admin team will review your screenshot and update standings shortly.'}</div>`;
-    toast(approved ? 'Result approved!' : 'Submitted — admin will review shortly', approved ? 'success' : 'info');
+    const box=document.getElementById('match-result-box'); box.style.display='block';
+    const approved=result.status==='ai_approved';
+    box.style.borderColor=approved?'var(--primary)':'var(--gold)';
+    box.innerHTML=`<div style="font-weight:700;color:${approved?'var(--primary)':'var(--gold)'};margin-bottom:6px">${approved?'✓ Result approved — standings updated':'⏳ Submitted — pending admin review'}</div>
+      <div style="font-size:.85rem;color:var(--muted)">${approved?'Great result! Check your profile to see updated stats.':'Admin will review your screenshot and update standings shortly.'}</div>`;
+    toast(approved?'Result approved!':'Submitted — admin will review','info');
     e.target.reset();
-  } catch(err) { toast(err.message, 'error'); }
-  finally { btn.textContent = 'Submit Result'; btn.disabled = false; }
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.textContent='Submit Result'; btn.disabled=false; }
 });
 
 document.getElementById('stream-form').addEventListener('submit', async e => {
   e.preventDefault();
   try {
-    await api('POST', '/streams/submit', {
-      tournament_id: document.getElementById('stream-tournament').value,
-      title: document.getElementById('stream-title').value,
-      platform: document.getElementById('stream-platform').value,
-      stream_url: document.getElementById('stream-url').value
-    });
-    toast('Stream link submitted! Admin will feature it on TV.', 'success');
-    e.target.reset();
-  } catch(err) { toast(err.message, 'error'); }
+    await api('POST', '/streams/submit', { tournament_id:document.getElementById('stream-tournament').value, title:document.getElementById('stream-title').value, platform:document.getElementById('stream-platform').value, stream_url:document.getElementById('stream-url').value });
+    toast('Stream link submitted!','success'); e.target.reset();
+  } catch(err) { toast(err.message,'error'); }
 });
 
 const params = new URLSearchParams(location.search);
-if (params.get('payment') === 'success') {
-  toast('Payment confirmed! You are now registered.', 'success');
-  setTimeout(() => switchDashTab('payout', document.querySelector('.dash-tab:nth-child(2)')), 1500);
-}
-if (params.get('error')) toast('Payment issue: ' + params.get('error').replace(/_/g,' '), 'error');
+if (params.get('payment')==='success') toast('Payment confirmed! You are now registered.','success');
+if (params.get('error')) toast('Payment issue: '+params.get('error').replace(/_/g,' '),'error');
 
 document.addEventListener('DOMContentLoaded', initDashboard);
 </script>

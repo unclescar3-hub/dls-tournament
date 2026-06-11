@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Schedule | Unclescar Studios</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+  <div class="nav-links">
+    <a href="/">Hub</a>
+    <a href="/dls.html">DLS Arena</a>
+    <a href="/efootball.html">eFootball</a>
+    <a href="/eafc.html">EA FC</a>
+    <a href="/fixtures.html" class="active">Fixtures</a>
+    <a href="/leaderboard.html">Leaderboard</a>
+    <a href="/tv.html" class="nav-tv">&#9679; TV</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" class="nav-btn nav-btn-outline" id="nav-login-btn" onclick="openModal('login-modal');return false;">Log In</a>
+    <a href="#" class="nav-btn nav-btn-primary" id="nav-register-btn" onclick="openModal('register-modal');return false;">Sign Up</a>
+    <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
+      <span style="color:var(--muted);font-size:.85rem;">Hi, <strong id="nav-username" style="color:var(--text)"></strong></span>
+      <a href="/dashboard.html" id="nav-dashboard-link" class="nav-btn nav-btn-outline">Dashboard</a>
+      <button onclick="logout()" class="nav-btn nav-btn-outline">Log Out</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero" style="background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(0,229,255,.05) 0%,transparent 70%)">
+  <div class="hero-eyebrow tag tag-ef">Match Calendar</div>
+  <h1>FIXTURE SCHEDULE</h1>
+  <p>Upcoming scheduled matches across all arenas. Tune in, show up, compete.</p>
+</div>
+
+<div class="section">
+  <!-- Filters -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap">
+    <button class="filter-btn active" onclick="filterFixtures('all',this)">All Arenas</button>
+    <button class="filter-btn" onclick="filterFixtures('dls',this)">DLS Arena</button>
+    <button class="filter-btn" onclick="filterFixtures('efootball',this)">eFootball</button>
+    <button class="filter-btn" onclick="filterFixtures('eafc',this)">EA FC</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <label style="color:var(--muted);font-size:.8rem;letter-spacing:1px;text-transform:uppercase;margin:0">Show:</label>
+      <select id="status-filter" onchange="renderFixtures()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 10px;font-size:.85rem">
+        <option value="scheduled">Upcoming</option>
+        <option value="all">All</option>
+        <option value="played">Played</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Live countdown strip for next match -->
+  <div id="next-match-strip" style="display:none;background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(0,229,255,.02));border:1px solid rgba(0,229,255,.25);border-radius:14px;padding:20px 28px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div>
+      <div style="font-size:.7rem;color:var(--ef);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">⚡ Next Match</div>
+      <div id="next-match-info" style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700"></div>
+      <div id="next-match-detail" style="color:var(--muted);font-size:.82rem;margin-top:4px"></div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Starts In</div>
+      <div id="countdown" style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--ef);letter-spacing:2px">–</div>
+    </div>
+  </div>
+
+  <!-- Fixtures list -->
+  <div id="fixtures-list"><div class="spinner"></div></div>
+  <div id="no-fixtures" style="display:none;text-align:center;padding:60px 0">
+    <div style="font-size:3rem;margin-bottom:16px">📅</div>
+    <h3 style="margin-bottom:8px">No fixtures scheduled yet</h3>
+    <p style="color:var(--muted)">Check back soon — the admin team schedules matches for active tournaments.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
+  <span class="footer-copy">&copy; 2026 Unclescar Studios.</span>
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/rules.html" class="footer-link">Rulebook</a>
+    <a href="/admin.html" class="footer-admin-link">&#9881; Admin Panel</a>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+
+<style>
+.filter-btn { background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:7px 16px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif; }
+.filter-btn:hover { color:var(--text); }
+.filter-btn.active { background:var(--ef-dim);border-color:var(--ef);color:var(--ef); }
+.fixture-card { background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0;overflow:hidden;transition:all .25s; }
+.fixture-card:hover { border-color:#2a3f60;transform:translateY(-2px); }
+.fixture-card.status-played { opacity:.65; }
+.fixture-header { padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.75rem;color:var(--muted); }
+.fixture-body { padding:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap; }
+.fixture-player { flex:1;min-width:120px; }
+.fixture-vs { font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--muted);text-align:center;flex-shrink:0; }
+.fixture-meta { padding:10px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.78rem;color:var(--muted); }
+.countdown-badge { display:inline-block;background:var(--ef-dim);color:var(--ef);padding:3px 10px;border-radius:6px;font-size:.72rem;font-weight:700;letter-spacing:1px; }
+</style>
+
+<script>
+let allFixtures = [];
+let currentArena = 'all';
+let countdownInterval;
+
+async function loadFixtures() {
+  try {
+    allFixtures = await api('GET', '/fixtures');
+    renderFixtures();
+    startCountdown();
+  } catch(err) {
+    document.getElementById('no-fixtures').style.display = 'block';
+    document.getElementById('fixtures-list').innerHTML = '';
+  }
+}
+
+function filterFixtures(arena, btn) {
+  currentArena = arena;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFixtures();
+}
+
+function renderFixtures() {
+  const statusFilter = document.getElementById('status-filter').value;
+  let filtered = allFixtures;
+  if (currentArena !== 'all') filtered = filtered.filter(f => f.arena === currentArena);
+  if (statusFilter === 'scheduled') filtered = filtered.filter(f => f.status === 'scheduled');
+  else if (statusFilter === 'played') filtered = filtered.filter(f => f.status === 'played');
+
+  const list = document.getElementById('fixtures-list');
+  const noFix = document.getElementById('no-fixtures');
+
+  if (!filtered.length) {
+    list.innerHTML = '';
+    noFix.style.display = 'block';
+    return;
+  }
+  noFix.style.display = 'none';
+
+  // Group by date
+  const grouped = {};
+  filtered.forEach(f => {
+    const day = new Date(f.scheduled_at).toDateString();
+    if (!grouped[day]) grouped[day] = [];
+    grouped[day].push(f);
+  });
+
+  const arenaColors = { dls: 'var(--primary)', efootball: 'var(--ef)', eafc: 'var(--eafc)' };
+  const arenaLabels = { dls: 'DLS Arena', efootball: 'eFootball', eafc: 'EA FC' };
+
+  list.innerHTML = Object.entries(grouped).map(([day, fixes]) => `
+    <div style="margin-bottom:28px">
+      <div style="font-size:.72rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">${day}</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${fixes.map(f => {
+          const isPast = new Date(f.scheduled_at) < Date.now();
+          const acol = arenaColors[f.arena] || 'var(--primary)';
+          const until = isPast ? (f.status === 'played' ? '✓ Played' : 'Pending') : timeUntil(f.scheduled_at);
+          const isMyMatch = currentUser && (currentUser.id === f.player1_id || currentUser.id === f.player2_id);
+          return `<div class="fixture-card ${f.status === 'played' ? 'status-played' : ''}" ${isMyMatch ? 'style="border-color:rgba(0,229,255,.4);box-shadow:0 0 0 1px rgba(0,229,255,.15)"' : ''}>
+            <div class="fixture-header">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="width:6px;height:6px;border-radius:50%;background:${acol};display:inline-block"></span>
+                <span>${arenaLabels[f.arena] || f.arena}</span>
+                ${f.round_label ? `<span style="color:var(--text)">&bull; ${f.round_label}</span>` : ''}
+                ${f.tournament_name ? `<span>— ${f.tournament_name}</span>` : ''}
+                ${isMyMatch ? '<span style="color:var(--ef);font-weight:700">⭐ Your Match</span>' : ''}
+              </div>
+              <span style="color:${f.status==='played'?'var(--primary)':f.status==='cancelled'?'var(--danger)':'var(--muted)'}">${f.status}</span>
+            </div>
+            <div class="fixture-body">
+              <div class="fixture-player" style="text-align:right">
+                <div style="font-family:'Rajdhani',sans-serif;font-size:1.25rem;font-weight:700">${f.player1_name}</div>
+                <a href="/player.html?u=${f.player1_name}" style="color:var(--muted);font-size:.75rem;text-decoration:none">View Profile</a>
+              </div>
+              <div class="fixture-vs">VS</div>
+              <div class="fixture-player">
+                <div style="font-family:'Rajdhani',sans-serif;font-size:1.25rem;font-weight:700">${f.player2_name}</div>
+                <a href="/player.html?u=${f.player2_name}" style="color:var(--muted);font-size:.75rem;text-decoration:none">View Profile</a>
+              </div>
+            </div>
+            <div class="fixture-meta">
+              <span>🕐 ${fmtDateTime(f.scheduled_at)}</span>
+              <div style="display:flex;align-items:center;gap:10px">
+                ${f.match_code && isMyMatch ? `<span style="font-family:monospace;font-weight:700;color:${acol};letter-spacing:3px">Code: ${f.match_code}</span>` : ''}
+                ${f.status==='scheduled' ? `<span class="countdown-badge">⏱ ${until}</span>` : ''}
+              </div>
+            </div>
+            ${f.note ? `<div style="padding:10px 20px;background:var(--surface);border-top:1px solid var(--border);font-size:.8rem;color:var(--muted)">📋 ${f.note}</div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function startCountdown() {
+  const upcoming = allFixtures.filter(f => f.status === 'scheduled' && new Date(f.scheduled_at) > Date.now());
+  if (!upcoming.length) return;
+  upcoming.sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
+  const next = upcoming[0];
+
+  const strip = document.getElementById('next-match-strip');
+  strip.style.display = 'flex';
+  document.getElementById('next-match-info').textContent = `${next.player1_name} vs ${next.player2_name}`;
+  document.getElementById('next-match-detail').textContent = `${next.tournament_name} ${next.round_label ? '— ' + next.round_label : ''}`;
+
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    const diff = new Date(next.scheduled_at) - Date.now();
+    if (diff <= 0) { document.getElementById('countdown').textContent = 'NOW!'; clearInterval(countdownInterval); return; }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('countdown').textContent = h > 0 ? `${h}h ${String(m).padStart(2,'0')}m` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', loadFixtures);
+</script>
+</body>
+</html>

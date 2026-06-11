@@ -27,6 +27,9 @@ app.use('/api/matches', require('./server/routes/matches'));
 app.use('/api/streams', require('./server/routes/streams'));
 app.use('/api/admin', require('./server/routes/admin'));
 app.use('/api/payouts', require('./server/routes/payouts'));
+app.use('/api/fixtures', require('./server/routes/fixtures'));
+app.use('/api/notifications', require('./server/routes/notifications'));
+app.use('/api/announcements', require('./server/routes/announcements'));
 
 // Serve HTML pages
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));

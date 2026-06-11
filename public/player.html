@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Profile | Unclescar Studios</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+  <div class="nav-links">
+    <a href="/">Hub</a>
+    <a href="/dls.html">DLS Arena</a>
+    <a href="/efootball.html">eFootball</a>
+    <a href="/eafc.html">EA FC</a>
+    <a href="/fixtures.html">Fixtures</a>
+    <a href="/leaderboard.html">Leaderboard</a>
+    <a href="/tv.html" class="nav-tv">&#9679; TV</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" class="nav-btn nav-btn-outline" id="nav-login-btn" onclick="openModal('login-modal');return false;">Log In</a>
+    <a href="#" class="nav-btn nav-btn-primary" id="nav-register-btn" onclick="openModal('register-modal');return false;">Sign Up</a>
+    <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
+      <span style="color:var(--muted);font-size:.85rem;">Hi, <strong id="nav-username" style="color:var(--text)"></strong></span>
+      <a href="/dashboard.html" id="nav-dashboard-link" class="nav-btn nav-btn-outline">Dashboard</a>
+      <button onclick="logout()" class="nav-btn nav-btn-outline">Log Out</button>
+    </div>
+  </div>
+</nav>
+
+<div id="profile-loading" style="text-align:center;padding:100px 20px"><div class="spinner"></div></div>
+<div id="profile-not-found" style="display:none;text-align:center;padding:100px 20px">
+  <div style="font-size:3rem;margin-bottom:16px">🎮</div>
+  <h2>Player Not Found</h2>
+  <p style="color:var(--muted);margin-top:8px">This player doesn't exist or their account is not public.</p>
+  <a href="/leaderboard.html" class="btn btn-primary" style="margin-top:24px">Browse Leaderboard</a>
+</div>
+
+<div id="profile-content" style="display:none">
+  <!-- Hero -->
+  <div class="page-hero" id="profile-hero" style="background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(0,230,118,.07) 0%,transparent 70%)">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div id="profile-avatar" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;flex-shrink:0"></div>
+      <div>
+        <h1 id="profile-username" style="margin-bottom:4px"></h1>
+        <p id="profile-meta" style="color:var(--muted)"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:20px 32px">
+    <div style="max-width:900px;margin:0 auto;display:flex;justify-content:space-around;flex-wrap:wrap;gap:20px;text-align:center">
+      <div><div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--gold)" id="p-points">0</div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">Total Points</div></div>
+      <div><div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--primary)" id="p-wins">0</div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">Wins</div></div>
+      <div><div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--action-blue)" id="p-draws">0</div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">Draws</div></div>
+      <div><div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--danger)" id="p-losses">0</div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">Losses</div></div>
+      <div><div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--text)" id="p-gf">0</div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">Goals Scored</div></div>
+      <div><div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--purple)" id="p-played">0</div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">Tournaments</div></div>
+    </div>
+  </div>
+
+  <div class="section" style="max-width:900px">
+    <!-- Win rate bar -->
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:.8rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Win Rate</div>
+          <strong id="p-winrate">–%</strong>
+        </div>
+        <div style="background:var(--surface);border-radius:100px;height:8px;overflow:hidden">
+          <div id="p-winrate-bar" style="background:linear-gradient(90deg,var(--primary),var(--ef));height:100%;border-radius:100px;transition:width .8s ease;width:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:.75rem;color:var(--muted)">
+          <span id="p-wdl">0W / 0D / 0L</span>
+          <span>Goal Diff: <strong id="p-gd" style="color:var(--text)">0</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tournament History -->
+    <div style="margin-bottom:12px">
+      <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px;letter-spacing:1px">TOURNAMENT HISTORY</h3>
+      <div id="p-history"><div class="spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
+  <span class="footer-copy">&copy; 2026 Unclescar Studios.</span>
+  <a href="/leaderboard.html" class="footer-link">Leaderboard</a>
+</footer>
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<script>
+async function loadProfile() {
+  const params = new URLSearchParams(location.search);
+  const username = params.get('u');
+  if (!username) { showNotFound(); return; }
+
+  document.title = `${username} | Unclescar Studios`;
+
+  try {
+    const data = await api('GET', `/admin/profile/${encodeURIComponent(username)}`);
+    renderProfile(data);
+  } catch(err) {
+    showNotFound();
+  }
+}
+
+function showNotFound() {
+  document.getElementById('profile-loading').style.display = 'none';
+  document.getElementById('profile-not-found').style.display = 'block';
+}
+
+function renderProfile(data) {
+  document.getElementById('profile-loading').style.display = 'none';
+  document.getElementById('profile-content').style.display = 'block';
+
+  const { user, stats, history } = data;
+  const wins = parseInt(stats.total_wins || 0);
+  const draws = parseInt(stats.total_draws || 0);
+  const losses = parseInt(stats.total_losses || 0);
+  const total = wins + draws + losses;
+  const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
+  const gf = parseInt(stats.total_gf || 0);
+  const ga = parseInt(stats.total_ga || 0);
+  const gd = gf - ga;
+
+  // Avatar - first letter with gradient background
+  const colors = ['#00e676','#00e5ff','#ff1a5e','#ffc107','#a855f7','#3b82f6'];
+  const color = colors[user.username.charCodeAt(0) % colors.length];
+  const avatar = document.getElementById('profile-avatar');
+  avatar.style.background = `linear-gradient(135deg, ${color}30, ${color}10)`;
+  avatar.style.border = `2px solid ${color}50`;
+  avatar.style.color = color;
+  avatar.textContent = user.username[0].toUpperCase();
+
+  document.getElementById('profile-username').textContent = user.username.toUpperCase();
+  document.getElementById('profile-meta').textContent = `Member since ${fmtDate(user.created_at)} · ${parseInt(stats.tournaments_played || 0)} tournaments`;
+
+  document.getElementById('p-points').textContent = parseInt(stats.total_points || 0);
+  document.getElementById('p-wins').textContent = wins;
+  document.getElementById('p-draws').textContent = draws;
+  document.getElementById('p-losses').textContent = losses;
+  document.getElementById('p-gf').textContent = gf;
+  document.getElementById('p-played').textContent = parseInt(stats.tournaments_played || 0);
+  document.getElementById('p-winrate').textContent = winRate + '%';
+  document.getElementById('p-winrate-bar').style.width = winRate + '%';
+  document.getElementById('p-wdl').textContent = `${wins}W / ${draws}D / ${losses}L`;
+  document.getElementById('p-gd').textContent = (gd >= 0 ? '+' : '') + gd;
+  document.getElementById('p-gd').style.color = gd > 0 ? 'var(--primary)' : gd < 0 ? 'var(--danger)' : 'var(--muted)';
+
+  // Tournament history
+  const arenaColors = { dls: 'var(--primary)', efootball: 'var(--ef)', eafc: 'var(--eafc)' };
+  const ordinal = n => n + (['th','st','nd','rd'][((n%100-20)%10)||n%100>10?0:n%10]||'th');
+  const medals = { 1:'🥇', 2:'🥈', 3:'🥉' };
+
+  const histEl = document.getElementById('p-history');
+  if (!history.length) {
+    histEl.innerHTML = '<p style="color:var(--muted)">No tournament history yet.</p>';
+    return;
+  }
+
+  histEl.innerHTML = history.map(h => {
+    const rank = parseInt(h.rank);
+    const acol = arenaColors[h.arena] || 'var(--primary)';
+    const hWins = parseInt(h.wins || 0), hDraws = parseInt(h.draws || 0), hLosses = parseInt(h.losses || 0);
+    const hGd = parseInt(h.goals_for || 0) - parseInt(h.goals_against || 0);
+    return `<div class="card" style="margin-bottom:10px">
+      <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:1.6rem;min-width:32px;text-align:center">${medals[rank] || ordinal(rank)}</div>
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700">${h.name}</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:3px">
+              <span style="width:6px;height:6px;border-radius:50%;background:${acol};display:inline-block"></span>
+              <span style="font-size:.78rem;color:var(--muted)">${h.arena}</span>
+              ${statusBadge(h.status)}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:20px;text-align:center;flex-wrap:wrap">
+          <div><div style="font-weight:700;color:var(--gold)">${parseInt(h.points || 0)}</div><div style="font-size:.7rem;color:var(--muted)">Pts</div></div>
+          <div><div style="font-weight:700">${hWins}W/${hDraws}D/${hLosses}L</div><div style="font-size:.7rem;color:var(--muted)">Record</div></div>
+          <div><div style="font-weight:700;color:${hGd>=0?'var(--primary)':'var(--danger)'}">${hGd>=0?'+':''}${hGd}</div><div style="font-size:.7rem;color:var(--muted)">GD</div></div>
+          <div><div style="font-weight:700;color:${rank===1?'var(--gold)':rank===2?'var(--silver)':rank===3?'var(--bronze)':'var(--text)'}">${rank <= 3 ? medals[rank] : '#'+rank} of ${h.total_players}</div><div style="font-size:.7rem;color:var(--muted)">Rank</div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', loadProfile);
+</script>
+</body>
+</html>
