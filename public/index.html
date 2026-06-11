@@ -43,7 +43,7 @@
   </div>
 </section>
 
-<!-- ANNOUNCEMENTS (shown when there are any) -->
+<!-- ANNOUNCEMENTS -->
 <div id="announcements-section" style="display:none;background:var(--surface);border-bottom:1px solid var(--border);padding:24px 32px">
   <div style="max-width:1100px;margin:0 auto">
     <div style="font-size:.72rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-bottom:12px">📢 Platform News</div>
@@ -110,7 +110,7 @@
       <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:var(--primary);opacity:.4;margin-bottom:12px">03</div>
         <h3 style="font-size:1.2rem;margin-bottom:8px">Play &amp; Submit</h3>
-        <p style="color:var(--muted);font-size:.88rem;line-height:1.6">Play your match, screenshot the result and submit it. Our admin team reviews every result fairly.</p>
+        <p style="color:var(--muted);font-size:.88rem;line-height:1.6">Play your match, screenshot the result and submit it. Our team reviews every result fairly.</p>
       </div>
     </div>
   </div>
@@ -125,29 +125,13 @@
   <a href="/leaderboard.html" class="btn btn-primary">View Full Leaderboard</a>
 </div>
 
-<!-- ADMIN BANNER -->
-<div style="background:var(--surface);border-top:1px solid var(--border);padding:40px 32px" id="admin-section">
-  <div style="max-width:1100px;margin:0 auto">
-    <div style="background:linear-gradient(135deg,rgba(255,68,68,.08),rgba(255,68,68,.02));border:1px solid rgba(255,68,68,.3);border-radius:14px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
-      <div>
-        <div style="font-size:.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--danger);margin-bottom:8px">&#9881; Platform Administration</div>
-        <h3 style="font-size:1.3rem;margin-bottom:6px">Admin &amp; Operator Access</h3>
-        <p style="color:var(--muted);font-size:.85rem;line-height:1.6;max-width:480px">Manage tournaments, review matches, schedule fixtures, send announcements, handle payouts, and invite co-admins.</p>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px;min-width:180px">
-        <a href="/admin.html" class="btn btn-danger" style="text-align:center">&#128274; Admin Login</a>
-        <div style="font-size:.75rem;color:var(--muted);text-align:center">Use your ADMIN_PASSWORD to access</div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <footer>
   <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
   <span class="footer-copy">&copy; 2026 Unclescar Studios. All rights reserved.</span>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
     <a href="/rules.html" class="footer-link">Official Rulebook</a>
-    <a href="/admin.html" class="footer-admin-link">&#9881; Admin Panel</a>
+    <a href="/fixtures.html" class="footer-link">Fixtures</a>
+    <a href="/leaderboard.html" class="footer-link">Leaderboard</a>
   </div>
 </footer>
 
@@ -277,7 +261,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
     const data = await api('POST', '/auth/login', { email: document.getElementById('login-email').value.trim(), password: document.getElementById('login-password').value });
     currentUser = data.user; updateNavAuth(); closeModal('login-modal');
     toast('Welcome back, ' + data.user.username + '!', 'success');
-    if (data.user.role === 'admin') window.location.href = '/admin.html';
+    if (data.user.role === 'admin') window.location.href = '/dashboard.html';
   } catch(err) { toast(err.message, 'error'); }
   finally { btn.textContent='Log In'; btn.disabled=false; }
 });

@@ -3,8 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const pool = require('./server/db');
 
 const app = express();
@@ -12,47 +14,108 @@ const PORT = 5000;
 
 if (!fs.existsSync('public/uploads')) fs.mkdirSync('public/uploads', { recursive: true });
 
+// ── Generate secret admin path ──────────────────────────────────────────────
+// Path is derived from the ADMIN_PASSWORD — same every restart, impossible to
+// guess without knowing the password. Optionally override via ADMIN_PANEL_PATH.
+function getAdminPath() {
+  if (process.env.ADMIN_PANEL_PATH) return process.env.ADMIN_PANEL_PATH;
+  const seed = (process.env.ADMIN_PASSWORD || 'unclescar_default') + '_esc_ops';
+  return '/ops-' + crypto.createHash('sha256').update(seed).digest('hex').slice(0, 14);
+}
+const ADMIN_PATH = getAdminPath();
+
+// ── Rate limiters ────────────────────────────────────────────────────────────
+
+// Strict: admin login — 5 attempts per 15 minutes per IP
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  skipSuccessfulRequests: true,
+  message: { error: 'Too many login attempts. You are locked out for 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Moderate: all admin API routes — 200 requests per minute per IP
+const adminApiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 200,
+  message: { error: 'Too many requests. Slow down.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// General: public API routes
+const generalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// ── Middleware ────────────────────────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(generalLimiter);
+
+// ── Block any public access to /admin.html or /admin ─────────────────────────
+// Intercept BEFORE static middleware so the file is never served directly
+app.get(['/admin.html', '/admin', '/admin/'], (req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ── Static files (public site) ───────────────────────────────────────────────
 app.use(express.static('public'));
 app.use('/uploads', express.static('public/uploads'));
 
-// Routes
+// ── API Routes ────────────────────────────────────────────────────────────────
 app.use('/api/auth', require('./server/routes/auth'));
 app.use('/api/tournaments', require('./server/routes/tournaments'));
 app.use('/api/matches', require('./server/routes/matches'));
 app.use('/api/streams', require('./server/routes/streams'));
-app.use('/api/admin', require('./server/routes/admin'));
+app.use('/api/admin/login', adminLoginLimiter); // apply strict limiter only to login
+app.use('/api/admin', adminApiLimiter, require('./server/routes/admin'));
 app.use('/api/payouts', require('./server/routes/payouts'));
 app.use('/api/fixtures', require('./server/routes/fixtures'));
 app.use('/api/notifications', require('./server/routes/notifications'));
 app.use('/api/announcements', require('./server/routes/announcements'));
 
-// Serve HTML pages
+// ── Secret Admin Panel route ──────────────────────────────────────────────────
+// Served ONLY at the secret path. The file admin.html is never directly exposed.
+app.get(ADMIN_PATH, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// ── Public HTML pages ─────────────────────────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/:page.html', (req, res) => {
+  // Never serve admin.html directly even via this catch-all
+  if (req.params.page === 'admin') {
+    return res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
   const file = path.join(__dirname, 'public', req.params.page + '.html');
   if (fs.existsSync(file)) res.sendFile(file);
   else res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {
     const schema = fs.readFileSync('./server/schema.sql', 'utf8');
     await pool.query(schema);
-
-    // Add reminder_1h_sent column if it doesn't exist yet (safe migration)
-    await pool.query(`
-      ALTER TABLE fixtures ADD COLUMN IF NOT EXISTS reminder_1h_sent BOOLEAN DEFAULT FALSE
-    `).catch(() => {});
+    await pool.query(`ALTER TABLE fixtures ADD COLUMN IF NOT EXISTS reminder_1h_sent BOOLEAN DEFAULT FALSE`).catch(() => {});
 
     console.log('Database schema ready');
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Unclescar Studios running on port ${PORT}`);
-      // Start automated fixture reminder scheduler
+      console.log(`\n  ╔══════════════════════════════════════════════════╗`);
+      console.log(`  ║  ADMIN PANEL — SECRET URL (keep private!)        ║`);
+      console.log(`  ║  Path: ${ADMIN_PATH.padEnd(42)}║`);
+      console.log(`  ╚══════════════════════════════════════════════════╝\n`);
+
       const { startScheduler } = require('./server/scheduler');
       startScheduler();
     });
