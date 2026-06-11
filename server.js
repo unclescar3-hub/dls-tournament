@@ -43,8 +43,19 @@ async function init() {
   try {
     const schema = fs.readFileSync('./server/schema.sql', 'utf8');
     await pool.query(schema);
+
+    // Add reminder_1h_sent column if it doesn't exist yet (safe migration)
+    await pool.query(`
+      ALTER TABLE fixtures ADD COLUMN IF NOT EXISTS reminder_1h_sent BOOLEAN DEFAULT FALSE
+    `).catch(() => {});
+
     console.log('Database schema ready');
-    app.listen(PORT, '0.0.0.0', () => console.log(`Unclescar Studios running on port ${PORT}`));
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Unclescar Studios running on port ${PORT}`);
+      // Start automated fixture reminder scheduler
+      const { startScheduler } = require('./server/scheduler');
+      startScheduler();
+    });
   } catch (err) {
     console.error('Startup error:', err.message);
     process.exit(1);

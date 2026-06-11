@@ -163,6 +163,7 @@ CREATE TABLE IF NOT EXISTS fixtures (
   match_code VARCHAR(20),
   status VARCHAR(20) DEFAULT 'scheduled',
   reminder_sent BOOLEAN DEFAULT FALSE,
+  reminder_1h_sent BOOLEAN DEFAULT FALSE,
   note TEXT,
   created_by UUID REFERENCES users(id),
   created_at TIMESTAMP DEFAULT NOW()
