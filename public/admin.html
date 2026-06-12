@@ -9,28 +9,18 @@
 <body>
 <nav>
   <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
-  <div class="nav-links"><a href="/admin.html" class="active">Admin</a><a href="/">View Site</a><a href="/fixtures.html">Fixtures</a></div>
+  <div class="nav-links"><a href="/">View Site</a><a href="/fixtures.html">Fixtures</a><a href="/leaderboard.html">Leaderboard</a></div>
   <div class="nav-right">
-    <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
+    <div style="display:flex;align-items:center;gap:10px;">
       <span class="tag tag-danger">ADMIN</span>
       <strong id="nav-username" style="color:var(--text);font-size:.85rem"></strong>
-      <button onclick="logout()" class="nav-btn nav-btn-outline">Log Out</button>
+      <span id="nav-user-title" style="font-size:.72rem;color:var(--muted);display:none"></span>
+      <button onclick="adminLogout()" class="nav-btn nav-btn-outline">Log Out</button>
     </div>
   </div>
 </nav>
 
-<div id="admin-login-screen" style="min-height:80vh;display:flex;align-items:center;justify-content:center">
-  <div class="modal" style="position:static;max-width:420px;margin:0 auto">
-    <h2 style="margin-bottom:4px">Admin Access</h2>
-    <p style="color:var(--muted);font-size:.88rem;margin-bottom:24px">Enter your ADMIN_PASSWORD to continue.</p>
-    <form id="admin-login-form">
-      <div class="form-group"><label>Admin Password</label><input type="password" id="admin-pw" required placeholder="••••••••" autocomplete="current-password"></div>
-      <button type="submit" class="btn btn-danger btn-block">Access Admin Panel</button>
-    </form>
-  </div>
-</div>
-
-<div id="admin-panel" style="display:none">
+<div id="admin-panel">
   <div class="page-hero" style="background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,68,68,.06) 0%,transparent 70%);padding:40px 32px 32px">
     <div class="hero-eyebrow tag tag-danger">Control Center</div>
     <h1>ADMIN DASHBOARD</h1>
@@ -249,9 +239,20 @@
         <div class="card">
           <div class="card-header"><h3>Invite Co-Admin</h3></div>
           <div class="card-body">
-            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">They receive an email with a link to accept and set up their admin account. Expires in 24 hours.</p>
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">They receive an email invite link to create their admin account. Link expires in 48 hours.</p>
             <form id="invite-form">
               <div class="form-group"><label>Their Email</label><input type="email" id="invite-email" required placeholder="colleague@email.com"></div>
+              <div class="form-group">
+                <label>Their Title / Role</label>
+                <select id="invite-title" required>
+                  <option value="Tournament Director">🏆 Tournament Director</option>
+                  <option value="Match Referee">⚖️ Match Referee</option>
+                  <option value="Operations Manager">🛠 Operations Manager</option>
+                  <option value="Content Manager">📢 Content Manager</option>
+                  <option value="Support Staff">🤝 Support Staff</option>
+                  <option value="Admin Staff">👤 Admin Staff</option>
+                </select>
+              </div>
               <button type="submit" class="btn btn-danger">Send Admin Invite</button>
             </form>
           </div>
@@ -281,27 +282,30 @@ let allTournaments = [];
 let currentPayoutTournamentId = null;
 let prizePositions = [{ pos:1,amount:'' },{ pos:2,amount:'' },{ pos:3,amount:'' }];
 
+function adminLogout() {
+  // Clear cookie and redirect back to admin login page
+  document.cookie = 'token=; Max-Age=0; path=/';
+  const loginPath = window.location.pathname.replace('/dashboard', '');
+  window.location.href = loginPath;
+}
+
 async function initAdmin() {
   const user = await loadUser();
-  if (user && user.role === 'admin') showAdminPanel();
-  else document.getElementById('admin-login-screen').style.display = 'flex';
+  if (!user || user.role !== 'admin') {
+    // Not authenticated — send back to login page
+    const loginPath = window.location.pathname.replace('/dashboard', '');
+    window.location.href = loginPath;
+    return;
+  }
+  document.getElementById('nav-username').textContent = user.username;
+  if (user.title) {
+    const titleEl = document.getElementById('nav-user-title');
+    titleEl.textContent = user.title;
+    titleEl.style.display = 'inline';
+  }
+  loadStats();
+  loadTournamentsTab();
 }
-
-function showAdminPanel() {
-  document.getElementById('admin-login-screen').style.display = 'none';
-  document.getElementById('admin-panel').style.display = 'block';
-  loadStats(); loadTournamentsTab();
-}
-
-document.getElementById('admin-login-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const btn = e.target.querySelector('button'); btn.textContent='Verifying...'; btn.disabled=true;
-  try {
-    await api('POST', '/admin/login', { password: document.getElementById('admin-pw').value });
-    await loadUser(); showAdminPanel(); toast('Welcome, Admin!', 'success');
-  } catch(err) { toast(err.message,'error'); }
-  finally { btn.textContent='Access Admin Panel'; btn.disabled=false; }
-});
 
 async function loadStats() {
   try {
@@ -836,11 +840,29 @@ async function deleteStream(id) { try { await api('DELETE',`/streams/${id}`); to
 async function loadAdminTeam() {
   try {
     const admins = await api('GET', '/admin/admins');
-    document.getElementById('admins-list').innerHTML=admins.map(a=>`
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(30,45,69,.5)">
-        <div><div style="font-weight:700">${a.username}</div><div style="font-size:.8rem;color:var(--muted)">${a.email} · Joined ${fmtDate(a.created_at)}</div></div>
-        <span class="tag tag-danger">Admin</span>
-      </div>`).join('')||'<p style="color:var(--muted)">No admins.</p>';
+    const titleColors = {
+      'Super Admin': 'var(--danger)',
+      'Tournament Director': 'var(--gold)',
+      'Match Referee': 'var(--ef)',
+      'Operations Manager': 'var(--primary)',
+      'Content Manager': 'var(--action-blue)',
+      'Support Staff': 'var(--muted)',
+      'Admin Staff': 'var(--muted)'
+    };
+    document.getElementById('admins-list').innerHTML = admins.map((a, i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(30,45,69,.5);gap:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0">${a.username.slice(0,1).toUpperCase()}</div>
+          <div>
+            <div style="font-weight:700;font-size:.95rem">${a.username}</div>
+            <div style="font-size:.78rem;color:var(--muted)">${a.email} · Joined ${fmtDate(a.created_at)}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:.72rem;font-weight:700;color:${titleColors[a.title]||'var(--muted)'};background:${titleColors[a.title]||'var(--muted)'}18;border:1px solid ${titleColors[a.title]||'var(--muted)'}30;padding:4px 10px;border-radius:6px">${a.title || 'Admin'}</span>
+          ${i === 0 ? '<span class="tag tag-danger" style="font-size:.65rem">SUPER ADMIN</span>' : ''}
+        </div>
+      </div>`).join('') || '<p style="color:var(--muted);padding:20px">No admins yet.</p>';
   } catch(err) { toast(err.message,'error'); }
 }
 
@@ -848,8 +870,13 @@ document.getElementById('invite-form').addEventListener('submit', async e => {
   e.preventDefault();
   const btn=e.target.querySelector('button'); btn.textContent='Sending...'; btn.disabled=true;
   try {
-    const res = await api('POST', '/admin/invite', { email:document.getElementById('invite-email').value });
-    toast(res.message,'success'); document.getElementById('invite-email').value=''; loadAdminTeam();
+    const res = await api('POST', '/admin/invite', {
+      email: document.getElementById('invite-email').value,
+      title: document.getElementById('invite-title').value
+    });
+    toast(res.message, 'success');
+    document.getElementById('invite-email').value='';
+    loadAdminTeam();
   } catch(err) { toast(err.message,'error'); }
   finally { btn.textContent='Send Admin Invite'; btn.disabled=false; }
 });

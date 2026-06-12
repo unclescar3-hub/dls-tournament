@@ -69,43 +69,69 @@ router.get('/registrations', adminMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Admin login
+// Admin login — username + password
 router.post('/login', async (req, res) => {
   try {
-    const { password } = req.body;
-    if (!password || password !== process.env.ADMIN_PASSWORD) {
-      return res.status(401).json({ error: 'Invalid admin password' });
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
     }
-    let admin = await pool.query("SELECT * FROM users WHERE role='admin' LIMIT 1");
-    if (!admin.rows.length) {
+
+    // Look up admin user in DB by username
+    const result = await pool.query(
+      "SELECT * FROM users WHERE LOWER(username)=LOWER($1) AND role='admin'",
+      [username.trim()]
+    );
+
+    if (result.rows.length) {
+      // Verify bcrypt password
+      const valid = await bcrypt.compare(password, result.rows[0].password_hash);
+      // Also allow ADMIN_PASSWORD env var as a master override (in case bcrypt is stale)
+      const masterOverride = password === process.env.ADMIN_PASSWORD;
+      if (!valid && !masterOverride) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+      }
+      const { signToken } = require('../auth');
+      const token = signToken(result.rows[0]);
+      res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
+      return res.json({ success: true });
+    }
+
+    // Bootstrap: no admin in DB yet — check against ADMIN_PASSWORD env var
+    const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+    if (username.trim().toLowerCase() === adminUsername.toLowerCase() && password === process.env.ADMIN_PASSWORD) {
       const hash = await bcrypt.hash(password, 10);
       const created = await pool.query(
-        "INSERT INTO users (username, email, password_hash, role) VALUES ('admin','admin@unclescar.com',$1,'admin') RETURNING *",
-        [hash]
+        `INSERT INTO users (username, email, password_hash, role, title)
+         VALUES ($1,'admin@unclescar.com',$2,'admin','Super Admin')
+         ON CONFLICT (username) DO UPDATE SET role='admin', title='Super Admin'
+         RETURNING *`,
+        [adminUsername, hash]
       );
-      admin = { rows: created.rows };
+      const { signToken } = require('../auth');
+      const token = signToken(created.rows[0]);
+      res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
+      return res.json({ success: true });
     }
-    const { signToken } = require('../auth');
-    const token = signToken(admin.rows[0]);
-    res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
-    res.json({ success: true });
+
+    return res.status(401).json({ error: 'Invalid username or password' });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Invite a co-admin
+// Invite a co-admin (with title)
 router.post('/invite', adminMiddleware, async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, title } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
     const token = crypto.randomBytes(48).toString('hex');
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const expires = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48h
     await pool.query(
-      'INSERT INTO admin_invites (email, token, invited_by, expires_at) VALUES ($1,$2,$3,$4)',
-      [email.trim().toLowerCase(), token, req.user.id, expires]
+      'INSERT INTO admin_invites (email, token, invited_by, expires_at, title) VALUES ($1,$2,$3,$4,$5)',
+      [email.trim().toLowerCase(), token, req.user.id, expires, title || 'Admin Staff']
     );
-    const inviterResult = await pool.query('SELECT username FROM users WHERE id=$1', [req.user.id]);
+    const inviterResult = await pool.query('SELECT username, title FROM users WHERE id=$1', [req.user.id]);
     const inviterName = inviterResult.rows[0]?.username || 'Admin';
-    await sendAdminInviteEmail(email, inviterName, token);
+    await sendAdminInviteEmail(email, inviterName, token, title || 'Admin Staff');
     res.json({ success: true, message: `Invite sent to ${email}` });
   } catch (err) {
     console.error('Invite error:', err.message);
@@ -113,11 +139,11 @@ router.post('/invite', adminMiddleware, async (req, res) => {
   }
 });
 
-// List all admins
+// List all admins (with titles)
 router.get('/admins', adminMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, username, email, created_at FROM users WHERE role='admin' ORDER BY created_at ASC"
+      "SELECT id, username, email, title, created_at FROM users WHERE role='admin' ORDER BY created_at ASC"
     );
     res.json(result.rows);
   } catch (err) { res.status(500).json({ error: err.message }); }

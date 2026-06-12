@@ -83,9 +83,25 @@ app.use('/api/fixtures', require('./server/routes/fixtures'));
 app.use('/api/notifications', require('./server/routes/notifications'));
 app.use('/api/announcements', require('./server/routes/announcements'));
 
-// ── Secret Admin Panel route ──────────────────────────────────────────────────
-// Served ONLY at the secret path. The file admin.html is never directly exposed.
+// ── Admin session middleware ──────────────────────────────────────────────────
+function requireAdminSession(req, res, next) {
+  const token = req.cookies?.token;
+  if (!token) return res.redirect(ADMIN_PATH);
+  try {
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.role !== 'admin') return res.redirect(ADMIN_PATH);
+    next();
+  } catch { res.redirect(ADMIN_PATH); }
+}
+
+// ── Secret Admin Portal routes ────────────────────────────────────────────────
+// /ops-[hash]           → login page (public)
+// /ops-[hash]/dashboard → admin panel (requires valid admin session)
 app.get(ADMIN_PATH, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-login.html'));
+});
+app.get(ADMIN_PATH + '/dashboard', requireAdminSession, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
@@ -107,6 +123,7 @@ async function init() {
     const schema = fs.readFileSync('./server/schema.sql', 'utf8');
     await pool.query(schema);
     await pool.query(`ALTER TABLE fixtures ADD COLUMN IF NOT EXISTS reminder_1h_sent BOOLEAN DEFAULT FALSE`).catch(() => {});
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS title VARCHAR(100)`).catch(() => {});
 
     console.log('Database schema ready');
     app.listen(PORT, '0.0.0.0', () => {
