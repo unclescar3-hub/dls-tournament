@@ -49,6 +49,7 @@
       <button class="admin-tab" data-tab="users" onclick="switchTab('users')">Players</button>
       <button class="admin-tab" data-tab="streams" onclick="switchTab('streams')">Streams</button>
       <button class="admin-tab" data-tab="team" onclick="switchTab('team')">Admin Team</button>
+      <button class="admin-tab" data-tab="logs" onclick="switchTab('logs')">📋 Activity Log</button>
     </div>
 
     <!-- TOURNAMENTS -->
@@ -230,6 +231,35 @@
     <div id="tab-streams" class="admin-tab-content" style="display:none"><div id="streams-list"><div class="spinner"></div></div></div>
 
     <!-- ADMIN TEAM -->
+    <!-- ACTIVITY LOG -->
+    <div id="tab-logs" class="admin-tab-content" style="display:none">
+      <div class="card">
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <h3>📋 Admin Activity Log</h3>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <input type="text" id="log-filter" placeholder="Filter by action, admin or details…" style="background:#0f1623;border:1px solid #1e2d45;color:#f0f4ff;border-radius:8px;padding:7px 14px;font-size:.85rem;width:260px" oninput="filterLogs()">
+            <button class="btn btn-outline btn-sm" onclick="loadLogsTab()">↻ Refresh</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div id="logs-table-wrap" style="overflow-x:auto">
+            <table id="logs-table" style="width:100%;border-collapse:collapse;font-size:.83rem">
+              <thead>
+                <tr style="background:#0a101a;color:var(--muted);font-size:.75rem;letter-spacing:1px;text-transform:uppercase">
+                  <th style="padding:12px 16px;text-align:left">Time</th>
+                  <th style="padding:12px 16px;text-align:left">Admin</th>
+                  <th style="padding:12px 16px;text-align:left">Action</th>
+                  <th style="padding:12px 16px;text-align:left">Details</th>
+                  <th style="padding:12px 16px;text-align:left">IP</th>
+                </tr>
+              </thead>
+              <tbody id="logs-body"><tr><td colspan="5" style="padding:32px;text-align:center;color:var(--muted)"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="tab-team" class="admin-tab-content" style="display:none">
       <div class="grid-2">
         <div class="card">
@@ -321,7 +351,7 @@ function switchTab(name) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab===name));
   document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display='none');
   document.getElementById('tab-'+name).style.display='block';
-  const loaders = { tournaments:loadTournamentsTab, matches:loadPendingMatches, users:loadUsers, streams:loadStreams, team:loadAdminTeam, codes:loadCodesTab, payouts:loadPayoutsTab, fixtures:loadFixturesTab, disputes:loadDisputesTab, announcements:loadAnnouncementsTab };
+  const loaders = { tournaments:loadTournamentsTab, matches:loadPendingMatches, users:loadUsers, streams:loadStreams, team:loadAdminTeam, codes:loadCodesTab, payouts:loadPayoutsTab, fixtures:loadFixturesTab, disputes:loadDisputesTab, announcements:loadAnnouncementsTab, logs:loadLogsTab };
   if (loaders[name]) loaders[name]();
 }
 
@@ -880,6 +910,73 @@ document.getElementById('invite-form').addEventListener('submit', async e => {
   } catch(err) { toast(err.message,'error'); }
   finally { btn.textContent='Send Admin Invite'; btn.disabled=false; }
 });
+
+let allLogs = [];
+
+async function loadLogsTab() {
+  document.getElementById('logs-body').innerHTML = '<tr><td colspan="5" style="padding:32px;text-align:center;color:var(--muted)"><div class="spinner"></div></td></tr>';
+  try {
+    allLogs = await api('GET', '/admin/logs?limit=200');
+    document.getElementById('log-filter').value = '';
+    renderLogs(allLogs);
+  } catch(err) { toast(err.message,'error'); }
+}
+
+const ACTION_ICONS = {
+  LOGIN:'🔐', LOGOUT:'🚪', CREATE_TOURNAMENT:'🏟', UPDATE_TOURNAMENT:'🔄',
+  DELETE_TOURNAMENT:'🗑', APPROVE_MATCH:'✅', REJECT_MATCH:'❌', SEND_PAYOUT:'💸',
+  SEND_ALL_PAYOUTS:'💸', GENERATE_CODE:'🔑', SCHEDULE_FIXTURE:'📅',
+  DELETE_FIXTURE:'🗑', UPDATE_FIXTURE:'🔄', SEND_REMINDER:'⏰',
+  POST_ANNOUNCEMENT:'📢', DELETE_ANNOUNCEMENT:'🗑', RESOLVE_DISPUTE:'⚖️',
+  CHANGE_USER_ROLE:'👤', INVITE_ADMIN:'📧', BROADCAST_NOTIF:'🔔'
+};
+const ACTION_COLORS = {
+  LOGIN:'var(--primary)', APPROVE_MATCH:'var(--primary)', CREATE_TOURNAMENT:'var(--primary)',
+  SCHEDULE_FIXTURE:'var(--primary)', GENERATE_CODE:'var(--primary)', INVITE_ADMIN:'var(--primary)',
+  POST_ANNOUNCEMENT:'var(--primary)', SEND_PAYOUT:'var(--gold)', SEND_ALL_PAYOUTS:'var(--gold)',
+  REJECT_MATCH:'var(--danger)', DELETE_TOURNAMENT:'var(--danger)', DELETE_FIXTURE:'var(--danger)',
+  DELETE_ANNOUNCEMENT:'var(--danger)', CHANGE_USER_ROLE:'#a78bfa', RESOLVE_DISPUTE:'#a78bfa',
+  UPDATE_TOURNAMENT:'var(--muted)', UPDATE_FIXTURE:'var(--muted)'
+};
+
+function renderLogs(logs) {
+  const tbody = document.getElementById('logs-body');
+  if (!logs.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:32px;text-align:center;color:var(--muted)">No activity recorded yet. Actions you take will appear here.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = logs.map(l => {
+    const icon = ACTION_ICONS[l.action] || '🔹';
+    const color = ACTION_COLORS[l.action] || 'var(--muted)';
+    const details = l.details && typeof l.details === 'object'
+      ? Object.entries(l.details).filter(([,v]) => v !== null && v !== undefined && v !== false).map(([k,v]) => `<span style="color:var(--muted);font-size:.8rem">${k}:</span> <span>${v}</span>`).join(' &nbsp;·&nbsp; ')
+      : '';
+    const timeStr = new Date(l.created_at).toLocaleString('en-NG', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+    return `<tr style="border-bottom:1px solid rgba(30,45,69,.4);transition:background .15s" onmouseover="this.style.background='rgba(0,230,118,.03)'" onmouseout="this.style.background=''">
+      <td style="padding:11px 16px;white-space:nowrap;color:var(--muted);font-size:.78rem">${timeStr}</td>
+      <td style="padding:11px 16px;white-space:nowrap">
+        <span style="font-weight:700;font-size:.85rem">${l.admin_username || '<em style=\"color:var(--muted)\">system</em>'}</span>
+        ${l.admin_title ? `<div style="font-size:.7rem;color:var(--muted)">${l.admin_title}</div>` : ''}
+      </td>
+      <td style="padding:11px 16px;white-space:nowrap">
+        <span style="color:${color};font-weight:600;font-size:.83rem">${icon} ${l.action.replace(/_/g,' ')}</span>
+      </td>
+      <td style="padding:11px 16px;line-height:1.6;max-width:380px">${details || '<span style="color:var(--muted)">—</span>'}</td>
+      <td style="padding:11px 16px;white-space:nowrap;color:var(--muted);font-size:.78rem;font-family:monospace">${l.ip_address || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterLogs() {
+  const q = document.getElementById('log-filter').value.trim().toLowerCase();
+  if (!q) { renderLogs(allLogs); return; }
+  renderLogs(allLogs.filter(l => {
+    const details = JSON.stringify(l.details || {}).toLowerCase();
+    return l.action.toLowerCase().includes(q) ||
+           (l.admin_username || '').toLowerCase().includes(q) ||
+           details.includes(q);
+  }));
+}
 
 document.addEventListener('DOMContentLoaded', initAdmin);
 </script>

@@ -1,3 +1,4 @@
+const { logAction } = require('../adminLogger');
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
@@ -247,6 +248,7 @@ router.post('/send/:tournament_id/:user_id', adminMiddleware, async (req, res) =
     sendPayoutEmail(user, tournamentName, amount, position, bank.account_name, bank.bank_name)
       .catch(e => console.warn('Payout email failed:', e.message));
 
+    logAction(req.user.id, 'SEND_PAYOUT', { player: user.username, amount, position, tournament: tournamentName }, req.ip).catch(() => {});
     res.json({ success: true, status: transfer.status, reference, amount });
   } catch (err) {
     const msg = err.response?.data?.message || err.message;

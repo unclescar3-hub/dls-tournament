@@ -6,6 +6,7 @@ const { adminMiddleware } = require('../auth');
 const bcrypt = require('bcryptjs');
 const { sendAdminInviteEmail } = require('../email');
 const { createNotification } = require('../notifHelper');
+const { logAction } = require('../adminLogger');
 
 // Dashboard stats
 router.get('/stats', adminMiddleware, async (req, res) => {
@@ -53,6 +54,7 @@ router.patch('/users/:id/role', adminMiddleware, async (req, res) => {
       'UPDATE users SET role=$1 WHERE id=$2 RETURNING id, username, email, role',
       [role, req.params.id]
     );
+    logAction(req.user.id, 'CHANGE_USER_ROLE', { target_user: result.rows[0]?.username, new_role: role }, req.ip).catch(() => {});
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -84,9 +86,8 @@ router.post('/login', async (req, res) => {
     );
 
     if (result.rows.length) {
-      // Verify bcrypt password
+      // Verify bcrypt password; also allow ADMIN_PASSWORD env var as master override
       const valid = await bcrypt.compare(password, result.rows[0].password_hash);
-      // Also allow ADMIN_PASSWORD env var as a master override (in case bcrypt is stale)
       const masterOverride = password === process.env.ADMIN_PASSWORD;
       if (!valid && !masterOverride) {
         return res.status(401).json({ error: 'Invalid username or password' });
@@ -94,10 +95,11 @@ router.post('/login', async (req, res) => {
       const { signToken } = require('../auth');
       const token = signToken(result.rows[0]);
       res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
+      logAction(result.rows[0].id, 'LOGIN', { username: result.rows[0].username }, req.ip).catch(() => {});
       return res.json({ success: true });
     }
 
-    // Bootstrap: no admin in DB yet — check against ADMIN_PASSWORD env var
+    // Bootstrap: no admin in DB yet — create from env vars
     const adminUsername = process.env.ADMIN_USERNAME || 'admin';
     if (username.trim().toLowerCase() === adminUsername.toLowerCase() && password === process.env.ADMIN_PASSWORD) {
       const hash = await bcrypt.hash(password, 10);
@@ -111,6 +113,7 @@ router.post('/login', async (req, res) => {
       const { signToken } = require('../auth');
       const token = signToken(created.rows[0]);
       res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
+      logAction(created.rows[0].id, 'LOGIN', { username: adminUsername, bootstrap: true }, req.ip).catch(() => {});
       return res.json({ success: true });
     }
 
@@ -132,11 +135,28 @@ router.post('/invite', adminMiddleware, async (req, res) => {
     const inviterResult = await pool.query('SELECT username, title FROM users WHERE id=$1', [req.user.id]);
     const inviterName = inviterResult.rows[0]?.username || 'Admin';
     await sendAdminInviteEmail(email, inviterName, token, title || 'Admin Staff');
+    logAction(req.user.id, 'INVITE_ADMIN', { email, title: title || 'Admin Staff' }, req.ip).catch(() => {});
     res.json({ success: true, message: `Invite sent to ${email}` });
   } catch (err) {
     console.error('Invite error:', err.message);
     res.status(500).json({ error: err.message });
   }
+});
+
+// Activity log
+router.get('/logs', adminMiddleware, async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+    const result = await pool.query(`
+      SELECT al.id, al.action, al.details, al.ip_address, al.created_at,
+             u.username AS admin_username, u.title AS admin_title
+      FROM admin_logs al
+      LEFT JOIN users u ON u.id = al.admin_id
+      ORDER BY al.created_at DESC
+      LIMIT $1
+    `, [limit]);
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // List all admins (with titles)
@@ -182,6 +202,7 @@ router.post('/match-code', adminMiddleware, async (req, res) => {
       createNotification(player2_id, 'code', `🎮 Match Code: ${tournamentName}`, `Your lobby code vs ${player1.username} is: ${code}`, '/dashboard.html')
     ]);
 
+    logAction(req.user.id, 'GENERATE_CODE', { code, player1: player1.username, player2: player2.username, tournament: tournamentName }, req.ip).catch(() => {});
     res.json({ success: true, code, player1: player1.username, player2: player2.username });
   } catch (err) {
     console.error('Match code error:', err.message);

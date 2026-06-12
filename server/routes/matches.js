@@ -1,3 +1,4 @@
+const { logAction } = require('../adminLogger');
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -163,6 +164,8 @@ router.patch('/:id/review', adminMiddleware, async (req, res) => {
         `Your ${m.submitter_score}–${m.opponent_score} result vs ${oppName} was rejected. Check the rulebook.`, '/rules.html');
     }
 
+    logAction(req.user.id, approved ? 'APPROVE_MATCH' : 'REJECT_MATCH',
+      { match_id: req.params.id, players: `${subName} vs ${oppName}`, score: `${m.submitter_score}-${m.opponent_score}`, tournament: tname }, req.ip).catch(() => {});
     res.json({ success: true, status: newStatus });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

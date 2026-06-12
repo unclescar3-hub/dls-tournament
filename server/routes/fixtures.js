@@ -1,3 +1,4 @@
+const { logAction } = require('../adminLogger');
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
@@ -115,6 +116,7 @@ router.post('/', adminMiddleware, async (req, res) => {
       ]).catch(e => console.warn('Fixture email failed:', e.message));
     }
 
+    logAction(req.user.id, 'SCHEDULE_FIXTURE', { players: `${player1.username} vs ${player2.username}`, tournament: tourney.name, scheduled_at, round_label }, req.ip).catch(() => {});
     res.json({ success: true, fixture: { ...fixture, player1_name: player1.username, player2_name: player2.username, tournament_name: tourney.name } });
   } catch (err) {
     console.error('Create fixture error:', err.message);

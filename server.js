@@ -125,13 +125,27 @@ async function init() {
     await pool.query(`ALTER TABLE fixtures ADD COLUMN IF NOT EXISTS reminder_1h_sent BOOLEAN DEFAULT FALSE`).catch(() => {});
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS title VARCHAR(100)`).catch(() => {});
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admin_logs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        admin_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        action VARCHAR(120) NOT NULL,
+        details JSONB DEFAULT '{}',
+        ip_address VARCHAR(45),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `).catch(() => {});
+
     console.log('Database schema ready');
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Unclescar Studios running on port ${PORT}`);
-      console.log(`\n  ╔══════════════════════════════════════════════════╗`);
-      console.log(`  ║  ADMIN PANEL — SECRET URL (keep private!)        ║`);
-      console.log(`  ║  Path: ${ADMIN_PATH.padEnd(42)}║`);
-      console.log(`  ╚══════════════════════════════════════════════════╝\n`);
+      const domain = process.env.REPLIT_DEV_DOMAIN || `localhost:${PORT}`;
+      const protocol = process.env.REPLIT_DEV_DOMAIN ? 'https' : 'http';
+      const fullAdminUrl = `${protocol}://${domain}${ADMIN_PATH}`;
+      console.log(`\n  ╔════════════════════════════════════════════════════════════════╗`);
+      console.log(`  ║  ADMIN LOGIN PORTAL — KEEP THIS URL PRIVATE                    ║`);
+      console.log(`  ║  ${fullAdminUrl.padEnd(62)}║`);
+      console.log(`  ╚════════════════════════════════════════════════════════════════╝\n`);
 
       const { startScheduler } = require('./server/scheduler');
       startScheduler();

@@ -1,3 +1,4 @@
+const { logAction } = require('../adminLogger');
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
@@ -72,6 +73,7 @@ router.post('/', adminMiddleware, async (req, res) => {
       'INSERT INTO tournaments (name, arena, format, max_players, entry_fee, created_by) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
       [name, arena, format, parseInt(max_players), parseInt(entry_fee), req.user.id]
     );
+    logAction(req.user.id, 'CREATE_TOURNAMENT', { name, arena, format, entry_fee }, req.ip).catch(() => {});
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -85,6 +87,7 @@ router.patch('/:id', adminMiddleware, async (req, res) => {
     const allowed = ['open', 'ongoing', 'closed', 'completed'];
     if (!allowed.includes(status)) return res.status(400).json({ error: 'Invalid status' });
     const result = await pool.query('UPDATE tournaments SET status=$1 WHERE id=$2 RETURNING *', [status, req.params.id]);
+    logAction(req.user.id, 'UPDATE_TOURNAMENT', { tournament_id: req.params.id, new_status: status }, req.ip).catch(() => {});
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -94,7 +97,9 @@ router.patch('/:id', adminMiddleware, async (req, res) => {
 // Admin: delete tournament
 router.delete('/:id', adminMiddleware, async (req, res) => {
   try {
+    const t = await pool.query('SELECT name FROM tournaments WHERE id=$1', [req.params.id]);
     await pool.query('DELETE FROM tournaments WHERE id=$1', [req.params.id]);
+    logAction(req.user.id, 'DELETE_TOURNAMENT', { tournament_id: req.params.id, name: t.rows[0]?.name }, req.ip).catch(() => {});
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
