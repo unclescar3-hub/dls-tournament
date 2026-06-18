@@ -11,7 +11,7 @@ async function verifyMatchScreenshot(imagePath, submitterName, opponentName, cla
     const ext = imagePath.split('.').pop().toLowerCase();
     const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
 
-    const prompt = `You are an esports match result verifier for Unclescar Studios tournament platform.
+    const prompt = `You are an esports match result verifier for Game Day Royal Tournaments platform.
     
 Analyze this match result screenshot carefully.
 

@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
     const t = await pool.query('SELECT * FROM tournaments WHERE id=$1', [req.params.id]);
     if (!t.rows.length) return res.status(404).json({ error: 'Not found' });
     const standings = await pool.query(
-      `SELECT be.*, u.username FROM bracket_entries be
+      `SELECT be.*, u.username, u.last_active FROM bracket_entries be
        JOIN users u ON u.id = be.user_id
        WHERE be.tournament_id=$1
        ORDER BY be.points DESC, be.goal_diff DESC, be.goals_for DESC`,

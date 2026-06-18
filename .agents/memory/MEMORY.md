@@ -1,0 +1,5 @@
+- [Platform rebrand](rebrand.md) — fully renamed to "Game Day Royal Tournaments"; email sender via GMAIL_USER env var
+- [New admin tabs](admin-tabs.md) — Intelligence (AI supervision), Ads & Promos, Config added; AI never named "AI/Gemini" in UI
+- [Online presence tracking](online-presence.md) — last_active column + authMiddleware update + fixture dropdowns show 🟢 online status
+- [Ads system](ads-system.md) — ads table, /api/ads routes, public/js/ads.js injects ticker/banner/promo on player pages
+- [Telegram integration](telegram.md) — server/telegram.js helper; needs TELEGRAM_BOT_TOKEN + TELEGRAM_CHANNEL_ID secrets

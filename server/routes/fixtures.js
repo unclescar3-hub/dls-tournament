@@ -86,10 +86,10 @@ router.post('/', adminMiddleware, async (req, res) => {
 
     // Email both players
     const baseWrapper = content => `<div style="background:#080c14;color:#f0f4ff;font-family:Arial,sans-serif;padding:40px;max-width:580px;margin:0 auto;border-radius:12px">
-      <div style="text-align:center;margin-bottom:28px"><h1 style="color:#00e676;font-size:26px;letter-spacing:3px;margin:0">UNCLESCAR <span style="color:#f0f4ff">STUDIOS</span></h1></div>
+      <div style="text-align:center;margin-bottom:28px"><h1 style="color:#00e676;font-size:22px;letter-spacing:3px;margin:0">GAME DAY <span style="color:#f0f4ff">ROYAL</span></h1></div>
       ${content}
       <hr style="border:1px solid #1e2d45;margin:32px 0">
-      <p style="color:#6b7a99;font-size:11px;text-align:center">&copy; 2026 Unclescar Studios</p></div>`;
+      <p style="color:#6b7a99;font-size:11px;text-align:center">&copy; 2026 Game Day Royal Tournaments</p></div>`;
 
     const fixtureEmail = (player, opponent) => baseWrapper(`
       <h2>Match Fixture Confirmed</h2>
@@ -156,7 +156,7 @@ router.post('/:id/remind', adminMiddleware, async (req, res) => {
     const f = fixRes.rows[0];
     const matchDate = new Date(f.scheduled_at).toLocaleString('en-NG', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Africa/Lagos' });
 
-    const baseWrapper = c => `<div style="background:#080c14;color:#f0f4ff;font-family:Arial,sans-serif;padding:40px;max-width:580px;margin:0 auto;border-radius:12px"><div style="text-align:center;margin-bottom:28px"><h1 style="color:#00e676;font-size:26px;letter-spacing:3px;margin:0">UNCLESCAR <span style="color:#f0f4ff">STUDIOS</span></h1></div>${c}<hr style="border:1px solid #1e2d45;margin:32px 0"><p style="color:#6b7a99;font-size:11px;text-align:center">&copy; 2026 Unclescar Studios</p></div>`;
+    const baseWrapper = c => `<div style="background:#080c14;color:#f0f4ff;font-family:Arial,sans-serif;padding:40px;max-width:580px;margin:0 auto;border-radius:12px"><div style="text-align:center;margin-bottom:28px"><h1 style="color:#00e676;font-size:22px;letter-spacing:3px;margin:0">GAME DAY <span style="color:#f0f4ff">ROYAL</span></h1></div>${c}<hr style="border:1px solid #1e2d45;margin:32px 0"><p style="color:#6b7a99;font-size:11px;text-align:center">&copy; 2026 Game Day Royal Tournaments</p></div>`;
     const reminderHtml = (pname, oname) => baseWrapper(`
       <h2 style="color:#ffc107">⏰ Match Reminder</h2>
       <p style="color:#6b7a99;line-height:1.7">Hi <strong style="color:#f0f4ff">${pname}</strong>, this is a reminder that your match against <strong style="color:#f0f4ff">${oname}</strong> is coming up soon!</p>

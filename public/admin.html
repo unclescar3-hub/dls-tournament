@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | Unclescar Studios</title>
+  <title>Admin Dashboard | Game Day Royal Tournaments</title>
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
 <nav>
-  <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+  <a href="/" class="nav-brand">GAME DAY <span>ROYAL</span></a>
   <div class="nav-links"><a href="/">View Site</a><a href="/fixtures.html">Fixtures</a><a href="/leaderboard.html">Leaderboard</a></div>
   <div class="nav-right">
     <div style="display:flex;align-items:center;gap:10px;">
@@ -50,6 +50,9 @@
       <button class="admin-tab" data-tab="streams" onclick="switchTab('streams')">Streams</button>
       <button class="admin-tab" data-tab="team" onclick="switchTab('team')">Admin Team</button>
       <button class="admin-tab" data-tab="logs" onclick="switchTab('logs')">📋 Activity Log</button>
+      <button class="admin-tab" data-tab="intelligence" onclick="switchTab('intelligence')">🧠 Intelligence</button>
+      <button class="admin-tab" data-tab="ads" onclick="switchTab('ads')">📺 Ads & Promos</button>
+      <button class="admin-tab" data-tab="config" onclick="switchTab('config')">⚙️ Config</button>
     </div>
 
     <!-- TOURNAMENTS -->
@@ -260,6 +263,100 @@
       </div>
     </div>
 
+    <!-- INTELLIGENCE TAB -->
+    <div id="tab-intelligence" class="admin-tab-content" style="display:none">
+      <div class="card">
+        <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <h3>🧠 Assistant Intelligence</h3>
+            <p style="color:var(--muted);font-size:.82rem;margin:4px 0 0">Automated evidence analysis — review and supervise all match verifications in real-time</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadIntelligenceTab()">↻ Refresh</button>
+        </div>
+        <div class="card-body" style="padding:0;overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:.83rem">
+            <thead>
+              <tr style="background:#0a101a;color:var(--muted);font-size:.72rem;letter-spacing:1px;text-transform:uppercase">
+                <th style="padding:10px 16px;text-align:left;white-space:nowrap">Time</th>
+                <th style="padding:10px 16px;text-align:left">Match</th>
+                <th style="padding:10px 16px;text-align:left">Tournament</th>
+                <th style="padding:10px 16px;text-align:left">Verdict</th>
+                <th style="padding:10px 16px;text-align:left">Confidence</th>
+                <th style="padding:10px 16px;text-align:left">Analysis Notes</th>
+                <th style="padding:10px 16px;text-align:left">Status</th>
+              </tr>
+            </thead>
+            <tbody id="intelligence-body">
+              <tr><td colspan="7" style="padding:32px;text-align:center;color:var(--muted)"><div class="spinner"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADS & PROMOS TAB -->
+    <div id="tab-ads" class="admin-tab-content" style="display:none">
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><h3>📺 Create Ad / Promo</h3><span class="tag tag-primary">Goes Live Instantly</span></div>
+          <div class="card-body">
+            <form id="ads-form">
+              <div class="form-group"><label>Headline</label><input type="text" id="ad-title" required placeholder="e.g. Season 4 is NOW OPEN!"></div>
+              <div class="form-group"><label>Message / Body</label><textarea id="ad-body" rows="2" required placeholder="Short description shown to players..."></textarea></div>
+              <div class="form-row">
+                <div class="form-group"><label>Display Type</label>
+                  <select id="ad-type">
+                    <option value="ticker">📢 Ticker (scrolling strip)</option>
+                    <option value="banner">🖼 Banner (top of page)</option>
+                    <option value="promo">🎯 Promo Card</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Image URL (optional)</label><input type="url" id="ad-image" placeholder="https://..."></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Link URL (optional)</label><input type="url" id="ad-link" placeholder="https://..."></div>
+                <div class="form-group"><label>Auto-expire (optional)</label><input type="datetime-local" id="ad-expires"></div>
+              </div>
+              <button type="submit" class="btn btn-primary">🚀 Publish Ad</button>
+            </form>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Active Promotions</h3><button class="btn btn-outline btn-sm" onclick="loadAdsTab()">↻ Refresh</button></div>
+          <div id="ads-list" class="card-body"><div class="spinner"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <h3>📣 Telegram Channel Broadcast</h3>
+          <span class="tag" id="tg-status-tag" style="font-size:.72rem">Checking...</span>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--muted);font-size:.85rem;margin-bottom:16px">Send a message directly to your Telegram channel. Reaches all subscribers instantly.</p>
+          <form id="tg-broadcast-form">
+            <div class="form-group"><label>Broadcast Message</label><textarea id="tg-message" rows="3" required placeholder="Your announcement to the Telegram community..."></textarea></div>
+            <button type="submit" class="btn btn-ef">📨 Send to Channel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIG TAB -->
+    <div id="tab-config" class="admin-tab-content" style="display:none">
+      <div class="card">
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <h3>⚙️ Platform Configuration</h3>
+            <p style="color:var(--muted);font-size:.82rem;margin:4px 0 0">All secret keys — status only, values are never shown</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadConfigTab()">↻ Refresh</button>
+        </div>
+        <div class="card-body">
+          <div id="config-list"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
     <div id="tab-team" class="admin-tab-content" style="display:none">
       <div class="grid-2">
         <div class="card">
@@ -293,7 +390,7 @@
 </div>
 
 <footer>
-  <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
+  <div class="footer-brand">GAME DAY <span>ROYAL</span></div>
   <span class="footer-copy">Admin Panel &copy; 2026</span>
 </footer>
 <div id="toast-container"></div>
@@ -351,7 +448,7 @@ function switchTab(name) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab===name));
   document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display='none');
   document.getElementById('tab-'+name).style.display='block';
-  const loaders = { tournaments:loadTournamentsTab, matches:loadPendingMatches, users:loadUsers, streams:loadStreams, team:loadAdminTeam, codes:loadCodesTab, payouts:loadPayoutsTab, fixtures:loadFixturesTab, disputes:loadDisputesTab, announcements:loadAnnouncementsTab, logs:loadLogsTab };
+  const loaders = { tournaments:loadTournamentsTab, matches:loadPendingMatches, users:loadUsers, streams:loadStreams, team:loadAdminTeam, codes:loadCodesTab, payouts:loadPayoutsTab, fixtures:loadFixturesTab, disputes:loadDisputesTab, announcements:loadAnnouncementsTab, logs:loadLogsTab, intelligence:loadIntelligenceTab, ads:loadAdsTab, config:loadConfigTab };
   if (loaders[name]) loaders[name]();
 }
 
@@ -415,9 +512,10 @@ async function loadPendingMatches() {
               <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">${m.tournament_name}</div>
               <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700">${m.submitter_name} <span style="color:var(--primary)">${m.submitter_score}</span> – <span style="color:var(--danger)">${m.opponent_score}</span> ${m.opponent_name}</div>
               <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Submitted ${fmtDate(m.submitted_at)}</div>
+              ${renderIntelligenceBadge(m.ai_result)}
             </div>
             <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
-              ${m.screenshot_path ? `<a href="/${m.screenshot_path}" target="_blank" class="btn btn-outline btn-sm">View Screenshot</a>` : ''}
+              ${m.screenshot_path ? `<a href="/${m.screenshot_path}" target="_blank" class="btn btn-outline btn-sm">📸 Screenshot</a>` : ''}
               <button class="btn btn-primary btn-sm" onclick="reviewMatch('${m.id}',true)">✓ Approve</button>
               <button class="btn btn-danger btn-sm" onclick="reviewMatch('${m.id}',false)">✕ Reject</button>
             </div>
@@ -453,7 +551,14 @@ document.getElementById('code-tournament').addEventListener('change', async func
   if (!this.value) return;
   try {
     const data = await api('GET', `/tournaments/${this.value}`);
-    data.standings.forEach(s => { p1.innerHTML+=`<option value="${s.user_id}">${s.username}</option>`; p2.innerHTML+=`<option value="${s.user_id}">${s.username}</option>`; });
+    const now = new Date();
+    data.standings.forEach(s => {
+      const lastActive = s.last_active ? new Date(s.last_active) : null;
+      const isOnline = lastActive && (now - lastActive) < 30 * 60 * 1000;
+      const badge = isOnline ? '🟢 ' : '';
+      const opt = `<option value="${s.user_id}">${badge}${s.username}${isOnline ? ' (online)' : ''}</option>`;
+      p1.innerHTML += opt; p2.innerHTML += opt;
+    });
   } catch {}
 });
 
@@ -506,7 +611,14 @@ document.getElementById('fix-tournament').addEventListener('change', async funct
   if (!this.value) return;
   try {
     const data = await api('GET', `/tournaments/${this.value}`);
-    data.standings.forEach(s => { p1.innerHTML+=`<option value="${s.user_id}">${s.username}</option>`; p2.innerHTML+=`<option value="${s.user_id}">${s.username}</option>`; });
+    const now = new Date();
+    data.standings.forEach(s => {
+      const lastActive = s.last_active ? new Date(s.last_active) : null;
+      const isOnline = lastActive && (now - lastActive) < 30 * 60 * 1000;
+      const badge = isOnline ? '🟢 ' : '';
+      const opt = `<option value="${s.user_id}">${badge}${s.username}${isOnline ? ' (online)' : ''}</option>`;
+      p1.innerHTML += opt; p2.innerHTML += opt;
+    });
   } catch {}
 });
 
@@ -979,6 +1091,194 @@ function filterLogs() {
 }
 
 document.addEventListener('DOMContentLoaded', initAdmin);
+
+// ── INTELLIGENCE BADGE (Match Reviews) ───────────────────────────────────────
+function renderIntelligenceBadge(aiResult) {
+  if (!aiResult) return '';
+  const ai = typeof aiResult === 'string' ? JSON.parse(aiResult) : aiResult;
+  const conf = Math.round((ai.confidence || 0) * 100);
+  const ok = ai.verified;
+  return `<div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <span style="font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;background:${ok?'rgba(0,230,118,.1)':'rgba(255,68,68,.1)'};color:${ok?'var(--primary)':'var(--danger)'};border:1px solid ${ok?'rgba(0,230,118,.2)':'rgba(255,68,68,.2)'}">
+      🧠 ${ok ? '✅ Cleared' : '⚠️ Flagged'}
+    </span>
+    <span style="font-size:.7rem;color:var(--muted)">Confidence: <strong style="color:${conf>=70?'var(--primary)':conf>=40?'var(--gold)':'var(--danger)'}">${conf}%</strong></span>
+    ${ai.notes ? `<span style="font-size:.7rem;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${String(ai.notes).replace(/"/g,'&quot;')}">💬 ${String(ai.notes).slice(0,55)}${String(ai.notes).length>55?'…':''}</span>` : ''}
+  </div>`;
+}
+
+// ── INTELLIGENCE TAB ──────────────────────────────────────────────────────────
+async function loadIntelligenceTab() {
+  document.getElementById('intelligence-body').innerHTML =
+    '<tr><td colspan="7" style="padding:32px;text-align:center;color:var(--muted)"><div class="spinner"></div></td></tr>';
+  try {
+    const data = await api('GET', '/admin/intelligence');
+    const tbody = document.getElementById('intelligence-body');
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--muted)">No analysis records yet. The system analyses screenshots automatically when players submit results.</td></tr>';
+      return;
+    }
+    const statusColors = { approved:'var(--primary)', ai_approved:'#00e5ff', rejected:'var(--danger)', pending_review:'var(--gold)' };
+    tbody.innerHTML = data.map(m => {
+      const ai = m.ai_result ? (typeof m.ai_result === 'string' ? JSON.parse(m.ai_result) : m.ai_result) : null;
+      const conf = ai ? Math.round((ai.confidence || 0) * 100) : 0;
+      const ok = ai ? ai.verified : null;
+      const sc = statusColors[m.status] || 'var(--muted)';
+      return `<tr style="border-bottom:1px solid rgba(30,45,69,.4)" onmouseover="this.style.background='rgba(0,230,118,.02)'" onmouseout="this.style.background=''">
+        <td style="padding:10px 16px;white-space:nowrap;color:var(--muted);font-size:.78rem">${fmtDate(m.submitted_at)}</td>
+        <td style="padding:10px 16px;white-space:nowrap">
+          <div style="font-weight:700;font-family:'Rajdhani',sans-serif">${m.submitter_name} <span style="color:var(--muted)">vs</span> ${m.opponent_name}</div>
+          <div style="font-size:.75rem;color:var(--muted)">${m.submitter_score} – ${m.opponent_score}</div>
+        </td>
+        <td style="padding:10px 16px;color:var(--muted);font-size:.8rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.tournament_name}</td>
+        <td style="padding:10px 16px">
+          ${ok !== null ? `<span style="font-size:.73rem;font-weight:700;padding:3px 8px;border-radius:4px;background:${ok?'rgba(0,230,118,.1)':'rgba(255,68,68,.1)'};color:${ok?'var(--primary)':'var(--danger)'};border:1px solid ${ok?'rgba(0,230,118,.2)':'rgba(255,68,68,.2)'}">
+            ${ok ? '✅ Cleared' : '⚠️ Flagged'}</span>` : '<span style="color:var(--muted);font-size:.75rem">—</span>'}
+        </td>
+        <td style="padding:10px 16px">
+          ${ai ? `<div style="display:flex;align-items:center;gap:7px">
+            <div style="background:rgba(30,45,69,.5);border-radius:3px;height:6px;width:56px;overflow:hidden">
+              <div style="background:${conf>=70?'var(--primary)':conf>=40?'var(--gold)':'var(--danger)'};height:100%;width:${conf}%;transition:width .3s"></div>
+            </div>
+            <span style="font-size:.75rem;color:var(--muted)">${conf}%</span></div>` : '—'}
+        </td>
+        <td style="padding:10px 16px;max-width:240px;font-size:.78rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ai?.notes || '—'}</td>
+        <td style="padding:10px 16px;white-space:nowrap">
+          <span style="font-size:.71rem;font-weight:700;color:${sc}">${m.status.replace(/_/g,' ').toUpperCase()}</span>
+          ${m.screenshot_path ? `<br><a href="/${m.screenshot_path}" target="_blank" style="font-size:.72rem;color:#3b82f6">📸 View</a>` : ''}
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(err) { toast(err.message,'error'); }
+}
+
+// ── ADS & PROMOS TAB ──────────────────────────────────────────────────────────
+async function loadAdsTab() {
+  try {
+    const cfg = await api('GET', '/admin/config');
+    const tgTag = document.getElementById('tg-status-tag');
+    if (tgTag) {
+      tgTag.textContent  = cfg.telegram_ready ? '🟢 Telegram Connected' : '⚪ Telegram Not Set Up';
+      tgTag.className    = 'tag ' + (cfg.telegram_ready ? 'tag-primary' : '');
+    }
+  } catch {}
+  try {
+    const ads = await api('GET', '/ads');
+    const el  = document.getElementById('ads-list');
+    if (!ads.length) { el.innerHTML='<p style="color:var(--muted)">No ads published yet.</p>'; return; }
+    el.innerHTML = ads.map(a => `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(30,45,69,.4);gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px">
+            <span style="font-weight:700;font-size:.9rem">${a.title}</span>
+            <span class="tag ${a.type==='ticker'?'tag-ef':a.type==='promo'?'tag-gold':'tag-blue'}" style="font-size:.63rem">${a.type.toUpperCase()}</span>
+            ${a.active ? '<span class="tag tag-primary" style="font-size:.63rem">LIVE</span>' : '<span class="tag" style="font-size:.63rem;color:var(--danger)">PAUSED</span>'}
+          </div>
+          <div style="color:var(--muted);font-size:.8rem">${a.body}</div>
+          ${a.link_url?`<div style="font-size:.75rem;color:#3b82f6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px">${a.link_url}</div>`:''}
+          ${a.expires_at?`<div style="font-size:.72rem;color:var(--muted)">Expires ${fmtDate(a.expires_at)}</div>`:''}
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-outline btn-sm" onclick="toggleAd('${a.id}',${!a.active})">${a.active?'⏸ Pause':'▶ Activate'}</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteAd('${a.id}')">🗑</button>
+        </div>
+      </div>`).join('');
+  } catch(err) { toast(err.message,'error'); }
+}
+
+async function toggleAd(id, active) {
+  try { await api('PATCH', `/ads/${id}`, { active }); toast(active ? 'Ad activated — now live on site' : 'Ad paused','success'); loadAdsTab(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+async function deleteAd(id) {
+  if (!confirm('Delete this ad permanently? Cannot be undone.')) return;
+  try { await api('DELETE', `/ads/${id}`); toast('Ad deleted','success'); loadAdsTab(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+document.getElementById('ads-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled=true; btn.textContent='Publishing...';
+  try {
+    await api('POST', '/ads', {
+      title:     document.getElementById('ad-title').value,
+      body:      document.getElementById('ad-body').value,
+      type:      document.getElementById('ad-type').value,
+      image_url: document.getElementById('ad-image').value || null,
+      link_url:  document.getElementById('ad-link').value || null,
+      expires_at:document.getElementById('ad-expires').value || null
+    });
+    toast('Ad published — live on site now!','success');
+    e.target.reset();
+    loadAdsTab();
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='🚀 Publish Ad'; }
+});
+
+document.getElementById('tg-broadcast-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled=true; btn.textContent='Sending...';
+  try {
+    await api('POST', '/telegram/broadcast', { message: document.getElementById('tg-message').value });
+    toast('Message broadcast to Telegram channel!','success');
+    e.target.reset();
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='📨 Send to Channel'; }
+});
+
+// ── CONFIG TAB ────────────────────────────────────────────────────────────────
+async function loadConfigTab() {
+  try {
+    const cfg = await api('GET', '/admin/config');
+    const el  = document.getElementById('config-list');
+    const keyMeta = {
+      GMAIL_APP_PASSWORD: { label:'Gmail App Password',       desc:'App password for the Gmail sender account. Generate at myaccount.google.com → Security → App passwords.', req:true },
+      GMAIL_USER:         { label:'Gmail Sender Address',     desc:'Sender email (e.g. gamedayroyaltournaments@gmail.com). Must match the account the app password belongs to.', req:true },
+      PAYSTACK_SECRET_KEY:{ label:'Paystack Secret Key',      desc:'sk_live_... key from your Paystack dashboard. Required to send prize payouts.', req:true },
+      PAYSTACK_PUBLIC_KEY:{ label:'Paystack Public Key',      desc:'pk_live_... key from your Paystack dashboard. Used to process entry payments.', req:true },
+      GEMINI_API_KEY:     { label:'Intelligence Engine Key',  desc:'Powers the automated evidence analysis. Get from Google AI Studio.', req:true },
+      TELEGRAM_BOT_TOKEN: { label:'Telegram Bot Token',       desc:'Create a bot via @BotFather on Telegram, then add the bot as an admin to your channel.', req:false },
+      TELEGRAM_CHANNEL_ID:{ label:'Telegram Channel ID',      desc:'Your channel username (e.g. @gamedayroyal) or numeric chat ID. Required for broadcasts and announcements.', req:false },
+      JWT_SECRET:         { label:'JWT Secret',               desc:'Long random string used to sign session tokens. Changing this logs out all users immediately.', req:true }
+    };
+    el.innerHTML = Object.entries(keyMeta).map(([key, m]) => {
+      const isSet = cfg.keys[key];
+      return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:16px 0;border-bottom:1px solid rgba(30,45,69,.4);gap:16px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="font-weight:700;font-size:.88rem">${m.label}</span>
+            <code style="font-size:.7rem;color:var(--muted);background:#0a101a;padding:2px 6px;border-radius:4px">${key}</code>
+            <span style="font-size:.64rem;padding:1px 5px;border-radius:3px;border:1px solid rgba(${m.req?'255,193,7':'107,122,153'},.3);color:${m.req?'var(--gold)':'var(--muted)'}">${m.req?'REQUIRED':'OPTIONAL'}</span>
+          </div>
+          <div style="color:var(--muted);font-size:.8rem;line-height:1.65">${m.desc}</div>
+        </div>
+        <div style="flex-shrink:0;padding-top:2px">
+          <span style="font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:6px;background:${isSet?'rgba(0,230,118,.1)':'rgba(255,68,68,.07)'};color:${isSet?'var(--primary)':'var(--danger)'};border:1px solid ${isSet?'rgba(0,230,118,.2)':'rgba(255,68,68,.15)'}">
+            ${isSet ? '✅ Set' : '❌ Missing'}
+          </span>
+        </div>
+      </div>`;
+    }).join('');
+
+    el.innerHTML += `
+      <div style="margin-top:24px;background:#0a101a;border:1px solid rgba(0,230,118,.12);border-radius:10px;padding:18px">
+        <div style="font-weight:700;margin-bottom:10px;color:var(--primary);font-size:.85rem">📌 How to add or update a secret</div>
+        <div style="color:var(--muted);font-size:.82rem;line-height:1.9">
+          1. In Replit, click the <strong style="color:#f0f4ff">🔒 Secrets</strong> icon in the left sidebar.<br>
+          2. Click <strong style="color:#f0f4ff">+ New Secret</strong> and enter the Key name and Value.<br>
+          3. Click <strong style="color:#f0f4ff">Save</strong>. Restart the server from the Replit top bar — it picks up new secrets on boot.
+        </div>
+      </div>
+      <div style="margin-top:12px;background:#0a101a;border:1px solid rgba(0,229,255,.1);border-radius:10px;padding:16px">
+        <div style="font-weight:700;margin-bottom:6px;color:#00e5ff;font-size:.85rem">📧 Current email sender</div>
+        <div style="font-family:monospace;font-size:.9rem;color:#f0f4ff">${cfg.gmail_sender}</div>
+        <div style="color:var(--muted);font-size:.78rem;margin-top:4px">Set <code>GMAIL_USER</code> secret to change. <code>GMAIL_APP_PASSWORD</code> must be for the same Google account.</div>
+      </div>`;
+  } catch(err) { toast(err.message,'error'); }
+}
 </script>
 </body>
 </html>

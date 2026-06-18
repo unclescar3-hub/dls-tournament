@@ -223,7 +223,7 @@ router.post('/send/:tournament_id/:user_id', adminMiddleware, async (req, res) =
     if (existing.rows.length) return res.status(400).json({ error: 'Payout already sent to this player' });
 
     // Initiate Paystack transfer
-    const reference = `unclescar-payout-${tournament_id.slice(0, 8)}-${user_id.slice(0, 8)}-${Date.now()}`;
+    const reference = `gameday-payout-${tournament_id.slice(0, 8)}-${user_id.slice(0, 8)}-${Date.now()}`;
     const transferRes = await axios.post('https://api.paystack.co/transfer', {
       source: 'balance',
       amount: parseInt(amount) * 100, // kobo
@@ -317,7 +317,7 @@ router.post('/send-all/:tournament_id', adminMiddleware, async (req, res) => {
       }
 
       try {
-        const reference = `unclescar-payout-${tournament_id.slice(0,8)}-${player.user_id.slice(0,8)}-${Date.now()}`;
+        const reference = `gameday-payout-${tournament_id.slice(0,8)}-${player.user_id.slice(0,8)}-${Date.now()}`;
         const transferRes = await axios.post('https://api.paystack.co/transfer', {
           source: 'balance',
           amount: parseInt(amount) * 100,

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tournament | Unclescar Studios</title>
+  <title>Tournament | Game Day Royal Tournaments</title>
   <link rel="stylesheet" href="/css/main.css">
   <script>window.PAYSTACK_PUBLIC_KEY = 'pk_test_aa93807a3f2361403a4f3df0a124210f67962f77';</script>
   <style>
@@ -23,7 +23,7 @@
 </head>
 <body>
 <nav>
-  <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+  <a href="/" class="nav-brand">GAME DAY <span>ROYAL</span></a>
   <div class="nav-links">
     <a href="/">Hub</a>
     <a href="/dls.html">DLS Arena</a>
@@ -188,6 +188,7 @@
 <div id="toast-container"></div>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script src="/js/app.js"></script>
+<script src="/js/ads.js"></script>
 <script>
 const tournamentId = new URLSearchParams(location.search).get('id');
 let tournament = null, standings = [];
@@ -218,7 +219,7 @@ async function init() {
     tournament = data.tournament;
     standings = data.standings;
 
-    document.title = tournament.name + ' | Unclescar Studios';
+    document.title = tournament.name + ' | Game Day Royal Tournaments';
     document.getElementById('t-name').textContent = tournament.name;
     document.getElementById('t-fee').textContent = naira(tournament.entry_fee);
     document.getElementById('cta-fee').textContent = naira(tournament.entry_fee);

@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unclescar Studios | Esports Tournaments</title>
+  <title>Game Day Royal Tournaments | Esports Tournaments</title>
   <link rel="stylesheet" href="/css/main.css">
   <script>window.PAYSTACK_PUBLIC_KEY = 'pk_test_aa93807a3f2361403a4f3df0a124210f67962f77';</script>
 </head>
 <body>
 <nav>
-  <a href="/" class="nav-brand">UNCLESCAR <span>STUDIOS</span></a>
+  <a href="/" class="nav-brand">GAME DAY <span>ROYAL</span></a>
   <div class="nav-links">
     <a href="/" class="active">Hub</a>
     <a href="/dls.html">DLS Arena</a>
@@ -34,7 +34,7 @@
 <!-- HERO -->
 <section class="page-hero" style="background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(0,230,118,.07) 0%,transparent 70%);">
   <div class="hero-eyebrow tag tag-primary">The Elite Competitive Platform</div>
-  <h1>UNCLESCAR <span style="color:var(--primary)">STUDIOS</span></h1>
+  <h1>GAME DAY <span style="color:var(--primary)">ROYAL</span></h1>
   <p>Nigeria's premier grassroots esports tournament platform. Compete, earn, and become a legend.</p>
   <div style="display:flex;justify-content:center;gap:48px;flex-wrap:wrap;margin-top:40px">
     <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:1.75rem;font-weight:700">3</div><div style="font-size:.75rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Active Arenas</div></div>
@@ -126,8 +126,8 @@
 </div>
 
 <footer>
-  <div class="footer-brand">UNCLESCAR <span>STUDIOS</span></div>
-  <span class="footer-copy">&copy; 2026 Unclescar Studios. All rights reserved.</span>
+  <div class="footer-brand">GAME DAY <span>ROYAL</span></div>
+  <span class="footer-copy">&copy; 2026 Game Day Royal Tournaments. All rights reserved.</span>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
     <a href="/rules.html" class="footer-link">Official Rulebook</a>
     <a href="/fixtures.html" class="footer-link">Fixtures</a>
@@ -186,6 +186,7 @@
 
 <div id="toast-container"></div>
 <script src="/js/app.js"></script>
+<script src="/js/ads.js"></script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
 async function loadStats() {
@@ -273,7 +274,7 @@ document.getElementById('register-form').addEventListener('submit', async e => {
   try {
     const data = await api('POST', '/auth/register', { username: document.getElementById('reg-username').value.trim(), email: document.getElementById('reg-email').value.trim(), phone: document.getElementById('reg-phone').value.trim(), password: document.getElementById('reg-password').value });
     currentUser = data.user; updateNavAuth(); closeModal('register-modal');
-    toast('Welcome to Unclescar Studios, ' + data.user.username + '! Check your email.', 'success');
+    toast('Welcome to Game Day Royal Tournaments, ' + data.user.username + '! Check your email.', 'success');
     loadStats();
   } catch(err) { errBox.textContent=err.message; errBox.style.display='block'; }
   finally { btn.textContent='Create Account'; btn.disabled=false; }

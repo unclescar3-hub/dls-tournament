@@ -82,6 +82,8 @@ app.use('/api/payouts', require('./server/routes/payouts'));
 app.use('/api/fixtures', require('./server/routes/fixtures'));
 app.use('/api/notifications', require('./server/routes/notifications'));
 app.use('/api/announcements', require('./server/routes/announcements'));
+app.use('/api/ads', require('./server/routes/ads'));
+app.use('/api/telegram', require('./server/routes/telegram'));
 
 // ── Admin session middleware ──────────────────────────────────────────────────
 function requireAdminSession(req, res, next) {
@@ -124,6 +126,22 @@ async function init() {
     await pool.query(schema);
     await pool.query(`ALTER TABLE fixtures ADD COLUMN IF NOT EXISTS reminder_1h_sent BOOLEAN DEFAULT FALSE`).catch(() => {});
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS title VARCHAR(100)`).catch(() => {});
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_active TIMESTAMP`).catch(() => {});
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ads (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title VARCHAR(255) NOT NULL,
+        body TEXT NOT NULL,
+        image_url VARCHAR(500),
+        link_url VARCHAR(500),
+        type VARCHAR(30) DEFAULT 'banner',
+        position VARCHAR(30) DEFAULT 'all',
+        active BOOLEAN DEFAULT TRUE,
+        expires_at TIMESTAMP,
+        created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `).catch(() => {});
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS admin_logs (
@@ -138,7 +156,7 @@ async function init() {
 
     console.log('Database schema ready');
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Unclescar Studios running on port ${PORT}`);
+      console.log(`Game Day Royal Tournaments running on port ${PORT}`);
       const domain = process.env.REPLIT_DEV_DOMAIN || `localhost:${PORT}`;
       const protocol = process.env.REPLIT_DEV_DOMAIN ? 'https' : 'http';
       const fullAdminUrl = `${protocol}://${domain}${ADMIN_PATH}`;

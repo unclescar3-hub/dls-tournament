@@ -1,5 +1,5 @@
 /**
- * Unclescar Studios — Automated Scheduler
+ * Game Day Royal Tournaments — Automated Scheduler
  * Runs every 5 minutes and fires reminder emails/notifications
  * automatically at the 24-hour and 1-hour marks before each fixture.
  */
@@ -14,12 +14,12 @@ const INTERVAL_MS = 5 * 60 * 1000; // check every 5 minutes
 function baseEmail(content) {
   return `<div style="background:#080c14;color:#f0f4ff;font-family:Arial,sans-serif;padding:40px;max-width:580px;margin:0 auto;border-radius:12px">
     <div style="text-align:center;margin-bottom:28px">
-      <h1 style="color:#00e676;font-size:26px;letter-spacing:3px;margin:0">UNCLESCAR <span style="color:#f0f4ff">STUDIOS</span></h1>
-      <p style="color:#6b7a99;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Nigeria's Premier Esports Platform</p>
+      <h1 style="color:#00e676;font-size:22px;letter-spacing:3px;margin:0">GAME DAY <span style="color:#f0f4ff">ROYAL</span></h1>
+      <p style="color:#6b7a99;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Nigeria's Premier Esports Tournament</p>
     </div>
     ${content}
     <hr style="border:1px solid #1e2d45;margin:32px 0">
-    <p style="color:#6b7a99;font-size:11px;text-align:center">&copy; 2026 Unclescar Studios &bull; <a href="${APP_URL()}" style="color:#3b82f6">${APP_URL()}</a></p>
+    <p style="color:#6b7a99;font-size:11px;text-align:center">&copy; 2026 Game Day Royal Tournaments &bull; <a href="${APP_URL()}" style="color:#3b82f6">${APP_URL()}</a></p>
   </div>`;
 }
 

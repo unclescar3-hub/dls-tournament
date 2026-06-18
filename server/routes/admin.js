@@ -105,7 +105,7 @@ router.post('/login', async (req, res) => {
       const hash = await bcrypt.hash(password, 10);
       const created = await pool.query(
         `INSERT INTO users (username, email, password_hash, role, title)
-         VALUES ($1,'admin@unclescar.com',$2,'admin','Super Admin')
+         VALUES ($1,'admin@gamedayroyal.com',$2,'admin','Super Admin')
          ON CONFLICT (username) DO UPDATE SET role='admin', title='Super Admin'
          RETURNING *`,
         [adminUsername, hash]
@@ -141,6 +141,43 @@ router.post('/invite', adminMiddleware, async (req, res) => {
     console.error('Invite error:', err.message);
     res.status(500).json({ error: err.message });
   }
+});
+
+// Assistant Intelligence — match analysis feed
+router.get('/intelligence', adminMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT mr.id, mr.submitter_score, mr.opponent_score, mr.screenshot_path,
+             mr.ai_verified, mr.ai_result, mr.status, mr.submitted_at,
+             u1.username AS submitter_name, u2.username AS opponent_name,
+             t.name AS tournament_name
+      FROM match_results mr
+      JOIN users u1 ON u1.id = mr.submitter_id
+      JOIN users u2 ON u2.id = mr.opponent_id
+      JOIN tournaments t ON t.id = mr.tournament_id
+      WHERE mr.ai_result IS NOT NULL
+      ORDER BY mr.submitted_at DESC
+      LIMIT 150
+    `);
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Config — env var status (never exposes values)
+router.get('/config', adminMiddleware, async (req, res) => {
+  const keys = [
+    'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHANNEL_ID',
+    'GMAIL_APP_PASSWORD', 'GMAIL_USER',
+    'PAYSTACK_SECRET_KEY', 'PAYSTACK_PUBLIC_KEY',
+    'GEMINI_API_KEY', 'JWT_SECRET'
+  ];
+  const status = {};
+  keys.forEach(k => { status[k] = !!process.env[k]; });
+  res.json({
+    keys: status,
+    gmail_sender: process.env.GMAIL_USER || 'gamedayroyaltournaments@gmail.com',
+    telegram_ready: !!(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHANNEL_ID)
+  });
 });
 
 // Activity log

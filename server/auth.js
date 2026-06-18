@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const pool = require('./db');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'unclescar-fallback-secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'gameday-fallback-secret';
 
 function signToken(user) {
   return jwt.sign({ id: user.id, email: user.email, role: user.role, username: user.username }, JWT_SECRET, { expiresIn: '7d' });
@@ -17,6 +17,8 @@ function authMiddleware(req, res, next) {
   if (!token) return res.status(401).json({ error: 'Not authenticated' });
   try {
     req.user = verifyToken(token);
+    // Update online presence (non-blocking — never fails the request)
+    pool.query('UPDATE users SET last_active=NOW() WHERE id=$1', [req.user.id]).catch(() => {});
     next();
   } catch {
     return res.status(401).json({ error: 'Invalid token' });
