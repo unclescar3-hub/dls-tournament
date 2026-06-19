@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS admin_invites (
   used BOOLEAN DEFAULT FALSE,
   expires_at TIMESTAMP NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
+  titles VARCHAR(255)
 );
 
 -- Streams
