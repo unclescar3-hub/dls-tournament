@@ -6,7 +6,6 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto');
 const pool = require('./server/db');
 
 const app = express();
@@ -15,13 +14,7 @@ const PORT = 5000;
 if (!fs.existsSync('public/uploads')) fs.mkdirSync('public/uploads', { recursive: true });
 
 // ── Generate secret admin path ──────────────────────────────────────────────
-// Path is derived from the ADMIN_PASSWORD — same every restart, impossible to
-// guess without knowing the password. Optionally override via ADMIN_PANEL_PATH.
-function getAdminPath() {
-  if (process.env.ADMIN_PANEL_PATH) return process.env.ADMIN_PANEL_PATH;
-  const seed = (process.env.ADMIN_PASSWORD || 'unclescar_default') + '_esc_ops';
-  return '/ops-' + crypto.createHash('sha256').update(seed).digest('hex').slice(0, 14);
-}
+const { getAdminPath } = require('./server/adminPath');
 const ADMIN_PATH = getAdminPath();
 
 // ── Rate limiters ────────────────────────────────────────────────────────────
@@ -88,6 +81,7 @@ app.use('/api/referrals', require('./server/routes/referrals'));
 app.use('/api/proving-ground', require('./server/routes/proving-ground'));
 app.use('/api/promotions', require('./server/routes/promotions'));
 app.use('/api/staff-chat', require('./server/routes/staff-chat'));
+app.use('/api/arenas', require('./server/routes/arenas'));
 
 // ── Admin session middleware ──────────────────────────────────────────────────
 function requireAdminSession(req, res, next) {
@@ -244,6 +238,32 @@ async function init() {
     // ── Tournaments: allow text for max_players (unlimited) ───────────────────
     // max_players is already INT — store 0 for unlimited
     await pool.query(`ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS is_unlimited BOOLEAN DEFAULT FALSE`).catch(() => {});
+
+    // ── Referral leaderboard visibility ───────────────────────────────────────
+    await pool.query(`ALTER TABLE referral_settings ADD COLUMN IF NOT EXISTS leaderboard_visible BOOLEAN DEFAULT FALSE`).catch(() => {});
+
+    // ── Arenas ────────────────────────────────────────────────────────────────
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS arenas (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(100) NOT NULL,
+        slug VARCHAR(50) UNIQUE NOT NULL,
+        color VARCHAR(30) DEFAULT '#00e676',
+        description TEXT,
+        season_start DATE,
+        season_end DATE,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `).catch(() => {});
+    // Seed default arenas if none exist
+    await pool.query(`
+      INSERT INTO arenas (name, slug, color, description) VALUES
+        ('DLS Arena', 'dls', '#00e676', 'Dream League Soccer tournaments'),
+        ('eFootball Arena', 'efootball', '#00e5ff', 'eFootball / PES tournaments'),
+        ('EA FC Arena', 'eafc', '#ff1a5e', 'EA Sports FC tournaments')
+      ON CONFLICT (slug) DO NOTHING
+    `).catch(() => {});
 
     console.log('Database schema ready');
     app.listen(PORT, '0.0.0.0', () => {

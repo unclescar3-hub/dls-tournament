@@ -197,7 +197,9 @@ router.post('/accept-invite', async (req, res) => {
 
     const jwtToken = signToken(user);
     res.cookie('token', jwtToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
-    res.json({ success: true, user: { id: user.id, username: user.username, email: user.email, role: 'admin' } });
+    const { getAdminPath } = require('../adminPath');
+    const adminPath = getAdminPath();
+    res.json({ success: true, user: { id: user.id, username: user.username, email: user.email, role: 'admin' }, adminPath: adminPath + '/dashboard' });
   } catch (err) {
     console.error('Accept invite error:', err.message);
     res.status(500).json({ error: err.message });

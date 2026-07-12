@@ -96,7 +96,10 @@ document.getElementById('invite-form').addEventListener('submit', async e => {
     });
     currentUser = d.user;
     show('invite-success');
-    toast('Admin access activated!', 'success');
+    toast('Admin access activated! Redirecting to admin panel...', 'success');
+    if (d.adminPath) {
+      setTimeout(() => { window.location.href = d.adminPath; }, 2000);
+    }
   } catch(err) {
     toast(err.message, 'error');
     if (err.message.includes('expired') || err.message.includes('invalid')) show('invalid');

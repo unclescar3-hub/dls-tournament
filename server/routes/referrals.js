@@ -46,11 +46,34 @@ router.get('/lookup/:code', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ── Public: leaderboard (only when visible) ───────────────────────────────────
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const settings = await pool.query('SELECT leaderboard_visible FROM referral_settings LIMIT 1');
+    const visible = settings.rows[0]?.leaderboard_visible;
+    if (!visible) return res.json({ visible: false, data: [] });
+    const result = await pool.query(`
+      SELECT u.username, u.referral_points, u.referral_cash,
+             COUNT(ref.id) AS total_referred,
+             COUNT(CASE WHEN r.payment_status='paid' THEN ref.id END) AS paid_referred
+      FROM users u
+      LEFT JOIN users ref ON ref.referred_by = u.id
+      LEFT JOIN registrations r ON r.user_id = ref.id
+      WHERE u.role = 'player'
+      GROUP BY u.id
+      HAVING COUNT(ref.id) > 0
+      ORDER BY COUNT(ref.id) DESC, u.referral_points DESC
+      LIMIT 20
+    `);
+    res.json({ visible: true, data: result.rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // ── Admin: get referral settings ──────────────────────────────────────────────
 router.get('/settings', adminMiddleware, async (req, res) => {
   try {
     const settings = await pool.query('SELECT * FROM referral_settings LIMIT 1');
-    res.json(settings.rows[0] || { points_per_free_ref: 10 });
+    res.json(settings.rows[0] || { points_per_free_ref: 10, leaderboard_visible: false });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -62,16 +85,16 @@ router.get('/tiers', adminMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ── Admin: update points per free referral ───────────────────────────────────
+// ── Admin: update referral settings ──────────────────────────────────────────
 router.post('/settings', adminMiddleware, async (req, res) => {
   try {
-    const { points_per_free_ref } = req.body;
+    const { points_per_free_ref, leaderboard_visible } = req.body;
     await pool.query(
-      `INSERT INTO referral_settings (id, points_per_free_ref) VALUES (1, $1)
-       ON CONFLICT (id) DO UPDATE SET points_per_free_ref=$1, updated_at=NOW()`,
-      [parseInt(points_per_free_ref) || 10]
+      `INSERT INTO referral_settings (id, points_per_free_ref, leaderboard_visible) VALUES (1, $1, $2)
+       ON CONFLICT (id) DO UPDATE SET points_per_free_ref=$1, leaderboard_visible=$2, updated_at=NOW()`,
+      [parseInt(points_per_free_ref) || 10, leaderboard_visible === true || leaderboard_visible === 'true']
     );
-    logAction(req.user.id, 'UPDATE_REFERRAL_SETTINGS', { points_per_free_ref }, req.ip).catch(() => {});
+    logAction(req.user.id, 'UPDATE_REFERRAL_SETTINGS', { points_per_free_ref, leaderboard_visible }, req.ip).catch(() => {});
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

@@ -220,6 +220,22 @@
             <button class="btn btn-outline" onclick="copyReferralLink()">📋 Copy</button>
             <button class="btn btn-primary" onclick="shareReferralLink()">↗ Share</button>
           </div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+            <a id="ref-wa-btn" href="#" target="_blank" rel="noopener" style="display:none;align-items:center;gap:6px;background:#25D366;color:#fff;border-radius:8px;padding:9px 16px;font-size:.82rem;font-weight:700;text-decoration:none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp
+            </a>
+            <a id="ref-twitter-btn" href="#" target="_blank" rel="noopener" style="display:none;align-items:center;gap:6px;background:#1da1f2;color:#fff;border-radius:8px;padding:9px 16px;font-size:.82rem;font-weight:700;text-decoration:none">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+              Twitter / X
+            </a>
+          </div>
+        </div>
+      </div>
+      <div id="referral-leaderboard-box" style="display:none;margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><h3>🏆 Top Referrers</h3><span class="tag tag-gold">Leaderboard</span></div>
+          <div id="referral-leaderboard-list" class="card-body"><div class="spinner"></div></div>
         </div>
       </div>
       <div class="card">
@@ -677,10 +693,22 @@ async function loadReferralsTab() {
   const statsBox = document.getElementById('referral-stats-box');
   statsBox.innerHTML = '<div class="spinner"></div>';
   try {
-    const data = await api('GET', '/referrals/my');
+    const [data, lb] = await Promise.all([
+      api('GET', '/referrals/my'),
+      fetch('/api/referrals/leaderboard').then(r => r.json()).catch(() => ({ visible: false, data: [] }))
+    ]);
     const baseUrl = window.location.origin;
     const refLink = `${baseUrl}/?ref=${encodeURIComponent(data.referral_code)}`;
     document.getElementById('referral-link-input').value = refLink;
+
+    const waMsg = encodeURIComponent(`Join me on Game Day Royal Tournaments — the #1 esports competition platform! Register using my link and let's compete: ${refLink}`);
+    const twMsg = encodeURIComponent(`I compete on Game Day Royal Tournaments 🎮⚽ Join via my referral link and let's play! ${refLink} #GameDayRoyal #Esports`);
+    const waBtn = document.getElementById('ref-wa-btn');
+    const twBtn = document.getElementById('ref-twitter-btn');
+    waBtn.href = `https://wa.me/?text=${waMsg}`;
+    waBtn.style.display = 'inline-flex';
+    twBtn.href = `https://twitter.com/intent/tweet?text=${twMsg}`;
+    twBtn.style.display = 'inline-flex';
 
     statsBox.innerHTML = `<div class="grid-3" style="margin:0">
       <div class="card"><div class="card-body" style="text-align:center">
@@ -689,7 +717,7 @@ async function loadReferralsTab() {
       </div></div>
       <div class="card"><div class="card-body" style="text-align:center">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--gold)">${data.paid_referred}</div>
-        <div style="font-size:.72px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Paid Referrals</div>
+        <div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Paid Referrals</div>
       </div></div>
       <div class="card"><div class="card-body" style="text-align:center">
         <div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--primary)">${data.referral_points} <span style="font-size:1rem">pts</span></div>
@@ -701,6 +729,30 @@ async function loadReferralsTab() {
       <div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--gold)">₦${Number(data.referral_cash).toLocaleString()}</div>
       <div style="font-size:.78rem;color:var(--muted);margin-top:4px">Contact admin to request withdrawal</div>
     </div></div>` : ''}`;
+
+    if (lb.visible && lb.data.length) {
+      document.getElementById('referral-leaderboard-box').style.display = 'block';
+      const lbEl = document.getElementById('referral-leaderboard-list');
+      lbEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.85rem">
+        <thead><tr>
+          <th style="text-align:left;padding:8px 0;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">#</th>
+          <th style="text-align:left;padding:8px 0;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">PLAYER</th>
+          <th style="text-align:left;padding:8px 0;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">REFERRALS</th>
+          <th style="text-align:left;padding:8px 0;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">POINTS</th>
+        </tr></thead>
+        <tbody>${lb.data.map((r, i) => {
+          const medals = ['🥇','🥈','🥉'];
+          const isMe = r.username === (currentUser?.username);
+          return `<tr style="border-bottom:1px solid rgba(30,45,69,.3);${isMe?'background:rgba(0,230,118,.04)':''}">
+            <td style="padding:10px 0;font-weight:700;color:var(--muted)">${medals[i] || (i+1)}</td>
+            <td style="padding:10px 0;font-weight:${isMe?'700':'500'};color:${isMe?'var(--primary)':'var(--text)'}">${r.username}${isMe?' <span style="font-size:.7rem;color:var(--primary)">(you)</span>':''}</td>
+            <td style="padding:10px 0;font-weight:700">${r.total_referred} <span style="font-size:.72rem;color:var(--muted)">free</span> / ${r.paid_referred} <span style="font-size:.72rem;color:var(--gold)">paid</span></td>
+            <td style="padding:10px 0;color:var(--primary);font-weight:700">${r.referral_points} pts</td>
+          </tr>`;
+        }).join('')}</tbody></table>`;
+    } else {
+      document.getElementById('referral-leaderboard-box').style.display = 'none';
+    }
   } catch(err) {
     statsBox.innerHTML = `<div style="color:var(--danger);font-size:.85rem">${err.message}</div>`;
   }

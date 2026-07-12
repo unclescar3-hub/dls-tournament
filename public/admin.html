@@ -57,6 +57,7 @@
       <button class="admin-tab" data-tab="referrals" onclick="switchTab('referrals')">🔗 Referrals</button>
       <button class="admin-tab" data-tab="promotions" onclick="switchTab('promotions')">🎯 Promotions</button>
       <button class="admin-tab" data-tab="staff-chat" onclick="switchTab('staff-chat')" id="chat-tab-btn">💬 Staff Chat <span id="chat-unread-badge" style="display:none;background:var(--danger);color:#fff;font-size:.6rem;padding:1px 6px;border-radius:10px;margin-left:4px"></span></button>
+      <button class="admin-tab" data-tab="arenas" onclick="switchTab('arenas')">🏟️ Arenas</button>
     </div>
 
     <!-- TOURNAMENTS -->
@@ -461,7 +462,14 @@
                 <label>Points earned per free referral registration</label>
                 <input type="number" id="ref-points" min="0" placeholder="e.g. 10">
               </div>
-              <button type="submit" class="btn btn-primary">Save Points</button>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px">
+                <input type="checkbox" id="ref-leaderboard-visible" style="width:auto;margin:0">
+                <div>
+                  <label for="ref-leaderboard-visible" style="text-transform:none;letter-spacing:0;font-size:.88rem;cursor:pointer;margin:0;font-weight:600">Show Referral Leaderboard to Players</label>
+                  <div style="font-size:.75rem;color:var(--muted);margin-top:2px">When enabled, players see a top 20 referrers board in their dashboard.</div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Settings</button>
             </form>
             <hr style="border:1px solid var(--border);margin:20px 0">
             <div>
@@ -533,6 +541,53 @@
       </div>
     </div>
 
+    <!-- ARENAS -->
+    <div id="tab-arenas" class="admin-tab-content" style="display:none">
+      <div class="grid-2" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-header"><h3 id="arena-form-title">Add New Arena</h3><button class="btn btn-outline btn-sm" onclick="cancelArenaEdit()">✕ Cancel</button></div>
+          <div class="card-body">
+            <form id="arena-form">
+              <input type="hidden" id="arena-edit-id">
+              <div class="form-group"><label>Arena Name</label><input type="text" id="arena-name" required placeholder="e.g. Rocket League Arena"></div>
+              <div class="form-group">
+                <label>Slug <span style="color:var(--muted);font-size:.75rem">(used in URLs & filters)</span></label>
+                <input type="text" id="arena-slug" required placeholder="e.g. rocket-league">
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Accent Color</label><input type="color" id="arena-color" value="#00e676" style="height:42px;cursor:pointer"></div>
+                <div class="form-group">
+                  <label>Status</label>
+                  <select id="arena-active"><option value="true">Active</option><option value="false">Inactive (hidden)</option></select>
+                </div>
+              </div>
+              <div class="form-group"><label>Description (optional)</label><textarea id="arena-desc" rows="2" placeholder="Short description of the game/competition..."></textarea></div>
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px">
+                <div style="font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Season Dates (optional)</div>
+                <div class="form-row">
+                  <div class="form-group"><label>Season Start</label><input type="date" id="arena-season-start"></div>
+                  <div class="form-group"><label>Season End</label><input type="date" id="arena-season-end"></div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Arena</button>
+            </form>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>All Arenas</h3><button class="btn btn-outline btn-sm" onclick="loadArenasTab()">↻ Refresh</button></div>
+          <div id="arenas-list" class="card-body"><div class="spinner"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="color:var(--muted);font-size:.85rem;line-height:2">
+          🏟️ Arenas define the game categories on the platform (DLS, eFootball, EA FC, etc.).<br>
+          🎨 Each arena has its own accent color shown on the homepage and tournament pages.<br>
+          📅 Set Season Start/End dates — displayed on the arena page so players know the active competition window.<br>
+          ⚠️ Arenas with existing tournaments cannot be deleted — deactivate them instead to hide from players.
+        </div>
+      </div>
+    </div>
+
     <!-- STAFF CHAT -->
     <div id="tab-staff-chat" class="admin-tab-content" style="display:none">
       <div class="grid-2">
@@ -569,6 +624,35 @@
   <div class="footer-brand">GAME DAY <span>ROYAL</span></div>
   <span class="footer-copy">Admin Panel &copy; 2026</span>
 </footer>
+
+<!-- ── SITE PREVIEW PANEL ─────────────────────────────────────────────────── -->
+<button id="preview-toggle-btn" onclick="toggleSitePreview()" title="Preview Site" style="position:fixed;bottom:24px;right:24px;z-index:1000;background:linear-gradient(135deg,#00e676,#00b8d9);color:#000;border:none;border-radius:50%;width:52px;height:52px;font-size:1.25rem;cursor:pointer;box-shadow:0 4px 20px rgba(0,230,118,.35);display:flex;align-items:center;justify-content:center;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">👁</button>
+
+<div id="site-preview-panel" style="display:none;position:fixed;top:0;right:0;width:420px;height:100vh;z-index:999;background:var(--bg);border-left:2px solid var(--border);box-shadow:-8px 0 40px rgba(0,0,0,.5);display:none;flex-direction:column">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:.8rem;font-weight:700;letter-spacing:1px;color:var(--primary)">SITE PREVIEW</span>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('site-preview-iframe').src=document.getElementById('site-preview-iframe').src" title="Reload">↻</button>
+      <a href="/" target="_blank" class="btn btn-outline btn-sm">↗ Open</a>
+    </div>
+    <button onclick="toggleSitePreview()" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
+  </div>
+  <div style="display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;overflow-x:auto">
+    <button onclick="previewNav('/')" class="preview-nav-btn active">Hub</button>
+    <button onclick="previewNav('/dls.html')" class="preview-nav-btn">DLS</button>
+    <button onclick="previewNav('/efootball.html')" class="preview-nav-btn">eFootball</button>
+    <button onclick="previewNav('/eafc.html')" class="preview-nav-btn">EA FC</button>
+    <button onclick="previewNav('/leaderboard.html')" class="preview-nav-btn">Board</button>
+    <button onclick="previewNav('/fixtures.html')" class="preview-nav-btn">Fixtures</button>
+  </div>
+  <iframe id="site-preview-iframe" src="/" style="flex:1;border:none;width:100%;background:#fff"></iframe>
+</div>
+
+<style>
+.preview-nav-btn { background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-size:.75rem;font-weight:600;padding:8px 12px;cursor:pointer;white-space:nowrap;transition:all .2s; }
+.preview-nav-btn:hover,.preview-nav-btn.active { color:var(--primary);border-bottom-color:var(--primary); }
+</style>
+
 <div id="toast-container"></div>
 
 <style>
@@ -608,6 +692,7 @@ async function initAdmin() {
   }
   loadStats();
   loadTournamentsTab();
+  loadArenaDropdowns();
 }
 
 async function loadStats() {
@@ -624,7 +709,7 @@ function switchTab(name) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab===name));
   document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display='none');
   document.getElementById('tab-'+name).style.display='block';
-  const loaders = { tournaments:loadTournamentsTab, matches:loadPendingMatches, users:loadUsers, streams:loadStreams, team:loadAdminTeam, codes:loadCodesTab, payouts:loadPayoutsTab, fixtures:loadFixturesTab, disputes:loadDisputesTab, announcements:loadAnnouncementsTab, logs:loadLogsTab, intelligence:loadIntelligenceTab, ads:loadAdsTab, config:loadConfigTab, 'proving-ground':loadProvingGroundTab, referrals:loadReferralsTab, promotions:loadPromotionsTab, 'staff-chat':loadStaffChatTab };
+  const loaders = { tournaments:loadTournamentsTab, matches:loadPendingMatches, users:loadUsers, streams:loadStreams, team:loadAdminTeam, codes:loadCodesTab, payouts:loadPayoutsTab, fixtures:loadFixturesTab, disputes:loadDisputesTab, announcements:loadAnnouncementsTab, logs:loadLogsTab, intelligence:loadIntelligenceTab, ads:loadAdsTab, config:loadConfigTab, 'proving-ground':loadProvingGroundTab, referrals:loadReferralsTab, promotions:loadPromotionsTab, 'staff-chat':loadStaffChatTab, arenas:loadArenasTab };
   if (loaders[name]) loaders[name]();
 }
 
@@ -1415,6 +1500,7 @@ async function loadReferralsTab() {
   try {
     const settings = await api('GET', '/referrals/settings');
     document.getElementById('ref-points').value = settings.points_per_free_ref || 10;
+    document.getElementById('ref-leaderboard-visible').checked = !!settings.leaderboard_visible;
   } catch {}
 }
 
@@ -1422,10 +1508,13 @@ document.getElementById('referral-settings-form').addEventListener('submit', asy
   e.preventDefault();
   const btn = e.target.querySelector('button'); btn.textContent='Saving...'; btn.disabled=true;
   try {
-    await api('POST', '/referrals/settings', { points_per_free_ref: parseInt(document.getElementById('ref-points').value)||10 });
-    toast('Points setting saved!','success');
+    await api('POST', '/referrals/settings', {
+      points_per_free_ref: parseInt(document.getElementById('ref-points').value)||10,
+      leaderboard_visible: document.getElementById('ref-leaderboard-visible').checked
+    });
+    toast('Referral settings saved!','success');
   } catch(err) { toast(err.message,'error'); }
-  finally { btn.textContent='Save Points'; btn.disabled=false; }
+  finally { btn.textContent='Save Settings'; btn.disabled=false; }
 });
 
 function showAddTierForm() { document.getElementById('add-tier-form').style.display='block'; }
@@ -1784,6 +1873,140 @@ document.getElementById('tg-broadcast-form').addEventListener('submit', async e 
   } catch(err) { toast(err.message,'error'); }
   finally { btn.disabled=false; btn.textContent='📨 Send to Channel'; }
 });
+
+// ── ARENAS TAB ────────────────────────────────────────────────────────────────
+
+let editingArenaId = null;
+
+async function loadArenasTab() {
+  cancelArenaEdit();
+  const el = document.getElementById('arenas-list');
+  el.innerHTML = '<div class="spinner"></div>';
+  try {
+    const arenas = await api('GET', '/arenas/all');
+    if (!arenas.length) { el.innerHTML = '<p style="color:var(--muted);padding:16px">No arenas yet.</p>'; return; }
+    el.innerHTML = arenas.map(a => {
+      const seasonInfo = a.season_start
+        ? `<div style="font-size:.72rem;color:var(--muted);margin-top:2px">📅 ${fmtDate(a.season_start)}${a.season_end?' → '+fmtDate(a.season_end):''}</div>`
+        : '';
+      return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(30,45,69,.4);gap:10px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${a.color};flex-shrink:0"></span>
+            <span style="font-weight:700;font-size:.92rem">${a.name}</span>
+            <code style="font-size:.7rem;background:#0a101a;padding:2px 6px;border-radius:4px;color:var(--muted)">${a.slug}</code>
+            ${a.is_active ? '<span class="tag tag-primary" style="font-size:.6rem">ACTIVE</span>' : '<span style="font-size:.6rem;color:var(--danger);background:rgba(255,68,68,.1);padding:2px 7px;border-radius:4px;border:1px solid rgba(255,68,68,.2)">INACTIVE</span>'}
+          </div>
+          ${a.description ? `<div style="font-size:.78rem;color:var(--muted)">${a.description}</div>` : ''}
+          ${seasonInfo}
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-outline btn-sm" onclick="editArena(${JSON.stringify(a).replace(/"/g,'&quot;')})">✏️ Edit</button>
+          <button class="btn btn-sm" style="background:rgba(${a.is_active?'255,68,68':'0,230,118'},.1);color:${a.is_active?'var(--danger)':'var(--primary)'};border:1px solid ${a.is_active?'rgba(255,68,68,.2)':'rgba(0,230,118,.2)'};" onclick="toggleArena('${a.id}',${!a.is_active})">${a.is_active?'⏸ Deactivate':'▶ Activate'}</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteArena('${a.id}','${a.name}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(err) { el.innerHTML = `<p style="color:var(--danger);padding:16px">${err.message}</p>`; }
+}
+
+function editArena(a) {
+  editingArenaId = a.id;
+  document.getElementById('arena-form-title').textContent = 'Edit Arena';
+  document.getElementById('arena-edit-id').value = a.id;
+  document.getElementById('arena-name').value = a.name;
+  document.getElementById('arena-slug').value = a.slug;
+  document.getElementById('arena-color').value = a.color || '#00e676';
+  document.getElementById('arena-desc').value = a.description || '';
+  document.getElementById('arena-active').value = String(a.is_active);
+  document.getElementById('arena-season-start').value = a.season_start ? a.season_start.split('T')[0] : '';
+  document.getElementById('arena-season-end').value = a.season_end ? a.season_end.split('T')[0] : '';
+  document.getElementById('arena-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelArenaEdit() {
+  editingArenaId = null;
+  document.getElementById('arena-form-title').textContent = 'Add New Arena';
+  document.getElementById('arena-form').reset();
+  document.getElementById('arena-edit-id').value = '';
+  document.getElementById('arena-color').value = '#00e676';
+}
+
+async function toggleArena(id, active) {
+  try {
+    await api('PATCH', `/arenas/${id}`, { is_active: active });
+    toast(active ? 'Arena activated' : 'Arena deactivated', 'success');
+    loadArenasTab();
+    loadArenaDropdowns();
+  } catch(err) { toast(err.message, 'error'); }
+}
+
+async function deleteArena(id, name) {
+  if (!confirm(`Delete arena "${name}"? This cannot be undone. Arenas with tournaments cannot be deleted.`)) return;
+  try {
+    await api('DELETE', `/arenas/${id}`);
+    toast('Arena deleted', 'success');
+    loadArenasTab();
+    loadArenaDropdowns();
+  } catch(err) { toast(err.message, 'error'); }
+}
+
+document.getElementById('arena-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    const payload = {
+      name: document.getElementById('arena-name').value.trim(),
+      slug: document.getElementById('arena-slug').value.trim(),
+      color: document.getElementById('arena-color').value,
+      description: document.getElementById('arena-desc').value.trim() || null,
+      is_active: document.getElementById('arena-active').value === 'true',
+      season_start: document.getElementById('arena-season-start').value || null,
+      season_end: document.getElementById('arena-season-end').value || null
+    };
+    if (editingArenaId) {
+      await api('PATCH', `/arenas/${editingArenaId}`, payload);
+      toast('Arena updated!', 'success');
+    } else {
+      await api('POST', '/arenas', payload);
+      toast('Arena created!', 'success');
+    }
+    cancelArenaEdit();
+    loadArenasTab();
+    loadArenaDropdowns();
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Save Arena'; }
+});
+
+async function loadArenaDropdowns() {
+  try {
+    const arenas = await api('GET', '/arenas/all');
+    const active = arenas.filter(a => a.is_active);
+    const makeOptions = (includeAll) =>
+      (includeAll ? '<option value="">All Arenas</option>' : '') +
+      active.map(a => `<option value="${a.slug}">${a.name}</option>`).join('');
+    const cArena = document.getElementById('c-arena');
+    if (cArena) cArena.innerHTML = makeOptions(false);
+    const annArena = document.getElementById('ann-arena');
+    if (annArena) annArena.innerHTML = makeOptions(true);
+  } catch {}
+}
+
+// ── SITE PREVIEW ──────────────────────────────────────────────────────────────
+
+function toggleSitePreview() {
+  const panel = document.getElementById('site-preview-panel');
+  const isOpen = panel.style.display === 'flex';
+  panel.style.display = isOpen ? 'none' : 'flex';
+  document.getElementById('preview-toggle-btn').textContent = isOpen ? '👁' : '✕';
+}
+
+function previewNav(path) {
+  document.querySelectorAll('.preview-nav-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('site-preview-iframe').src = path;
+}
 
 // ── CONFIG TAB ────────────────────────────────────────────────────────────────
 async function loadConfigTab() {
