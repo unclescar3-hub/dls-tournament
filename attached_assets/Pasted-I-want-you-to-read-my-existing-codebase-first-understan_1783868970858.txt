@@ -1,0 +1,182 @@
+I want you to read my existing codebase first, 
+understand the structure, then add the following 6 features 
+without breaking anything that already works.
+
+---
+
+FEATURE 1 — REFERRAL SYSTEM
+
+Each registered player should have a unique referral link 
+(e.g. gamedaytournament.com/register?ref=USERNAME).
+
+When a referred friend uses that link and registers:
+→ Referrer earns POINTS (admin sets the point value in admin panel)
+
+When a referred friend registers AND pays to join a paid tournament:
+→ Referrer earns a CASH REWARD
+→ The cash reward is tiered based on how many paying referrals they 
+  bring in, starting from 10 paid referrals and above
+→ Admin sets each tier and its payout value inside the admin panel
+
+Admin panel must include:
+- A field to set "points earned per free referral registration"
+- A tiered cash reward table (e.g. 10 referrals = ₦500, 
+  20 referrals = ₦1200, etc.) that admin can add/edit/delete rows
+- An AUTO-CALCULATOR that shows projected referral payouts based 
+  on number of referrals — admin inputs a number and it shows 
+  total payout at each tier automatically
+- A dashboard showing each player's referral count, points earned, 
+  and cash earned from referrals
+
+Each player's profile/dashboard should show:
+- Their referral link (with a copy button)
+- How many people they've referred
+- Total points earned from referrals
+- Total cash earned from referrals
+
+---
+
+FEATURE 2 — PROVING GROUND UPGRADES
+
+The Proving Ground is a section where players can join and play 
+matches. Add the following:
+
+A) Admin toggle in admin panel:
+   - Set Proving Ground as FREE or PAID (with a price field if paid)
+   - This updates live on the public-facing Proving Ground page
+
+B) Early start — don't wait for full lobby:
+   - The moment 2 players have registered/joined the Proving Ground,
+     they should be matched immediately — do not wait for more players
+   - As soon as they are matched, both players receive:
+     → An EMAIL notification with: opponent name, match fixture 
+       details, and a unique GAME CODE they must enter in DLS 
+       (Dream League Soccer) to play the match
+     → An IN-PLATFORM notification (visible when logged in) with 
+       the same information
+   - Other players can keep joining while those 2 are already playing
+
+C) Screenshot upload & standings update:
+   - After their match, each player uploads a screenshot of the result
+   - My existing AI assistant handles reviewing the screenshots 
+     and verifying the score — do not replace or interfere with it
+   - Once verified, the standings table updates automatically
+   - If screenshots conflict or are unreadable, flag the match for 
+     admin review with a notification in the admin panel
+
+---
+
+FEATURE 3 — ADMIN: COMPETITION SIZE CONTROL
+
+In the admin panel, when creating or editing any competition/tournament:
+- Add a field where admin can type in the maximum number of players 
+  allowed (any number — could be 2, 64, 500, 1000, or set to 
+  "Unlimited")
+- This number should display publicly on the tournament/competition 
+  page so players can see spots available and spots filled 
+  (e.g. "48 / 64 players registered")
+- When the limit is reached, registration closes automatically 
+  and shows "Registration Closed" to new visitors
+
+---
+
+FEATURE 4 — STAFF INVITE SYSTEM (ACTIVATE EXISTING ROLES)
+
+The platform already has custom roles defined. Do not change or 
+rebuild the roles system. Just activate it with a real invite flow.
+
+In the admin panel, add an "Invite Staff" section where Super Admin can:
+- Type in the invitee's email address
+- Select their role from the existing roles already on the platform
+- Click Send Invite
+
+What happens next:
+→ The invitee receives a real email with a personalised invite link
+   (e.g. gamedaytournament.com/staff/accept?token=UNIQUETOKEN)
+→ The link expires after 48 hours for security
+→ When they click it, they land on a page to create their password
+→ Once they set their password, their account is active immediately
+→ They are taken straight to the admin panel with access only to 
+   the areas their assigned role permits
+
+Super Admin panel must show:
+- A list of all sent invites (pending, accepted, expired)
+- Ability to resend or cancel a pending invite
+- A live staff list showing each staff member, their role, 
+  last active time, and what actions they have taken on the platform
+  (audit log — e.g. "Results Moderator updated standings at 4:32pm")
+- Ability to remove a staff member or change their role at any time
+
+Security rules:
+- Staff accounts cannot invite other staff — only Super Admin can
+- If a staff member is removed, their access is revoked immediately
+- Invite tokens are single-use and expire after 48 hours
+
+---
+
+FEATURE 5 — INTERNAL STAFF CHAT
+
+Add a chat room inside the admin panel only — not visible to 
+regular players/users on the platform.
+
+A) Group chat room:
+   - One shared room where all active staff and Super Admin 
+     can talk together in real time
+   - Messages display the sender's role/position as their name
+     (e.g. "Results Moderator", "Finance Manager", "Super Admin")
+     — never their real name — alongside the timestamp
+   - New messages appear without refreshing the page (use 
+     WebSockets or polling — whatever fits the existing stack)
+   - Staff can see message history when they log in
+
+B) Direct messages:
+   - Any staff member can send a private DM to the Super Admin
+   - Super Admin can initiate a DM to any specific staff member
+   - Staff cannot DM each other — only Super Admin to staff 
+     and staff to Super Admin
+   - In all DM conversations, both sides are identified by their 
+     role/position as their display name — not their real name
+   - Super Admin sees all DM conversations in one inbox, 
+     organised by staff role/position
+   - Unread message count badge visible on the chat icon 
+     in the admin panel nav
+
+---
+
+FEATURE 6 — PROMOTIONS WITH PHOTO UPLOAD
+
+In the admin panel, add a Promotions section where Super Admin 
+or authorised staff can:
+- Upload a promotional photo/image
+- Add a title and optional description to the promotion
+- Set it as active or inactive
+- Choose visibility: Internal only, Public only, or Both
+
+Where promotions appear:
+A) Admin panel — all active internal promotions display as an 
+   announcement banner or notice board visible to all staff 
+   when they log into the admin panel
+
+B) Public platform — all active public promotions display to 
+   players/users on the platform as a banner, card, or popup
+   (use whatever display format fits the existing site design)
+
+Admin controls:
+- View all promotions (active and inactive) in a list
+- Edit, deactivate, or delete any promotion at any time
+- When a promotion is deactivated it disappears from both 
+  admin panel and public platform immediately
+
+---
+
+GENERAL INSTRUCTIONS:
+- Read my existing file structure first before writing any code
+- Do not delete or overwrite existing working features
+- Use my existing database/backend patterns — don't switch stacks
+- For email notifications use Nodemailer (or whatever email setup 
+  already exists in the project)
+- Keep the UI consistent with my existing design style
+- After each feature is added, tell me what was changed and what 
+  I need to configure (env variables, etc.)
+- Build one feature at a time and confirm it works before 
+  moving to the next
