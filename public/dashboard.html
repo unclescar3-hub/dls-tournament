@@ -68,6 +68,8 @@
       <button class="dash-tab" onclick="switchDashTab('disputes',this)">⚠ Disputes</button>
       <button class="dash-tab" onclick="switchDashTab('submit',this)">📤 Submit Result</button>
       <button class="dash-tab" onclick="switchDashTab('stream',this)">📡 Stream</button>
+      <button class="dash-tab" onclick="switchDashTab('proving-ground',this)">⚡ Proving Ground</button>
+      <button class="dash-tab" onclick="switchDashTab('referrals',this)">🔗 My Referrals</button>
     </div>
 
     <!-- MY TOURNAMENTS -->
@@ -173,6 +175,66 @@
       </div>
     </div>
 
+    <!-- PROVING GROUND -->
+    <div id="dtab-proving-ground" style="display:none">
+      <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg,rgba(0,229,255,.06) 0%,transparent 60%);border-color:rgba(0,229,255,.2)">
+        <div class="card-body" style="text-align:center;padding:32px 20px">
+          <div style="font-size:2.2rem;margin-bottom:10px">⚡</div>
+          <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.7rem;font-weight:700;color:#00e5ff;margin-bottom:8px">PROVING GROUND</h2>
+          <p style="color:var(--muted);font-size:.9rem;max-width:500px;margin:0 auto 24px">The fast-match arena. Join the queue and get matched instantly. No tournament entry — just raw 1v1 action.</p>
+          <div id="pg-status-box" style="margin-bottom:24px"><div class="spinner"></div></div>
+          <div id="pg-action-area">
+            <button id="pg-join-btn" class="btn btn-primary" style="font-size:1rem;padding:12px 32px" onclick="joinPG()">Join Queue</button>
+            <button id="pg-leave-btn" class="btn btn-outline" style="display:none;font-size:1rem;padding:12px 32px" onclick="leavePG()">Leave Queue</button>
+          </div>
+          <div id="pg-match-box" style="display:none;margin-top:24px;background:#0a0f1a;border:2px solid #00e5ff;border-radius:12px;padding:24px">
+            <div style="color:#00e5ff;font-size:.72rem;letter-spacing:2px;margin-bottom:6px">MATCH FOUND!</div>
+            <div style="font-size:1.4rem;font-weight:700;margin-bottom:16px">vs <span id="pg-opponent-name" style="color:#00e5ff"></span></div>
+            <div style="color:var(--muted);font-size:.8rem;margin-bottom:8px">Your Game Code</div>
+            <div style="font-family:monospace;font-size:2.5rem;font-weight:700;color:#00e5ff;letter-spacing:8px" id="pg-game-code"></div>
+            <div style="color:var(--muted);font-size:.78rem;margin-top:12px">Enter this code in DLS to start the match, then submit the result here.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>How Proving Ground Works</h3></div>
+        <div class="card-body" style="color:var(--muted);font-size:.88rem;line-height:2">
+          🔵 Click <strong style="color:#f0f4ff">Join Queue</strong> to enter the arena.<br>
+          ⚡ The moment another player joins, you are both instantly matched.<br>
+          📧 You'll get an email + in-app notification with your opponent and game code.<br>
+          🎮 Use the code to start the match in DLS.<br>
+          📤 After playing, submit the result using the <strong style="color:#f0f4ff">Submit Result</strong> tab.
+        </div>
+      </div>
+    </div>
+
+    <!-- REFERRALS -->
+    <div id="dtab-referrals" style="display:none">
+      <div id="referral-stats-box" style="margin-bottom:20px"><div class="spinner"></div></div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>My Referral Link</h3><span class="tag tag-primary">Share & Earn</span></div>
+        <div class="card-body">
+          <p style="color:var(--muted);font-size:.85rem;margin-bottom:16px">Share this link. Earn points when someone registers, and cash when they pay for a tournament!</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input type="text" id="referral-link-input" readonly style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--primary);font-family:monospace;font-size:.85rem;padding:10px 14px;border-radius:8px;min-width:200px" placeholder="Loading...">
+            <button class="btn btn-outline" onclick="copyReferralLink()">📋 Copy</button>
+            <button class="btn btn-primary" onclick="shareReferralLink()">↗ Share</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>How Referrals Work</h3></div>
+        <div class="card-body" style="color:var(--muted);font-size:.88rem;line-height:2">
+          🔗 Share your unique referral link with friends.<br>
+          🎉 When they register, you earn <strong id="ref-pts-display" style="color:var(--primary)">points</strong>.<br>
+          💰 When they pay for a tournament, you earn <strong style="color:var(--gold)">cash rewards</strong> based on your tier.<br>
+          📊 Track your referrals and earnings here.<br>
+          <br>
+          <strong style="color:#f0f4ff">Tier System:</strong> The more paid referrals, the higher your cash reward tier.
+        </div>
+      </div>
+    </div>
+
     <!-- STREAM -->
     <div id="dtab-stream" style="display:none">
       <div class="card">
@@ -226,7 +288,7 @@ let verifiedAccountData = null;
 function switchDashTab(name, btn) {
   document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  ['tournaments','fixtures','notifications','payout','earnings','disputes','submit','stream'].forEach(t =>
+  ['tournaments','fixtures','notifications','payout','earnings','disputes','submit','stream','proving-ground','referrals'].forEach(t =>
     document.getElementById('dtab-'+t).style.display = t===name?'block':'none'
   );
   if (name==='payout') loadBankTab();
@@ -234,6 +296,8 @@ function switchDashTab(name, btn) {
   if (name==='notifications') loadNotifications();
   if (name==='fixtures') loadMyFixtures();
   if (name==='disputes') loadMyDisputesTab();
+  if (name==='proving-ground') loadPGTab();
+  if (name==='referrals') loadReferralsTab();
 }
 
 async function initDashboard() {
@@ -529,6 +593,134 @@ document.getElementById('stream-form').addEventListener('submit', async e => {
 const params = new URLSearchParams(location.search);
 if (params.get('payment')==='success') toast('Payment confirmed! You are now registered.','success');
 if (params.get('error')) toast('Payment issue: '+params.get('error').replace(/_/g,' '),'error');
+
+// ── PROVING GROUND ────────────────────────────────────────────────────────────
+async function loadPGTab() {
+  const statusBox = document.getElementById('pg-status-box');
+  statusBox.innerHTML = '<div class="spinner"></div>';
+  try {
+    // Check if PG is active
+    const settings = await api('GET', '/proving-ground/settings');
+    if (!settings.is_active) {
+      statusBox.innerHTML = '<div style="color:var(--danger);font-size:.9rem">⛔ Proving Ground is currently closed. Check back soon!</div>';
+      document.getElementById('pg-join-btn').disabled = true;
+      document.getElementById('pg-join-btn').style.opacity = '.4';
+      return;
+    }
+    // Get my queue status
+    const queue = await api('GET', '/proving-ground/queue');
+    const myEntry = queue.my_entry;
+    const waiting = queue.waiting_count;
+
+    let statusHtml = `<div style="font-size:.85rem;color:var(--muted)">Players currently waiting: <strong style="color:#f0f4ff">${waiting}</strong></div>`;
+    if (settings.is_paid && settings.entry_fee > 0) {
+      statusHtml += `<div style="font-size:.82rem;color:var(--gold);margin-top:6px">Entry Fee: <strong>₦${Number(settings.entry_fee).toLocaleString()}</strong></div>`;
+    }
+    statusBox.innerHTML = statusHtml;
+
+    if (myEntry) {
+      if (myEntry.status === 'waiting') {
+        document.getElementById('pg-join-btn').style.display = 'none';
+        document.getElementById('pg-leave-btn').style.display = 'inline-block';
+        document.getElementById('pg-match-box').style.display = 'none';
+        statusBox.innerHTML += '<div style="color:var(--gold);font-size:.9rem;margin-top:8px">⏳ You are in the queue. Waiting for an opponent...</div>';
+      } else if (myEntry.status === 'matched') {
+        document.getElementById('pg-join-btn').style.display = 'none';
+        document.getElementById('pg-leave-btn').style.display = 'none';
+        document.getElementById('pg-match-box').style.display = 'block';
+        document.getElementById('pg-opponent-name').textContent = myEntry.opponent_username || 'Opponent';
+        document.getElementById('pg-game-code').textContent = myEntry.game_code || '????';
+      }
+    } else {
+      document.getElementById('pg-join-btn').style.display = 'inline-block';
+      document.getElementById('pg-leave-btn').style.display = 'none';
+      document.getElementById('pg-match-box').style.display = 'none';
+    }
+  } catch(err) {
+    statusBox.innerHTML = `<div style="color:var(--danger);font-size:.85rem">${err.message}</div>`;
+  }
+}
+
+async function joinPG() {
+  const btn = document.getElementById('pg-join-btn');
+  btn.textContent = 'Joining...'; btn.disabled = true;
+  try {
+    const res = await api('POST', '/proving-ground/join', {});
+    if (res.matched) {
+      toast('⚡ Match found! Check your opponent and code below.', 'success');
+      document.getElementById('pg-join-btn').style.display = 'none';
+      document.getElementById('pg-match-box').style.display = 'block';
+      document.getElementById('pg-opponent-name').textContent = res.opponent;
+      document.getElementById('pg-game-code').textContent = res.game_code;
+      document.getElementById('pg-status-box').innerHTML += '<div style="color:var(--primary);font-size:.9rem;margin-top:8px">✅ Matched! Check your email too.</div>';
+    } else {
+      toast('You\'re in the queue. Waiting for an opponent...', 'info');
+      document.getElementById('pg-join-btn').style.display = 'none';
+      document.getElementById('pg-leave-btn').style.display = 'inline-block';
+    }
+  } catch(err) { toast(err.message, 'error'); }
+  finally { btn.textContent = 'Join Queue'; btn.disabled = false; }
+}
+
+async function leavePG() {
+  try {
+    await api('DELETE', '/proving-ground/leave');
+    toast('Left the queue','info');
+    document.getElementById('pg-join-btn').style.display = 'inline-block';
+    document.getElementById('pg-leave-btn').style.display = 'none';
+    loadPGTab();
+  } catch(err) { toast(err.message,'error'); }
+}
+
+// ── REFERRALS TAB ─────────────────────────────────────────────────────────────
+async function loadReferralsTab() {
+  const statsBox = document.getElementById('referral-stats-box');
+  statsBox.innerHTML = '<div class="spinner"></div>';
+  try {
+    const data = await api('GET', '/referrals/my');
+    const baseUrl = window.location.origin;
+    const refLink = `${baseUrl}/?ref=${encodeURIComponent(data.referral_code)}`;
+    document.getElementById('referral-link-input').value = refLink;
+
+    statsBox.innerHTML = `<div class="grid-3" style="margin:0">
+      <div class="card"><div class="card-body" style="text-align:center">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--primary)">${data.total_referred}</div>
+        <div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Total Referred</div>
+      </div></div>
+      <div class="card"><div class="card-body" style="text-align:center">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--gold)">${data.paid_referred}</div>
+        <div style="font-size:.72px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Paid Referrals</div>
+      </div></div>
+      <div class="card"><div class="card-body" style="text-align:center">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--primary)">${data.referral_points} <span style="font-size:1rem">pts</span></div>
+        <div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Ref Points</div>
+      </div></div>
+    </div>
+    ${data.referral_cash > 0 ? `<div class="card" style="margin-top:12px;border-color:var(--gold)"><div class="card-body" style="text-align:center">
+      <div style="font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">Cash Rewards Earned</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;color:var(--gold)">₦${Number(data.referral_cash).toLocaleString()}</div>
+      <div style="font-size:.78rem;color:var(--muted);margin-top:4px">Contact admin to request withdrawal</div>
+    </div></div>` : ''}`;
+  } catch(err) {
+    statsBox.innerHTML = `<div style="color:var(--danger);font-size:.85rem">${err.message}</div>`;
+  }
+}
+
+function copyReferralLink() {
+  const input = document.getElementById('referral-link-input');
+  navigator.clipboard.writeText(input.value).then(() => toast('Referral link copied!','success')).catch(() => {
+    input.select(); document.execCommand('copy'); toast('Copied!','success');
+  });
+}
+
+function shareReferralLink() {
+  const link = document.getElementById('referral-link-input').value;
+  if (navigator.share) {
+    navigator.share({ title:'Join Game Day Royal Tournaments', text:'Join via my referral link!', url:link });
+  } else {
+    copyReferralLink();
+  }
+}
 
 document.addEventListener('DOMContentLoaded', initDashboard);
 </script>

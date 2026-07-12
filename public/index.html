@@ -272,7 +272,8 @@ document.getElementById('register-form').addEventListener('submit', async e => {
   const btn = document.getElementById('reg-btn'); const errBox = document.getElementById('reg-error');
   errBox.style.display='none'; btn.textContent='Creating account...'; btn.disabled=true;
   try {
-    const data = await api('POST', '/auth/register', { username: document.getElementById('reg-username').value.trim(), email: document.getElementById('reg-email').value.trim(), phone: document.getElementById('reg-phone').value.trim(), password: document.getElementById('reg-password').value });
+    const ref = new URLSearchParams(location.search).get('ref') || '';
+    const data = await api('POST', '/auth/register', { username: document.getElementById('reg-username').value.trim(), email: document.getElementById('reg-email').value.trim(), phone: document.getElementById('reg-phone').value.trim(), password: document.getElementById('reg-password').value, ref });
     currentUser = data.user; updateNavAuth(); closeModal('register-modal');
     toast('Welcome to Game Day Royal Tournaments, ' + data.user.username + '! Check your email.', 'success');
     loadStats();

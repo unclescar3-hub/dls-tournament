@@ -8,13 +8,50 @@ const pool = require('../db');
 // Register
 router.post('/register', async (req, res) => {
   try {
-    const { username, email, password, phone } = req.body;
+    const { username, email, password, phone, ref } = req.body;
     if (!username || !email || !password) return res.status(400).json({ error: 'Username, email and password are required' });
     if (username.length < 3) return res.status(400).json({ error: 'Username must be at least 3 characters' });
     if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Invalid email address' });
 
     const user = await register(username.trim(), email.trim().toLowerCase(), password, phone || '');
+
+    // Set referral_code = lowercase username
+    await pool.query('UPDATE users SET referral_code=LOWER($1) WHERE id=$2', [username.trim(), user.id]).catch(() => {});
+
+    // Handle referral — credit the referrer with points
+    if (ref) {
+      const referrer = await pool.query(
+        "SELECT id FROM users WHERE LOWER(referral_code)=LOWER($1) OR LOWER(username)=LOWER($1)",
+        [ref]
+      );
+      if (referrer.rows.length && referrer.rows[0].id !== user.id) {
+        const referrerId = referrer.rows[0].id;
+        // Link the new user to referrer
+        await pool.query('UPDATE users SET referred_by=$1 WHERE id=$2', [referrerId, user.id]).catch(() => {});
+
+        // Get points reward from settings
+        const settings = await pool.query('SELECT points_per_free_ref FROM referral_settings LIMIT 1');
+        const pts = settings.rows[0]?.points_per_free_ref || 10;
+        await pool.query('UPDATE users SET referral_points = COALESCE(referral_points,0) + $1 WHERE id=$2', [pts, referrerId]).catch(() => {});
+
+        // In-app notification for referrer
+        const { createNotification } = require('../notifHelper');
+        createNotification(referrerId, 'announcement',
+          '🎉 Referral Bonus!',
+          `Someone used your referral link and joined! You earned ${pts} points.`,
+          '/dashboard.html'
+        ).catch(() => {});
+
+        // Email referrer
+        const { sendReferralRewardEmail } = require('../email');
+        const referrerUser = await pool.query('SELECT username, email FROM users WHERE id=$1', [referrerId]);
+        if (referrerUser.rows.length) {
+          sendReferralRewardEmail(referrerUser.rows[0], 'points', pts).catch(() => {});
+        }
+      }
+    }
+
     const token = signToken(user);
     res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
 

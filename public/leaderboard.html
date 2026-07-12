@@ -189,7 +189,7 @@ document.getElementById('register-form').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = e.target.querySelector('button'); btn.textContent='Creating...'; btn.disabled=true;
   try {
-    const d = await api('POST','/auth/register',{username:document.getElementById('reg-username').value,email:document.getElementById('reg-email').value,phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value});
+    const ref=new URLSearchParams(location.search).get('ref')||''; const d = await api('POST','/auth/register',{username:document.getElementById('reg-username').value,email:document.getElementById('reg-email').value,phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value,ref});
     currentUser=d.user; updateNavAuth(); closeModal('register-modal'); toast('Account created! Welcome, '+d.user.username,'success');
   } catch(err) { toast(err.message,'error'); }
   finally { btn.textContent='Create Account'; btn.disabled=false; }

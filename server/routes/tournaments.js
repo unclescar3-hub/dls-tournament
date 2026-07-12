@@ -65,15 +65,17 @@ router.get('/:id', async (req, res) => {
 // Admin: create tournament
 router.post('/', adminMiddleware, async (req, res) => {
   try {
-    const { name, arena, format, max_players, entry_fee } = req.body;
-    if (!name || !arena || !format || !max_players || entry_fee === undefined) {
+    const { name, arena, format, max_players, entry_fee, is_unlimited } = req.body;
+    if (!name || !arena || !format || entry_fee === undefined) {
       return res.status(400).json({ error: 'All fields required' });
     }
+    const unlimited = is_unlimited === true || is_unlimited === 'true';
+    const maxP = unlimited ? 999999 : (parseInt(max_players) || 32);
     const result = await pool.query(
-      'INSERT INTO tournaments (name, arena, format, max_players, entry_fee, created_by) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
-      [name, arena, format, parseInt(max_players), parseInt(entry_fee), req.user.id]
+      'INSERT INTO tournaments (name, arena, format, max_players, entry_fee, created_by, is_unlimited) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *',
+      [name, arena, format, maxP, parseInt(entry_fee), req.user.id, unlimited]
     );
-    logAction(req.user.id, 'CREATE_TOURNAMENT', { name, arena, format, entry_fee }, req.ip).catch(() => {});
+    logAction(req.user.id, 'CREATE_TOURNAMENT', { name, arena, format, entry_fee, is_unlimited: unlimited }, req.ip).catch(() => {});
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -182,6 +184,48 @@ router.get('/:id/verify', async (req, res) => {
         'INSERT INTO bracket_entries (tournament_id, user_id) VALUES ($1,$2) ON CONFLICT (tournament_id, user_id) DO NOTHING',
         [r.tournament_id, r.user_id]
       );
+
+      // ── Referral cash reward for paid registrations ────────────────────────
+      try {
+        const userInfo = await pool.query('SELECT id, username, email, referred_by FROM users WHERE id=$1', [r.user_id]);
+        const u = userInfo.rows[0];
+        if (u && u.referred_by) {
+          // Count total paid referrals this referrer has
+          const paidCount = await pool.query(
+            `SELECT COUNT(DISTINCT u2.id) FROM users u2
+             JOIN registrations r2 ON r2.user_id = u2.id
+             WHERE u2.referred_by=$1 AND r2.payment_status='paid'`,
+            [u.referred_by]
+          );
+          const totalPaid = parseInt(paidCount.rows[0].count) || 0;
+
+          // Find the highest tier the referrer qualifies for
+          const tiers = await pool.query(
+            'SELECT * FROM referral_tiers WHERE min_referrals <= $1 ORDER BY min_referrals DESC LIMIT 1',
+            [totalPaid]
+          );
+          if (tiers.rows.length) {
+            const tier = tiers.rows[0];
+            await pool.query(
+              'UPDATE users SET referral_cash = COALESCE(referral_cash,0) + $1 WHERE id=$2',
+              [tier.cash_reward, u.referred_by]
+            );
+            // In-app notification for referrer
+            const { createNotification } = require('../notifHelper');
+            createNotification(u.referred_by, 'announcement',
+              '💰 Referral Cash Reward!',
+              `A player you referred just paid for a tournament! You earned ₦${Number(tier.cash_reward).toLocaleString()} cash reward.`,
+              '/dashboard.html'
+            ).catch(() => {});
+            // Email referrer
+            const { sendReferralRewardEmail } = require('../email');
+            const referrerUser = await pool.query('SELECT username, email FROM users WHERE id=$1', [u.referred_by]);
+            if (referrerUser.rows.length) {
+              sendReferralRewardEmail(referrerUser.rows[0], 'cash', tier.cash_reward).catch(() => {});
+            }
+          }
+        }
+      } catch (e) { console.warn('Referral reward failed:', e.message); }
 
       // Notify admin of new paid registration
       try {

@@ -53,6 +53,10 @@
       <button class="admin-tab" data-tab="intelligence" onclick="switchTab('intelligence')">🧠 Intelligence</button>
       <button class="admin-tab" data-tab="ads" onclick="switchTab('ads')">📺 Ads & Promos</button>
       <button class="admin-tab" data-tab="config" onclick="switchTab('config')">⚙️ Config</button>
+      <button class="admin-tab" data-tab="proving-ground" onclick="switchTab('proving-ground')">⚡ Proving Ground</button>
+      <button class="admin-tab" data-tab="referrals" onclick="switchTab('referrals')">🔗 Referrals</button>
+      <button class="admin-tab" data-tab="promotions" onclick="switchTab('promotions')">🎯 Promotions</button>
+      <button class="admin-tab" data-tab="staff-chat" onclick="switchTab('staff-chat')" id="chat-tab-btn">💬 Staff Chat <span id="chat-unread-badge" style="display:none;background:var(--danger);color:#fff;font-size:.6rem;padding:1px 6px;border-radius:10px;margin-left:4px"></span></button>
     </div>
 
     <!-- TOURNAMENTS -->
@@ -70,7 +74,14 @@
               <div class="form-group"><label>Format</label><select id="c-format" required><option value="open-ladder">Open Ladder</option><option value="32-player-single-elimination">32 Single Elim</option><option value="64-player-single-elimination">64 Single Elim</option><option value="16-player-single-elimination">16 Single Elim</option><option value="20-manager-round-robin">20-Manager Round Robin</option><option value="16-manager-round-robin">16-Manager Round Robin</option></select></div>
             </div>
             <div class="form-row">
-              <div class="form-group"><label>Max Players</label><select id="c-maxplayers" required><option value="16">16</option><option value="20">20</option><option value="32" selected>32</option><option value="64">64</option></select></div>
+              <div class="form-group">
+                <label>Max Players</label>
+                <input type="number" id="c-maxplayers" placeholder="e.g. 32 (leave 0 for unlimited)" min="0" value="32">
+                <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+                  <input type="checkbox" id="c-unlimited" style="width:auto" onchange="document.getElementById('c-maxplayers').disabled=this.checked">
+                  <label for="c-unlimited" style="text-transform:none;letter-spacing:0;font-size:.82rem;cursor:pointer;margin:0">Unlimited players</label>
+                </div>
+              </div>
               <div class="form-group"><label>Entry Fee (₦)</label><input type="number" id="c-fee" required placeholder="100" min="0"></div>
             </div>
             <button type="submit" class="btn btn-primary">Create Tournament</button>
@@ -358,15 +369,11 @@
     </div>
 
     <div id="tab-team" class="admin-tab-content" style="display:none">
-      <div class="grid-2">
+      <div class="grid-2" style="margin-bottom:24px">
         <div class="card">
-          <div class="card-header"><h3>Current Admin Team</h3></div>
-          <div id="admins-list" class="card-body"><div class="spinner"></div></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3>Invite Co-Admin</h3></div>
+          <div class="card-header"><h3>Invite Staff</h3><span class="tag tag-ef">48-hour link</span></div>
           <div class="card-body">
-            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">They receive an email invite link to create their admin account. Link expires in 48 hours.</p>
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Send a personalised invite email. They'll create a password and land directly in the admin panel.</p>
             <form id="invite-form">
               <div class="form-group"><label>Their Email</label><input type="email" id="invite-email" required placeholder="colleague@email.com"></div>
               <div class="form-group">
@@ -376,16 +383,185 @@
                   <option value="Match Referee">⚖️ Match Referee</option>
                   <option value="Operations Manager">🛠 Operations Manager</option>
                   <option value="Content Manager">📢 Content Manager</option>
+                  <option value="Finance Manager">💰 Finance Manager</option>
+                  <option value="Results Moderator">📋 Results Moderator</option>
                   <option value="Support Staff">🤝 Support Staff</option>
                   <option value="Admin Staff">👤 Admin Staff</option>
                 </select>
               </div>
-              <button type="submit" class="btn btn-danger">Send Admin Invite</button>
+              <button type="submit" class="btn btn-danger">Send Invite</button>
             </form>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>All Sent Invites</h3><button class="btn btn-outline btn-sm" onclick="loadInvitesList()">↻ Refresh</button></div>
+          <div id="invites-list" class="card-body"><div class="spinner"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Live Staff List</h3><button class="btn btn-outline btn-sm" onclick="loadStaffList()">↻ Refresh</button></div>
+        <div id="staff-list" class="card-body"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- PROVING GROUND -->
+    <div id="tab-proving-ground" class="admin-tab-content" style="display:none">
+      <div class="grid-2" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-header"><h3>⚡ Proving Ground Settings</h3></div>
+          <div class="card-body">
+            <form id="pg-settings-form">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+                <label style="text-transform:none;letter-spacing:0;font-size:.9rem;cursor:pointer;display:flex;align-items:center;gap:8px">
+                  <input type="checkbox" id="pg-is-paid" style="width:auto"> Charge entry fee
+                </label>
+              </div>
+              <div id="pg-fee-group" class="form-group" style="display:none">
+                <label>Entry Fee (₦)</label>
+                <input type="number" id="pg-fee" min="0" placeholder="e.g. 200">
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+                <label style="text-transform:none;letter-spacing:0;font-size:.9rem;cursor:pointer;display:flex;align-items:center;gap:8px">
+                  <input type="checkbox" id="pg-is-active" checked style="width:auto"> Proving Ground is open
+                </label>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Settings</button>
+            </form>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Active Queue</h3><button class="btn btn-outline btn-sm" onclick="loadPGSessions()">↻ Refresh</button></div>
+          <div id="pg-sessions-list" class="card-body"><div class="spinner"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>How It Works</h3>
+        </div>
+        <div class="card-body">
+          <div style="color:var(--muted);font-size:.85rem;line-height:2">
+            ▶ Players join the queue from the public site.<br>
+            ▶ The moment 2 players join, they are instantly matched — no waiting for more.<br>
+            ▶ Both players receive an <strong style="color:#f0f4ff">email</strong> + <strong style="color:#f0f4ff">in-app notification</strong> with their opponent name and a unique Game Code.<br>
+            ▶ After the match, players submit screenshots through their dashboard. The AI system verifies the result.<br>
+            ▶ Other players can keep joining while existing matches are in progress.
           </div>
         </div>
       </div>
     </div>
+
+    <!-- REFERRALS -->
+    <div id="tab-referrals" class="admin-tab-content" style="display:none">
+      <div class="grid-2" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-header"><h3>Referral Settings</h3></div>
+          <div class="card-body">
+            <form id="referral-settings-form">
+              <div class="form-group">
+                <label>Points earned per free referral registration</label>
+                <input type="number" id="ref-points" min="0" placeholder="e.g. 10">
+              </div>
+              <button type="submit" class="btn btn-primary">Save Points</button>
+            </form>
+            <hr style="border:1px solid var(--border);margin:20px 0">
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <h4 style="font-size:.95rem">Cash Reward Tiers (Paid Referrals)</h4>
+                <button class="btn btn-outline btn-sm" onclick="showAddTierForm()">+ Add Tier</button>
+              </div>
+              <p style="color:var(--muted);font-size:.8rem;margin-bottom:14px">Starting from 10 paid referrals. Example: 10 paid = ₦500, 20 paid = ₦1200</p>
+              <div id="add-tier-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:14px">
+                <div class="form-row">
+                  <div class="form-group"><label>Min Paid Referrals</label><input type="number" id="tier-min" min="1" placeholder="e.g. 10"></div>
+                  <div class="form-group"><label>Cash Reward (₦)</label><input type="number" id="tier-cash" min="0" placeholder="e.g. 500"></div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="saveTier()">Save Tier</button>
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('add-tier-form').style.display='none'">Cancel</button>
+              </div>
+              <div id="tiers-list"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Auto-Calculator</h3></div>
+          <div class="card-body">
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:16px">Enter a number of referrals to see total projected payout at each tier.</p>
+            <div class="form-group">
+              <label>Number of Referrals</label>
+              <input type="number" id="calc-referrals" min="0" placeholder="e.g. 25" oninput="calcReferralPayout()">
+            </div>
+            <div id="calc-result" style="display:none;margin-top:16px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Referral Dashboard</h3><button class="btn btn-outline btn-sm" onclick="loadReferralDashboard()">↻ Refresh</button></div>
+        <div id="referral-dashboard" class="card-body"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- PROMOTIONS -->
+    <div id="tab-promotions" class="admin-tab-content" style="display:none">
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><h3>🎯 Create Promotion</h3><span class="tag tag-primary">Goes Live Instantly</span></div>
+          <div class="card-body">
+            <form id="promo-form" enctype="multipart/form-data">
+              <div class="form-group"><label>Title</label><input type="text" id="promo-title" required placeholder="e.g. Season 4 is NOW OPEN!"></div>
+              <div class="form-group"><label>Description (optional)</label><textarea id="promo-desc" rows="2" placeholder="Extra details..."></textarea></div>
+              <div class="form-group"><label>Photo / Image</label><input type="file" id="promo-image" accept="image/*" class="input-file"></div>
+              <div class="form-group">
+                <label>Visibility</label>
+                <select id="promo-visibility">
+                  <option value="public">🌐 Public — shown to all players</option>
+                  <option value="internal">🔒 Internal — staff only</option>
+                  <option value="both">📡 Both — everyone</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                <input type="checkbox" id="promo-active" checked style="width:auto">
+                <label for="promo-active" style="text-transform:none;letter-spacing:0;font-size:.85rem;cursor:pointer;margin:0">Active (visible now)</label>
+              </div>
+              <button type="submit" class="btn btn-primary">🚀 Publish Promotion</button>
+            </form>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>All Promotions</h3><button class="btn btn-outline btn-sm" onclick="loadPromotionsTab()">↻ Refresh</button></div>
+          <div id="promos-list" class="card-body"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAFF CHAT -->
+    <div id="tab-staff-chat" class="admin-tab-content" style="display:none">
+      <div class="grid-2">
+        <div class="card" style="display:flex;flex-direction:column;height:520px">
+          <div class="card-header" style="flex-shrink:0"><h3>💬 Group Chat</h3><span class="tag tag-primary">All Staff</span></div>
+          <div id="group-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px"></div>
+          <div style="flex-shrink:0;padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px">
+            <input type="text" id="group-chat-input" placeholder="Type a message..." style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-size:.88rem" onkeydown="if(event.key==='Enter')sendGroupMessage()">
+            <button class="btn btn-primary btn-sm" onclick="sendGroupMessage()">Send</button>
+          </div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;height:520px">
+          <div class="card-header" style="flex-shrink:0">
+            <h3>📩 Direct Messages</h3>
+            <select id="dm-select" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 10px;font-size:.82rem" onchange="openDM(this.value)">
+              <option value="">Select staff member...</option>
+            </select>
+          </div>
+          <div id="dm-messages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px">
+            <p style="color:var(--muted);text-align:center;padding:40px 0;font-size:.85rem">Select a staff member to start a DM.</p>
+          </div>
+          <div style="flex-shrink:0;padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px">
+            <input type="text" id="dm-input" placeholder="Type a message..." style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-size:.88rem" onkeydown="if(event.key==='Enter')sendDM()">
+            <button class="btn btn-primary btn-sm" onclick="sendDM()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -448,7 +624,7 @@ function switchTab(name) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab===name));
   document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display='none');
   document.getElementById('tab-'+name).style.display='block';
-  const loaders = { tournaments:loadTournamentsTab, matches:loadPendingMatches, users:loadUsers, streams:loadStreams, team:loadAdminTeam, codes:loadCodesTab, payouts:loadPayoutsTab, fixtures:loadFixturesTab, disputes:loadDisputesTab, announcements:loadAnnouncementsTab, logs:loadLogsTab, intelligence:loadIntelligenceTab, ads:loadAdsTab, config:loadConfigTab };
+  const loaders = { tournaments:loadTournamentsTab, matches:loadPendingMatches, users:loadUsers, streams:loadStreams, team:loadAdminTeam, codes:loadCodesTab, payouts:loadPayoutsTab, fixtures:loadFixturesTab, disputes:loadDisputesTab, announcements:loadAnnouncementsTab, logs:loadLogsTab, intelligence:loadIntelligenceTab, ads:loadAdsTab, config:loadConfigTab, 'proving-ground':loadProvingGroundTab, referrals:loadReferralsTab, promotions:loadPromotionsTab, 'staff-chat':loadStaffChatTab };
   if (loaders[name]) loaders[name]();
 }
 
@@ -462,7 +638,7 @@ async function loadTournamentsTab() {
         <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700">${t.name}</div>
-            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${t.arena} · ${t.format} · ${naira(t.entry_fee)} · ${t.registered||0}/${t.max_players} players · Pool: ${naira((t.registered||0)*t.entry_fee)}</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${t.arena} · ${t.format} · ${naira(t.entry_fee)} · ${t.registered||0}/${t.is_unlimited?'∞':t.max_players} players${t.is_unlimited?' <span style="color:var(--primary);font-size:.7rem">(Unlimited)</span>':''} · Pool: ${naira((t.registered||0)*t.entry_fee)}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             ${statusBadge(t.status)}
@@ -493,8 +669,9 @@ document.getElementById('create-form').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = e.target.querySelector('button'); btn.textContent='Creating...'; btn.disabled=true;
   try {
-    await api('POST', '/tournaments', { name:document.getElementById('c-name').value, arena:document.getElementById('c-arena').value, format:document.getElementById('c-format').value, max_players:document.getElementById('c-maxplayers').value, entry_fee:document.getElementById('c-fee').value });
-    toast('Tournament created!','success'); e.target.reset(); switchTab('tournaments');
+    const unlimited = document.getElementById('c-unlimited').checked;
+    await api('POST', '/tournaments', { name:document.getElementById('c-name').value, arena:document.getElementById('c-arena').value, format:document.getElementById('c-format').value, max_players:unlimited?999999:(parseInt(document.getElementById('c-maxplayers').value)||32), entry_fee:document.getElementById('c-fee').value, is_unlimited:unlimited });
+    toast('Tournament created!','success'); document.getElementById('c-unlimited').checked=false; document.getElementById('c-maxplayers').disabled=false; e.target.reset(); switchTab('tournaments');
   } catch(err) { toast(err.message,'error'); }
   finally { btn.textContent='Create Tournament'; btn.disabled=false; }
 });
@@ -1091,6 +1268,385 @@ function filterLogs() {
 }
 
 document.addEventListener('DOMContentLoaded', initAdmin);
+
+// ── TEAM TAB ENHANCEMENTS ─────────────────────────────────────────────────────
+
+async function loadAdminTeam() {
+  loadInvitesList();
+  loadStaffList();
+}
+
+async function loadInvitesList() {
+  const el = document.getElementById('invites-list');
+  el.innerHTML = '<div class="spinner"></div>';
+  try {
+    const invites = await api('GET', '/admin/invites');
+    if (!invites.length) { el.innerHTML='<p style="color:var(--muted);padding:16px">No invites sent yet.</p>'; return; }
+    const statusColors = { pending:'var(--gold)', accepted:'var(--primary)', expired:'var(--danger)' };
+    el.innerHTML = invites.map(inv => `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(30,45,69,.5);gap:10px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:.88rem">${inv.email}</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:2px">${inv.title||'Admin Staff'} · Sent ${fmtDate(inv.created_at)}</div>
+          ${inv.invited_by_name ? `<div style="font-size:.72rem;color:var(--muted)">By: ${inv.invited_by_name}</div>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <span style="font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:5px;background:${statusColors[inv.status]||'var(--muted)'}18;color:${statusColors[inv.status]||'var(--muted)'};border:1px solid ${statusColors[inv.status]||'var(--muted)'}30">${inv.status.toUpperCase()}</span>
+          ${inv.status==='pending'?`<button class="btn btn-outline btn-sm" style="font-size:.7rem;padding:3px 8px" onclick="resendInvite('${inv.id}')">↩ Resend</button><button class="btn btn-danger btn-sm" style="font-size:.7rem;padding:3px 8px" onclick="cancelInvite('${inv.id}')">✕ Cancel</button>`:''}
+        </div>
+      </div>`).join('');
+  } catch(err) { el.innerHTML=`<p style="color:var(--danger);padding:16px">${err.message}</p>`; }
+}
+
+async function resendInvite(id) {
+  try { await api('POST', `/admin/invites/${id}/resend`, {}); toast('Invite resent!','success'); loadInvitesList(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+async function cancelInvite(id) {
+  if (!confirm('Cancel this invite?')) return;
+  try { await api('DELETE', `/admin/invites/${id}`); toast('Invite cancelled','info'); loadInvitesList(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+async function loadStaffList() {
+  const el = document.getElementById('staff-list');
+  el.innerHTML = '<div class="spinner"></div>';
+  try {
+    const staff = await api('GET', '/admin/staff');
+    const titleColors = { 'Super Admin':'var(--danger)', 'Tournament Director':'var(--gold)', 'Match Referee':'var(--primary)', 'Operations Manager':'#a78bfa', 'Finance Manager':'var(--gold)', 'Content Manager':'#00e5ff', 'Results Moderator':'var(--primary)', 'Support Staff':'var(--muted)' };
+    const titleOptions = ['Tournament Director','Match Referee','Operations Manager','Finance Manager','Content Manager','Results Moderator','Support Staff','Admin Staff'];
+    el.innerHTML = staff.map((s,i) => {
+      const isSuper = s.title === 'Super Admin';
+      const now = new Date();
+      const la = s.last_active ? new Date(s.last_active) : null;
+      const online = la && (now - la) < 30*60*1000;
+      return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(30,45,69,.4);gap:12px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            ${online?'<span style="color:var(--primary);font-size:.75rem">🟢</span>':'<span style="color:var(--muted);font-size:.75rem">⚪</span>'}
+            <span style="font-weight:700;font-size:.92rem">${s.username}</span>
+            ${isSuper?'<span class="tag tag-danger" style="font-size:.63rem">SUPER ADMIN</span>':''}
+          </div>
+          <div style="font-size:.75rem;color:var(--muted)">${s.email}</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:2px">Joined ${fmtDate(s.created_at)}${la?` · Last active ${fmtDate(s.last_active)}`:''}${s.last_action?` · Last action: ${s.last_action.action.replace(/_/g,' ')}`:''}</div>
+        </div>
+        ${!isSuper ? `<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap">
+          <select onchange="changeStaffTitle('${s.id}',this.value);this.value=''" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:.75rem">
+            <option value="">${s.title||'Admin Staff'}</option>
+            ${titleOptions.map(t=>`<option value="${t}">${t}</option>`).join('')}
+          </select>
+          <button class="btn btn-danger btn-sm" style="font-size:.7rem;padding:3px 8px" onclick="removeStaff('${s.id}','${s.username}')">Remove</button>
+        </div>` : ''}
+      </div>`;
+    }).join('') || '<p style="color:var(--muted);padding:16px">No staff yet.</p>';
+  } catch(err) { el.innerHTML=`<p style="color:var(--danger);padding:16px">${err.message}</p>`; }
+}
+
+async function changeStaffTitle(id, title) {
+  if (!title) return;
+  try { await api('PATCH', `/admin/staff/${id}/title`, { title }); toast(`Title updated to ${title}`,'success'); loadStaffList(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+async function removeStaff(id, username) {
+  if (!confirm(`Remove ${username} from the admin team? They will become a regular player.`)) return;
+  try { await api('DELETE', `/admin/staff/${id}`); toast(`${username} removed from staff`,'success'); loadStaffList(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+// ── PROVING GROUND TAB ────────────────────────────────────────────────────────
+
+async function loadProvingGroundTab() {
+  loadPGSessions();
+  try {
+    const settings = await api('GET', '/proving-ground/settings');
+    document.getElementById('pg-is-paid').checked = settings.is_paid;
+    document.getElementById('pg-is-active').checked = settings.is_active;
+    document.getElementById('pg-fee').value = settings.entry_fee || '';
+    document.getElementById('pg-fee-group').style.display = settings.is_paid ? 'block' : 'none';
+  } catch {}
+}
+
+document.getElementById('pg-is-paid').addEventListener('change', function() {
+  document.getElementById('pg-fee-group').style.display = this.checked ? 'block' : 'none';
+});
+
+document.getElementById('pg-settings-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button'); btn.textContent='Saving...'; btn.disabled=true;
+  try {
+    await api('POST', '/proving-ground/settings', {
+      is_paid: document.getElementById('pg-is-paid').checked,
+      entry_fee: parseInt(document.getElementById('pg-fee').value) || 0,
+      is_active: document.getElementById('pg-is-active').checked
+    });
+    toast('Proving Ground settings saved!','success');
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.textContent='Save Settings'; btn.disabled=false; }
+});
+
+async function loadPGSessions() {
+  const el = document.getElementById('pg-sessions-list');
+  el.innerHTML = '<div class="spinner"></div>';
+  try {
+    const sessions = await api('GET', '/proving-ground/sessions');
+    if (!sessions.length) { el.innerHTML='<p style="color:var(--muted);padding:16px">Queue is empty. No active sessions.</p>'; return; }
+    const statusColors = { waiting:'var(--gold)', matched:'var(--primary)', completed:'var(--muted)' };
+    el.innerHTML = sessions.map(s => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(30,45,69,.4);gap:10px">
+        <div>
+          <div style="font-weight:700;font-size:.9rem">${s.username}</div>
+          <div style="font-size:.75rem;color:var(--muted)">${s.email} · Joined ${fmtDate(s.joined_at)}</div>
+          ${s.matched_username ? `<div style="font-size:.75rem;color:var(--primary);margin-top:2px">vs ${s.matched_username} · Code: <span style="font-family:monospace;font-weight:700">${s.game_code||'—'}</span></div>` : ''}
+        </div>
+        <span style="font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:5px;background:${statusColors[s.status]||'var(--muted)'}18;color:${statusColors[s.status]||'var(--muted)'};border:1px solid ${statusColors[s.status]||'var(--muted)'}30">${s.status.toUpperCase()}</span>
+      </div>`).join('');
+  } catch(err) { el.innerHTML=`<p style="color:var(--danger);padding:16px">${err.message}</p>`; }
+}
+
+// ── REFERRALS TAB ─────────────────────────────────────────────────────────────
+
+let refTiers = [];
+
+async function loadReferralsTab() {
+  loadTiersList();
+  loadReferralDashboard();
+  try {
+    const settings = await api('GET', '/referrals/settings');
+    document.getElementById('ref-points').value = settings.points_per_free_ref || 10;
+  } catch {}
+}
+
+document.getElementById('referral-settings-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button'); btn.textContent='Saving...'; btn.disabled=true;
+  try {
+    await api('POST', '/referrals/settings', { points_per_free_ref: parseInt(document.getElementById('ref-points').value)||10 });
+    toast('Points setting saved!','success');
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.textContent='Save Points'; btn.disabled=false; }
+});
+
+function showAddTierForm() { document.getElementById('add-tier-form').style.display='block'; }
+
+async function saveTier() {
+  const min = parseInt(document.getElementById('tier-min').value);
+  const cash = parseInt(document.getElementById('tier-cash').value);
+  if (!min || !cash) { toast('Enter both fields','error'); return; }
+  try {
+    await api('POST', '/referrals/tiers', { min_referrals: min, cash_reward: cash });
+    toast('Tier saved!','success');
+    document.getElementById('add-tier-form').style.display='none';
+    document.getElementById('tier-min').value=''; document.getElementById('tier-cash').value='';
+    loadTiersList();
+  } catch(err) { toast(err.message,'error'); }
+}
+
+async function loadTiersList() {
+  const el = document.getElementById('tiers-list');
+  try {
+    refTiers = await api('GET', '/referrals/tiers');
+    if (!refTiers.length) { el.innerHTML='<p style="color:var(--muted);font-size:.82rem">No tiers yet. Add tiers above to reward paid referrals.</p>'; return; }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.85rem">
+      <thead><tr><th style="text-align:left;padding:8px 0;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">MIN PAID REFS</th><th style="text-align:left;padding:8px 0;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">CASH REWARD</th><th></th></tr></thead>
+      <tbody>${refTiers.map(t => `<tr style="border-bottom:1px solid rgba(30,45,69,.3)">
+        <td style="padding:10px 0;font-weight:700">${t.min_referrals}+ paid</td>
+        <td style="padding:10px 0;color:var(--gold);font-weight:700">${naira(t.cash_reward)}</td>
+        <td style="padding:10px 0;text-align:right"><button class="btn btn-danger btn-sm" style="font-size:.7rem;padding:3px 8px" onclick="deleteTier('${t.id}')">Delete</button></td>
+      </tr>`).join('')}</tbody></table>`;
+  } catch(err) { el.innerHTML='<p style="color:var(--danger);font-size:.82rem">'+err.message+'</p>'; }
+}
+
+async function deleteTier(id) {
+  if (!confirm('Delete this tier?')) return;
+  try { await api('DELETE', `/referrals/tiers/${id}`); toast('Tier deleted','info'); loadTiersList(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+async function loadReferralDashboard() {
+  const el = document.getElementById('referral-dashboard');
+  el.innerHTML = '<div class="spinner"></div>';
+  try {
+    const data = await api('GET', '/referrals/dashboard');
+    if (!data.length) { el.innerHTML='<p style="color:var(--muted);padding:16px">No referral activity yet.</p>'; return; }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="text-align:left;padding:10px 16px;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">PLAYER</th>
+        <th style="text-align:left;padding:10px 16px;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">REFERRAL CODE</th>
+        <th style="text-align:left;padding:10px 16px;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">FREE REFS</th>
+        <th style="text-align:left;padding:10px 16px;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">PAID REFS</th>
+        <th style="text-align:left;padding:10px 16px;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">REF POINTS</th>
+        <th style="text-align:left;padding:10px 16px;color:var(--muted);font-size:.72rem;border-bottom:1px solid var(--border)">REF CASH</th>
+      </tr></thead>
+      <tbody>${data.map(r => `<tr style="border-bottom:1px solid rgba(30,45,69,.4)" onmouseover="this.style.background='rgba(0,230,118,.02)'" onmouseout="this.style.background=''">
+        <td style="padding:10px 16px"><div style="font-weight:700">${r.username}</div><div style="font-size:.72rem;color:var(--muted)">${r.email}</div></td>
+        <td style="padding:10px 16px;font-family:monospace;color:var(--primary)">${r.referral_code||'—'}</td>
+        <td style="padding:10px 16px;font-weight:700;color:var(--text)">${r.free_refs||0}</td>
+        <td style="padding:10px 16px;font-weight:700;color:var(--text)">${r.paid_refs||0}</td>
+        <td style="padding:10px 16px;font-weight:700;color:var(--primary)">${r.referral_points||0} pts</td>
+        <td style="padding:10px 16px;font-weight:700;color:var(--gold)">${naira(r.referral_cash||0)}</td>
+      </tr>`).join('')}</tbody></table>`;
+  } catch(err) { el.innerHTML=`<p style="color:var(--danger);padding:16px">${err.message}</p>`; }
+}
+
+function calcReferralPayout() {
+  const count = parseInt(document.getElementById('calc-referrals').value) || 0;
+  const el = document.getElementById('calc-result');
+  if (!refTiers.length || count === 0) { el.style.display='none'; return; }
+  const sorted = [...refTiers].sort((a,b) => a.min_referrals - b.min_referrals);
+  const applicable = sorted.filter(t => t.min_referrals <= count);
+  el.style.display = 'block';
+  if (!applicable.length) {
+    el.innerHTML = `<p style="color:var(--muted);font-size:.85rem">No tier reached yet. Minimum is ${sorted[0].min_referrals} paid referrals.</p>`;
+    return;
+  }
+  const topTier = applicable[applicable.length - 1];
+  el.innerHTML = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px">
+    <div style="color:var(--muted);font-size:.75rem;margin-bottom:4px">With ${count} paid referrals, they qualify for:</div>
+    <div style="font-size:1.6rem;font-weight:700;color:var(--gold)">${naira(topTier.cash_reward)}</div>
+    <div style="color:var(--muted);font-size:.78rem;margin-top:4px">Tier: ${topTier.min_referrals}+ paid = ${naira(topTier.cash_reward)}</div>
+  </div>`;
+}
+
+// ── PROMOTIONS TAB ────────────────────────────────────────────────────────────
+
+async function loadPromotionsTab() {
+  const el = document.getElementById('promos-list');
+  el.innerHTML = '<div class="spinner"></div>';
+  try {
+    const promos = await api('GET', '/promotions');
+    if (!promos.length) { el.innerHTML='<p style="color:var(--muted);padding:16px">No promotions yet.</p>'; return; }
+    const visColors = { public:'var(--primary)', internal:'var(--gold)', both:'#00e5ff' };
+    el.innerHTML = promos.map(p => `
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid rgba(30,45,69,.4)">
+        ${p.image_path ? `<img src="/${p.image_path}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none'">` : `<div style="width:60px;height:60px;background:var(--surface);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🎯</div>`}
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="font-weight:700;font-size:.9rem">${p.title}</span>
+            <span style="font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${visColors[p.visibility]||'var(--muted)'}18;color:${visColors[p.visibility]||'var(--muted)'};border:1px solid ${visColors[p.visibility]||'var(--muted)'}30">${p.visibility.toUpperCase()}</span>
+            ${p.active ? '<span class="tag tag-primary" style="font-size:.63rem">LIVE</span>' : '<span style="font-size:.63rem;color:var(--danger)">INACTIVE</span>'}
+          </div>
+          ${p.description ? `<div style="color:var(--muted);font-size:.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px">${p.description}</div>` : ''}
+          <div style="font-size:.72rem;color:var(--muted);margin-top:4px">${fmtDate(p.created_at)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+          <button class="btn btn-outline btn-sm" style="font-size:.7rem" onclick="togglePromo('${p.id}',${!p.active})">${p.active?'⏸ Pause':'▶ Activate'}</button>
+          <button class="btn btn-danger btn-sm" style="font-size:.7rem" onclick="deletePromo('${p.id}')">🗑 Delete</button>
+        </div>
+      </div>`).join('');
+  } catch(err) { el.innerHTML=`<p style="color:var(--danger);padding:16px">${err.message}</p>`; }
+}
+
+async function togglePromo(id, active) {
+  try { await api('PATCH', `/promotions/${id}`, { active }); toast(active?'Promotion activated':'Promotion paused','success'); loadPromotionsTab(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+async function deletePromo(id) {
+  if (!confirm('Delete this promotion permanently?')) return;
+  try { await api('DELETE', `/promotions/${id}`); toast('Deleted','info'); loadPromotionsTab(); }
+  catch(err) { toast(err.message,'error'); }
+}
+
+document.getElementById('promo-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button'); btn.textContent='Publishing...'; btn.disabled=true;
+  try {
+    const formData = new FormData();
+    formData.append('title', document.getElementById('promo-title').value);
+    formData.append('description', document.getElementById('promo-desc').value);
+    formData.append('visibility', document.getElementById('promo-visibility').value);
+    formData.append('active', document.getElementById('promo-active').checked ? 'true' : 'false');
+    const imgFile = document.getElementById('promo-image').files[0];
+    if (imgFile) formData.append('image', imgFile);
+    const res = await fetch('/api/promotions', { method:'POST', body:formData });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    toast('Promotion published!','success'); e.target.reset(); loadPromotionsTab();
+  } catch(err) { toast(err.message,'error'); }
+  finally { btn.textContent='🚀 Publish Promotion'; btn.disabled=false; }
+});
+
+// ── STAFF CHAT TAB ────────────────────────────────────────────────────────────
+
+let chatPollTimer = null;
+let currentDMWith = null;
+let currentAdminId = null;
+
+async function loadStaffChatTab() {
+  // Get current admin id
+  try {
+    const me = await api('GET', '/admin/me');
+    currentAdminId = me.id;
+  } catch {}
+  // Load staff for DM dropdown
+  try {
+    const staff = await api('GET', '/admin/staff');
+    const sel = document.getElementById('dm-select');
+    sel.innerHTML = '<option value="">Select staff member...</option>';
+    staff.forEach(s => {
+      if (s.id !== currentAdminId) sel.innerHTML += `<option value="${s.id}">${s.username} — ${s.title||'Staff'}</option>`;
+    });
+  } catch {}
+  loadGroupChat();
+  if (chatPollTimer) clearInterval(chatPollTimer);
+  chatPollTimer = setInterval(() => { loadGroupChat(); if (currentDMWith) loadDMThread(currentDMWith); }, 8000);
+}
+
+async function loadGroupChat() {
+  const el = document.getElementById('group-chat-messages');
+  try {
+    const msgs = await api('GET', '/staff-chat/group');
+    const wasAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 60;
+    el.innerHTML = msgs.length ? msgs.map(m => renderChatMessage(m, m.sender_id === currentAdminId)).join('') : '<p style="color:var(--muted);text-align:center;padding:40px 0;font-size:.85rem">No messages yet. Say hello!</p>';
+    if (wasAtBottom || msgs.length <= 10) el.scrollTop = el.scrollHeight;
+  } catch {}
+}
+
+async function sendGroupMessage() {
+  const input = document.getElementById('group-chat-input');
+  const content = input.value.trim();
+  if (!content) return;
+  input.value = '';
+  try { await api('POST', '/staff-chat/group', { content }); loadGroupChat(); }
+  catch(err) { toast(err.message,'error'); input.value = content; }
+}
+
+async function openDM(userId) {
+  if (!userId) { document.getElementById('dm-messages').innerHTML='<p style="color:var(--muted);text-align:center;padding:40px 0;font-size:.85rem">Select a staff member to start a DM.</p>'; currentDMWith=null; return; }
+  currentDMWith = userId;
+  loadDMThread(userId);
+}
+
+async function loadDMThread(userId) {
+  const el = document.getElementById('dm-messages');
+  try {
+    const msgs = await api('GET', `/staff-chat/dm/${userId}`);
+    const wasAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 60;
+    el.innerHTML = msgs.length ? msgs.map(m => renderChatMessage(m, m.sender_id === currentAdminId)).join('') : '<p style="color:var(--muted);text-align:center;padding:40px 0;font-size:.85rem">No messages yet. Start the conversation!</p>';
+    if (wasAtBottom || msgs.length <= 10) el.scrollTop = el.scrollHeight;
+  } catch {}
+}
+
+async function sendDM() {
+  if (!currentDMWith) { toast('Select someone to DM first','error'); return; }
+  const input = document.getElementById('dm-input');
+  const content = input.value.trim();
+  if (!content) return;
+  input.value = '';
+  try { await api('POST', `/staff-chat/dm/${currentDMWith}`, { content }); loadDMThread(currentDMWith); }
+  catch(err) { toast(err.message,'error'); input.value = content; }
+}
+
+function renderChatMessage(m, isMine) {
+  const time = new Date(m.created_at).toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit',hour12:true});
+  return `<div style="display:flex;flex-direction:column;align-items:${isMine?'flex-end':'flex-start'};gap:2px;max-width:75%;${isMine?'align-self:flex-end':'align-self:flex-start'}">
+    ${!isMine?`<div style="font-size:.7rem;color:var(--muted);padding-left:4px">${m.sender_username||'Staff'} · ${m.sender_title||''}</div>`:''}
+    <div style="background:${isMine?'var(--primary)20':'var(--surface)'};border:1px solid ${isMine?'var(--primary)':'var(--border)'};border-radius:${isMine?'12px 12px 2px 12px':'12px 12px 12px 2px'};padding:8px 13px;font-size:.85rem;line-height:1.5;max-width:100%;word-wrap:break-word">${m.content}</div>
+    <div style="font-size:.68rem;color:var(--muted);padding:0 4px">${time}</div>
+  </div>`;
+}
 
 // ── INTELLIGENCE BADGE (Match Reviews) ───────────────────────────────────────
 function renderIntelligenceBadge(aiResult) {

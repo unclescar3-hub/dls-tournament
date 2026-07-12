@@ -373,6 +373,119 @@ router.get('/profile/:username', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ── CURRENT ADMIN INFO ────────────────────────────────────────────────────────
+router.get('/me', adminMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, username, email, title, last_active FROM users WHERE id=$1',
+      [req.user.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── STAFF INVITE MANAGEMENT ───────────────────────────────────────────────────
+
+// List all invites (with status)
+router.get('/invites', adminMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT ai.id, ai.email, ai.title, ai.used, ai.expires_at, ai.created_at,
+             u.username AS invited_by_name
+      FROM admin_invites ai
+      LEFT JOIN users u ON u.id = ai.invited_by
+      ORDER BY ai.created_at DESC
+    `);
+    const now = new Date();
+    const invites = result.rows.map(inv => ({
+      ...inv,
+      status: inv.used ? 'accepted' : (new Date(inv.expires_at) < now ? 'expired' : 'pending')
+    }));
+    res.json(invites);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Resend invite
+router.post('/invites/:id/resend', adminMiddleware, async (req, res) => {
+  try {
+    const invite = await pool.query('SELECT * FROM admin_invites WHERE id=$1', [req.params.id]);
+    if (!invite.rows.length) return res.status(404).json({ error: 'Invite not found' });
+    const inv = invite.rows[0];
+    if (inv.used) return res.status(400).json({ error: 'Invite already accepted' });
+
+    const { crypto } = require('crypto');
+    const token = require('crypto').randomBytes(48).toString('hex');
+    const expires = new Date(Date.now() + 48 * 60 * 60 * 1000);
+    await pool.query(
+      'UPDATE admin_invites SET token=$1, expires_at=$2 WHERE id=$3',
+      [token, expires, req.params.id]
+    );
+    const inviterResult = await pool.query('SELECT username FROM users WHERE id=$1', [req.user.id]);
+    const inviterName = inviterResult.rows[0]?.username || 'Admin';
+    await sendAdminInviteEmail(inv.email, inviterName, token, inv.title || 'Admin Staff');
+    logAction(req.user.id, 'RESEND_INVITE', { email: inv.email }, req.ip).catch(() => {});
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Cancel/delete invite
+router.delete('/invites/:id', adminMiddleware, async (req, res) => {
+  try {
+    const invite = await pool.query('SELECT * FROM admin_invites WHERE id=$1', [req.params.id]);
+    if (!invite.rows.length) return res.status(404).json({ error: 'Invite not found' });
+    if (invite.rows[0].used) return res.status(400).json({ error: 'Cannot cancel an accepted invite' });
+    await pool.query('DELETE FROM admin_invites WHERE id=$1', [req.params.id]);
+    logAction(req.user.id, 'CANCEL_INVITE', { email: invite.rows[0].email }, req.ip).catch(() => {});
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Remove a staff member (demote to player)
+router.delete('/staff/:id', adminMiddleware, async (req, res) => {
+  try {
+    const target = await pool.query("SELECT id, username, role FROM users WHERE id=$1", [req.params.id]);
+    if (!target.rows.length) return res.status(404).json({ error: 'User not found' });
+    if (target.rows[0].role !== 'admin') return res.status(400).json({ error: 'User is not a staff member' });
+    await pool.query("UPDATE users SET role='player' WHERE id=$1", [req.params.id]);
+    logAction(req.user.id, 'REMOVE_STAFF', { target: target.rows[0].username }, req.ip).catch(() => {});
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Change staff member title/role
+router.patch('/staff/:id/title', adminMiddleware, async (req, res) => {
+  try {
+    const { title } = req.body;
+    if (!title) return res.status(400).json({ error: 'title required' });
+    const result = await pool.query(
+      "UPDATE users SET title=$1 WHERE id=$2 AND role='admin' RETURNING id, username, title",
+      [title, req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Staff member not found' });
+    logAction(req.user.id, 'CHANGE_STAFF_TITLE', { target: result.rows[0].username, new_title: title }, req.ip).catch(() => {});
+    res.json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Staff list with last_active and recent actions
+router.get('/staff', adminMiddleware, async (req, res) => {
+  try {
+    const staff = await pool.query(
+      "SELECT id, username, email, title, last_active, created_at FROM users WHERE role='admin' ORDER BY created_at ASC"
+    );
+    // Get last action for each staff member
+    const staffWithActions = await Promise.all(staff.rows.map(async s => {
+      const lastLog = await pool.query(
+        'SELECT action, details, created_at FROM admin_logs WHERE admin_id=$1 ORDER BY created_at DESC LIMIT 1',
+        [s.id]
+      );
+      return { ...s, last_action: lastLog.rows[0] || null };
+    }));
+    res.json(staffWithActions);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // Send platform-wide announcement notification to all players
 router.post('/broadcast', adminMiddleware, async (req, res) => {
   try {

@@ -226,13 +226,13 @@ async function init() {
     document.getElementById('cta-title').textContent = 'Register for ' + tournament.name;
     document.getElementById('t-format-display').textContent = tournament.format.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
     document.getElementById('t-reg-count').textContent = standings.length;
-    document.getElementById('t-max').textContent = tournament.max_players;
+    document.getElementById('t-max').textContent = tournament.is_unlimited ? '∞' : tournament.max_players;
     document.getElementById('t-status-badge').innerHTML = statusBadge(tournament.status);
     document.getElementById('pm-name').textContent = tournament.name;
     document.getElementById('pm-arena').textContent = arenaNames[tournament.arena] || tournament.arena;
     document.getElementById('pm-fee').textContent = naira(tournament.entry_fee);
 
-    const pct = Math.min(100, (standings.length / tournament.max_players) * 100);
+    const pct = tournament.is_unlimited ? (standings.length > 0 ? 15 : 0) : Math.min(100, (standings.length / tournament.max_players) * 100);
     document.getElementById('t-reg-bar').style.width = pct + '%';
 
     const color = arenaColors[tournament.arena] || 'var(--primary)';
@@ -253,7 +253,7 @@ async function init() {
 }
 
 function showRegistrationCTA() {
-  const isFull = standings.length >= tournament.max_players;
+  const isFull = !tournament.is_unlimited && standings.length >= tournament.max_players;
   const isOpen = tournament.status === 'open';
 
   if (!currentUser) {
@@ -396,7 +396,7 @@ document.getElementById('register-form').addEventListener('submit', async e => {
   e.preventDefault();
   const btn=document.getElementById('reg-btn'),errBox=document.getElementById('reg-error');errBox.style.display='none';btn.textContent='Creating...';btn.disabled=true;
   try {
-    const d=await api('POST','/auth/register',{username:document.getElementById('reg-username').value.trim(),email:document.getElementById('reg-email').value.trim(),phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value});
+    const ref=new URLSearchParams(location.search).get('ref')||''; const d=await api('POST','/auth/register',{username:document.getElementById('reg-username').value.trim(),email:document.getElementById('reg-email').value.trim(),phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value,ref});
     currentUser=d.user;updateNavAuth();closeModal('register-modal');
     toast('Account created! You can now register for this tournament.','success');
     ['register-cta','login-to-register','already-registered','tournament-full'].forEach(id=>document.getElementById(id).style.display='none');

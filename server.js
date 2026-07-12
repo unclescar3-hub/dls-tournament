@@ -84,6 +84,10 @@ app.use('/api/notifications', require('./server/routes/notifications'));
 app.use('/api/announcements', require('./server/routes/announcements'));
 app.use('/api/ads', require('./server/routes/ads'));
 app.use('/api/telegram', require('./server/routes/telegram'));
+app.use('/api/referrals', require('./server/routes/referrals'));
+app.use('/api/proving-ground', require('./server/routes/proving-ground'));
+app.use('/api/promotions', require('./server/routes/promotions'));
+app.use('/api/staff-chat', require('./server/routes/staff-chat'));
 
 // ── Admin session middleware ──────────────────────────────────────────────────
 function requireAdminSession(req, res, next) {
@@ -153,6 +157,93 @@ async function init() {
         created_at TIMESTAMP DEFAULT NOW()
       )
     `).catch(() => {});
+
+    // ── Referral system ───────────────────────────────────────────────────────
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code VARCHAR(60) UNIQUE`).catch(() => {});
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by UUID REFERENCES users(id) ON DELETE SET NULL`).catch(() => {});
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_points INT DEFAULT 0`).catch(() => {});
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_cash INT DEFAULT 0`).catch(() => {});
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS referral_settings (
+        id INT PRIMARY KEY DEFAULT 1,
+        points_per_free_ref INT DEFAULT 10,
+        updated_at TIMESTAMP DEFAULT NOW(),
+        CONSTRAINT referral_settings_single CHECK (id = 1)
+      )
+    `).catch(() => {});
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS referral_tiers (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        min_referrals INT UNIQUE NOT NULL,
+        cash_reward INT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `).catch(() => {});
+
+    // Back-fill referral_code for existing users that don't have one
+    await pool.query(`
+      UPDATE users SET referral_code = LOWER(username)
+      WHERE referral_code IS NULL
+    `).catch(() => {});
+
+    // ── Admin invites title column ────────────────────────────────────────────
+    await pool.query(`ALTER TABLE admin_invites ADD COLUMN IF NOT EXISTS title VARCHAR(100) DEFAULT 'Admin Staff'`).catch(() => {});
+
+    // ── Proving Ground ────────────────────────────────────────────────────────
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS proving_ground_settings (
+        id INT PRIMARY KEY DEFAULT 1,
+        is_paid BOOLEAN DEFAULT FALSE,
+        entry_fee INT DEFAULT 0,
+        is_active BOOLEAN DEFAULT TRUE,
+        updated_at TIMESTAMP DEFAULT NOW(),
+        CONSTRAINT pg_settings_single CHECK (id = 1)
+      )
+    `).catch(() => {});
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS proving_ground_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        status VARCHAR(20) DEFAULT 'waiting',
+        matched_with UUID REFERENCES users(id) ON DELETE SET NULL,
+        game_code VARCHAR(20),
+        joined_at TIMESTAMP DEFAULT NOW()
+      )
+    `).catch(() => {});
+
+    // ── Promotions ────────────────────────────────────────────────────────────
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS promotions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        image_path VARCHAR(500),
+        visibility VARCHAR(20) DEFAULT 'public',
+        active BOOLEAN DEFAULT TRUE,
+        created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `).catch(() => {});
+
+    // ── Staff chat ────────────────────────────────────────────────────────────
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS staff_messages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        sender_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        recipient_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        content TEXT NOT NULL,
+        type VARCHAR(10) DEFAULT 'group',
+        dm_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `).catch(() => {});
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_messages_group ON staff_messages(type, created_at)`).catch(() => {});
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_messages_dm ON staff_messages(type, sender_id, recipient_id)`).catch(() => {});
+
+    // ── Tournaments: allow text for max_players (unlimited) ───────────────────
+    // max_players is already INT — store 0 for unlimited
+    await pool.query(`ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS is_unlimited BOOLEAN DEFAULT FALSE`).catch(() => {});
 
     console.log('Database schema ready');
     app.listen(PORT, '0.0.0.0', () => {

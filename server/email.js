@@ -163,8 +163,51 @@ async function sendPayoutEmail(user, tournamentName, amount, position, accountNa
   });
 }
 
+async function sendProvingGroundMatchEmail(player, opponent, gameCode) {
+  return sendEmail({
+    to: player.email,
+    subject: `🎮 Proving Ground Match Found! vs ${opponent.username} | Game Day Royal`,
+    html: baseWrapper(`
+      <h2 style="color:#00e5ff">Proving Ground — Match Found! ⚡</h2>
+      <p style="color:#6b7a99;line-height:1.7">Hi <strong style="color:#f0f4ff">${player.username}</strong>, you've been matched in the Proving Ground!</p>
+      <div style="background:#0f1623;border:1px solid #1e2d45;border-radius:12px;padding:24px;margin:20px 0;text-align:center">
+        <div style="color:#6b7a99;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Your Opponent</div>
+        <div style="font-size:22px;font-weight:700;margin-bottom:18px">${opponent.username}</div>
+        <div style="color:#6b7a99;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">Game Code</div>
+        <div style="background:#00e5ff20;border:2px solid #00e5ff;border-radius:8px;padding:18px;display:inline-block;min-width:200px">
+          <div style="font-size:32px;font-weight:700;letter-spacing:6px;color:#00e5ff;font-family:monospace">${gameCode}</div>
+        </div>
+        <p style="color:#6b7a99;font-size:11px;margin-top:10px">Enter this code in DLS to start the match</p>
+      </div>
+      <div style="background:#0f1623;border:1px solid #1e2d45;border-radius:8px;padding:14px">
+        <p style="color:#6b7a99;margin:0;font-size:12px;line-height:1.7">▶ After the match, upload your screenshot via your dashboard.<br>▶ The Proving Ground is a fast-match arena — good luck!</p>
+      </div>`)
+  });
+}
+
+async function sendReferralRewardEmail(user, type, amount) {
+  return sendEmail({
+    to: user.email,
+    subject: `🎉 Referral Reward Earned — ${type === 'cash' ? '₦' + Number(amount).toLocaleString() : amount + ' points'} | Game Day Royal`,
+    html: baseWrapper(`
+      <h2 style="color:#ffc107">Referral Reward! 🎉</h2>
+      <p style="color:#6b7a99;line-height:1.7">Hi <strong style="color:#f0f4ff">${user.username}</strong>, someone you referred just ${type === 'cash' ? 'paid for a tournament' : 'registered'}!</p>
+      <div style="background:#0f1623;border:1px solid #ffc10740;border-radius:12px;padding:24px;margin:20px 0;text-align:center">
+        <div style="color:#6b7a99;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Your Reward</div>
+        ${type === 'cash'
+          ? `<div style="font-family:monospace;font-size:36px;font-weight:700;color:#ffc107">₦${Number(amount).toLocaleString()}</div><div style="color:#6b7a99;font-size:12px;margin-top:8px">Cash reward added to your referral earnings</div>`
+          : `<div style="font-family:monospace;font-size:36px;font-weight:700;color:#00e676">+${amount} pts</div><div style="color:#6b7a99;font-size:12px;margin-top:8px">Points added to your referral balance</div>`
+        }
+      </div>
+      <div style="text-align:center">
+        <a href="${APP_URL()}/dashboard.html" style="background:#ffc107;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px">View Dashboard</a>
+      </div>`)
+  });
+}
+
 module.exports = {
   sendEmail, sendWelcomeEmail, sendPasswordResetEmail, sendMatchCodeEmail,
   sendAdminInviteEmail, sendAdminRegistrationNotification,
-  sendAdminMatchNotification, sendPayoutEmail
+  sendAdminMatchNotification, sendPayoutEmail,
+  sendProvingGroundMatchEmail, sendReferralRewardEmail
 };

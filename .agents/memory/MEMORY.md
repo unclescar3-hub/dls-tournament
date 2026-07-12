@@ -3,3 +3,4 @@
 - [Online presence tracking](online-presence.md) — last_active column + authMiddleware update + fixture dropdowns show 🟢 online status
 - [Ads system](ads-system.md) — ads table, /api/ads routes, public/js/ads.js injects ticker/banner/promo on player pages
 - [Telegram integration](telegram.md) — server/telegram.js helper; needs TELEGRAM_BOT_TOKEN + TELEGRAM_CHANNEL_ID secrets
+- [6 new features](new-features.md) — Referrals, Proving Ground, Size Control, Staff Invites, Staff Chat, Promotions all fully shipped
