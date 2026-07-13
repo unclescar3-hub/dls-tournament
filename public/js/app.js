@@ -96,7 +96,7 @@ document.addEventListener('click', e => {
   if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
 });
 
-function naira(amount) { return '₦' + Number(amount).toLocaleString(); }
+function naira(amount) { return (!amount || parseInt(amount)===0) ? '🆓 FREE' : '₦' + Number(amount).toLocaleString(); }
 function fmtDate(d) { return new Date(d).toLocaleDateString('en-NG', { day:'numeric', month:'short', year:'numeric' }); }
 function fmtDateTime(d) { return new Date(d).toLocaleString('en-NG', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', timeZone:'Africa/Lagos' }); }
 

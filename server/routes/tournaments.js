@@ -108,7 +108,21 @@ router.delete('/:id', adminMiddleware, async (req, res) => {
   }
 });
 
-// Initialize Paystack payment
+// Helper: complete free registration
+async function completeFreeRegistration(tournamentId, userId) {
+  await pool.query(
+    `INSERT INTO registrations (tournament_id, user_id, paystack_ref, payment_status)
+     VALUES ($1,$2,'FREE','paid')
+     ON CONFLICT (tournament_id, user_id) DO UPDATE SET payment_status='paid'`,
+    [tournamentId, userId]
+  );
+  await pool.query(
+    'INSERT INTO bracket_entries (tournament_id, user_id) VALUES ($1,$2) ON CONFLICT (tournament_id, user_id) DO NOTHING',
+    [tournamentId, userId]
+  );
+}
+
+// Initialize payment (Paystack for NGN / free tournaments)
 router.post('/:id/pay', authMiddleware, async (req, res) => {
   try {
     const tournament = await pool.query('SELECT * FROM tournaments WHERE id=$1', [req.params.id]);
@@ -128,8 +142,15 @@ router.post('/:id/pay', authMiddleware, async (req, res) => {
       "SELECT COUNT(*) FROM registrations WHERE tournament_id=$1 AND payment_status='paid'",
       [t.id]
     );
-    if (parseInt(count.rows[0].count) >= t.max_players) {
+    if (!t.is_unlimited && parseInt(count.rows[0].count) >= t.max_players) {
       return res.status(400).json({ error: 'Tournament is full' });
+    }
+
+    // FREE TOURNAMENT — no payment needed
+    if (!t.entry_fee || parseInt(t.entry_fee) === 0) {
+      await completeFreeRegistration(t.id, req.user.id);
+      logAction(req.user.id, 'FREE_REGISTRATION', { tournament_id: t.id, tournament_name: t.name }, '').catch(() => {});
+      return res.json({ free: true, success: true });
     }
 
     const userResult = await pool.query('SELECT * FROM users WHERE id=$1', [req.user.id]);

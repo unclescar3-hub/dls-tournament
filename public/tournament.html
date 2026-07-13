@@ -172,15 +172,30 @@
   </div>
 </div>
 <div class="modal-overlay" id="pay-modal">
-  <div class="modal">
+  <div class="modal" style="max-width:480px">
     <button class="modal-close" onclick="closeModal('pay-modal')">&times;</button>
-    <h2>Confirm Registration</h2>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="color:var(--muted)">Tournament</span><strong id="pm-name"></strong></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="color:var(--muted)">Arena</span><strong id="pm-arena"></strong></div>
-      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Entry Fee</span><strong style="color:var(--primary);font-size:1.2rem" id="pm-fee"></strong></div>
+    <h2 id="pm-title">Confirm Registration</h2>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="color:var(--muted)">Tournament</span><strong id="pm-name"></strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="color:var(--muted)">Arena</span><strong id="pm-arena"></strong></div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--muted)">Entry Fee</span><strong style="color:var(--primary);font-size:1.3rem" id="pm-fee"></strong></div>
     </div>
-    <p style="color:var(--muted);font-size:.85rem;margin-bottom:20px">You'll be redirected to Paystack to complete payment securely.</p>
+
+    <!-- Free tournament notice -->
+    <div id="pm-free-notice" style="display:none;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.3);border-radius:8px;padding:14px;margin-bottom:16px;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:4px">🎮</div>
+      <div style="font-weight:700;color:var(--primary)">This is a FREE Tournament!</div>
+      <div style="color:var(--muted);font-size:.85rem;margin-top:4px">No payment required — click below to join instantly.</div>
+    </div>
+
+    <!-- Currency conversion (only shown for paid tournaments) -->
+    <div id="pm-currency-section" style="display:none;margin-bottom:16px">
+      <div style="font-size:.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px">Entry Fee in Your Currency</div>
+      <div id="pm-currency-loading" style="color:var(--muted);font-size:.85rem;padding:8px 0">Fetching live rates…</div>
+      <div id="pm-currency-grid" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:240px;overflow-y:auto"></div>
+    </div>
+
+    <p id="pm-pay-note" style="color:var(--muted);font-size:.85rem;margin-bottom:16px">You will be redirected to Paystack to complete payment securely in Nigerian Naira (₦).</p>
     <button class="btn btn-primary btn-block" id="pay-confirm-btn" onclick="confirmPay()">Proceed to Payment</button>
   </div>
 </div>
@@ -230,7 +245,9 @@ async function init() {
     document.getElementById('t-status-badge').innerHTML = statusBadge(tournament.status);
     document.getElementById('pm-name').textContent = tournament.name;
     document.getElementById('pm-arena').textContent = arenaNames[tournament.arena] || tournament.arena;
-    document.getElementById('pm-fee').textContent = naira(tournament.entry_fee);
+    const isFreeT = !tournament.entry_fee || parseInt(tournament.entry_fee) === 0;
+    document.getElementById('pm-fee').textContent = isFreeT ? '🆓 FREE ENTRY' : naira(tournament.entry_fee);
+    document.getElementById('pm-fee').style.color = isFreeT ? 'var(--primary)' : 'var(--primary)';
 
     const pct = tournament.is_unlimited ? (standings.length > 0 ? 15 : 0) : Math.min(100, (standings.length / tournament.max_players) * 100);
     document.getElementById('t-reg-bar').style.width = pct + '%';
@@ -268,20 +285,106 @@ function showRegistrationCTA() {
   if (isOpen) { document.getElementById('register-cta').style.display = 'block'; }
 }
 
+const CURRENCIES = [
+  { code:'USD', symbol:'$',   flag:'🇺🇸', name:'US Dollar' },
+  { code:'GBP', symbol:'£',   flag:'🇬🇧', name:'Pound' },
+  { code:'EUR', symbol:'€',   flag:'🇪🇺', name:'Euro' },
+  { code:'GHS', symbol:'₵',   flag:'🇬🇭', name:'Ghanaian Cedi' },
+  { code:'KES', symbol:'KSh', flag:'🇰🇪', name:'Kenyan Shilling' },
+  { code:'ZAR', symbol:'R',   flag:'🇿🇦', name:'South African Rand' },
+  { code:'EGP', symbol:'£E',  flag:'🇪🇬', name:'Egyptian Pound' },
+  { code:'XOF', symbol:'CFA', flag:'🌍', name:'W. African CFA' },
+  { code:'AED', symbol:'د.إ', flag:'🇦🇪', name:'UAE Dirham' },
+  { code:'SAR', symbol:'﷼',   flag:'🇸🇦', name:'Saudi Riyal' },
+  { code:'INR', symbol:'₹',   flag:'🇮🇳', name:'Indian Rupee' },
+  { code:'CNY', symbol:'¥',   flag:'🇨🇳', name:'Chinese Yuan' },
+  { code:'JPY', symbol:'¥',   flag:'🇯🇵', name:'Japanese Yen' },
+  { code:'RUB', symbol:'₽',   flag:'🇷🇺', name:'Russian Ruble' },
+];
+
+let fxRates = null;
+
+async function loadFxRates() {
+  if (fxRates) return fxRates;
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/NGN');
+    const data = await r.json();
+    if (data && data.rates) { fxRates = data.rates; return fxRates; }
+  } catch(e) {}
+  try {
+    const r2 = await fetch('https://api.exchangerate-api.com/v4/latest/NGN');
+    const data2 = await r2.json();
+    if (data2 && data2.rates) { fxRates = data2.rates; return fxRates; }
+  } catch(e) {}
+  return null;
+}
+
+async function showCurrencyRates(nairaAmount) {
+  const section = document.getElementById('pm-currency-section');
+  const loadEl = document.getElementById('pm-currency-loading');
+  const gridEl = document.getElementById('pm-currency-grid');
+  section.style.display = 'block';
+  loadEl.style.display = 'block';
+  gridEl.style.display = 'none';
+
+  const rates = await loadFxRates();
+  loadEl.style.display = 'none';
+  if (!rates) { section.style.display = 'none'; return; }
+
+  gridEl.style.display = 'grid';
+  gridEl.innerHTML = CURRENCIES.map(c => {
+    const rate = rates[c.code];
+    if (!rate) return '';
+    const converted = (nairaAmount * rate).toFixed(c.code==='JPY'||c.code==='KES'?0:2);
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:2px">
+      <div style="font-size:.72rem;color:var(--muted)">${c.flag} ${c.code}</div>
+      <div style="font-weight:700;font-size:.9rem">${c.symbol}${Number(converted).toLocaleString()}</div>
+      <div style="font-size:.65rem;color:var(--muted)">${c.name}</div>
+    </div>`;
+  }).join('');
+}
+
 function handleRegister() {
   if (!currentUser) { toast('Please log in to register', 'info'); openModal('login-modal'); return; }
+  const isFree = !tournament.entry_fee || parseInt(tournament.entry_fee) === 0;
+  const freeNotice = document.getElementById('pm-free-notice');
+  const currSection = document.getElementById('pm-currency-section');
+  const payNote = document.getElementById('pm-pay-note');
+  const btn = document.getElementById('pay-confirm-btn');
+  const title = document.getElementById('pm-title');
+
+  if (isFree) {
+    freeNotice.style.display = 'block';
+    currSection.style.display = 'none';
+    payNote.style.display = 'none';
+    btn.textContent = '🎮 Join for Free';
+    title.textContent = 'Join Free Tournament';
+  } else {
+    freeNotice.style.display = 'none';
+    payNote.style.display = 'block';
+    btn.textContent = 'Proceed to Payment';
+    title.textContent = 'Confirm Registration';
+    showCurrencyRates(parseInt(tournament.entry_fee));
+  }
   openModal('pay-modal');
 }
 
 async function confirmPay() {
   const btn = document.getElementById('pay-confirm-btn');
-  btn.textContent = 'Redirecting...'; btn.disabled = true;
+  const origText = btn.textContent;
+  btn.textContent = 'Processing...'; btn.disabled = true;
   try {
     const data = await api('POST', `/tournaments/${tournamentId}/pay`, {});
-    if (data.authorization_url) window.location.href = data.authorization_url;
+    if (data.free) {
+      closeModal('pay-modal');
+      toast('🎮 You have joined the tournament for free!', 'success');
+      setTimeout(() => location.reload(), 1500);
+    } else if (data.authorization_url) {
+      window.location.href = data.authorization_url;
+    }
   } catch(err) {
     toast(err.message, 'error');
-    btn.textContent = 'Proceed to Payment'; btn.disabled = false;
+    btn.textContent = origText; btn.disabled = false;
   }
 }
 

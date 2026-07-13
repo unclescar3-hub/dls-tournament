@@ -34,23 +34,32 @@ nav {
   background: rgba(8,12,20,0.97);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
-  padding: 0 32px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  gap: 8px;
+  height: 60px;
   position: sticky;
   top: 0;
   z-index: 200;
+  overflow: hidden;
 }
-.nav-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--text); text-decoration: none; letter-spacing: 1px; }
+.nav-brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--text); text-decoration: none; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
 .nav-brand span { color: var(--primary); }
-.nav-links { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-.nav-links a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 8px 14px; border-radius: 6px; transition: all 0.2s; }
+.nav-links { display: flex; align-items: center; gap: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; flex: 1; min-width: 0; }
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 0.78rem; font-weight: 600; padding: 6px 10px; border-radius: 6px; transition: all 0.2s; white-space: nowrap; }
 .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface); }
 .nav-tv { color: #ff1a1a !important; border: 1px solid rgba(255,26,26,0.3); }
 .nav-tv:hover, .nav-tv.active { background: rgba(255,26,26,0.1) !important; }
-.nav-right { display: flex; align-items: center; gap: 8px; }
+.nav-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+@media (max-width: 640px) {
+  nav { padding: 0 12px; height: 56px; }
+  .nav-brand { font-size: 1rem; }
+  .nav-links a { font-size: 0.72rem; padding: 5px 8px; }
+  .nav-btn { padding: 5px 10px; font-size: 0.78rem; }
+}
 .nav-btn { padding: 7px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s; cursor: pointer; border: none; font-family: inherit; }
 .nav-btn-outline { background: transparent; color: var(--muted); border: 1px solid var(--border); }
 .nav-btn-outline:hover { color: var(--text); border-color: var(--text); }
