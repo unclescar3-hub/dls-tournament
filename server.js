@@ -265,6 +265,26 @@ async function init() {
       ON CONFLICT (slug) DO NOTHING
     `).catch(() => {});
 
+    // ── Flutterwave payout accounts ───────────────────────────────────────────
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS flw_payout_accounts (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        account_type VARCHAR(20) NOT NULL DEFAULT 'bank',
+        country VARCHAR(5) NOT NULL,
+        currency VARCHAR(10) NOT NULL,
+        account_number VARCHAR(100) NOT NULL,
+        account_name VARCHAR(200),
+        bank_code VARCHAR(30),
+        bank_name VARCHAR(200),
+        network VARCHAR(30),
+        verified BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(user_id)
+      )
+    `).catch(() => {});
+
     console.log('Database schema ready');
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Game Day Royal Tournaments running on port ${PORT}`);

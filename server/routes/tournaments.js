@@ -268,4 +268,148 @@ router.get('/:id/verify', async (req, res) => {
   }
 });
 
+// ── Flutterwave: Initialize payment in any currency ──────────────────────────
+router.post('/:id/pay-flw', authMiddleware, async (req, res) => {
+  try {
+    const FLW_SECRET = process.env.FLUTTERWAVE_SECRET_KEY;
+    if (!FLW_SECRET) return res.status(400).json({ error: 'Flutterwave is not configured yet. Contact the admin.' });
+
+    const { currency, amount } = req.body;
+    if (!currency || !amount || parseFloat(amount) <= 0) {
+      return res.status(400).json({ error: 'currency and amount are required' });
+    }
+
+    const tournament = await pool.query('SELECT * FROM tournaments WHERE id=$1', [req.params.id]);
+    if (!tournament.rows.length) return res.status(404).json({ error: 'Tournament not found' });
+    const t = tournament.rows[0];
+    if (t.status !== 'open') return res.status(400).json({ error: 'Tournament is not open for registration' });
+
+    const existing = await pool.query(
+      "SELECT * FROM registrations WHERE tournament_id=$1 AND user_id=$2 AND payment_status='paid'",
+      [t.id, req.user.id]
+    );
+    if (existing.rows.length) return res.status(400).json({ error: 'You are already registered for this tournament' });
+
+    const count = await pool.query(
+      "SELECT COUNT(*) FROM registrations WHERE tournament_id=$1 AND payment_status='paid'",
+      [t.id]
+    );
+    if (!t.is_unlimited && parseInt(count.rows[0].count) >= t.max_players) {
+      return res.status(400).json({ error: 'Tournament is full' });
+    }
+
+    const userResult = await pool.query('SELECT * FROM users WHERE id=$1', [req.user.id]);
+    const user = userResult.rows[0];
+    const appUrl = process.env.APP_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`;
+    const tx_ref = `gdr-${t.id.slice(0,8)}-${req.user.id.slice(0,8)}-${Date.now()}`;
+
+    const response = await axios.post('https://api.flutterwave.com/v3/payments', {
+      tx_ref,
+      amount: parseFloat(parseFloat(amount).toFixed(2)),
+      currency: currency.toUpperCase(),
+      redirect_url: `${appUrl}/api/tournaments/${t.id}/verify-flw`,
+      customer: { email: user.email, name: user.username },
+      meta: { tournament_id: t.id, user_id: req.user.id, ngn_amount: t.entry_fee },
+      customizations: {
+        title: 'Game Day Royal Tournaments',
+        description: `Tournament entry: ${t.name}`,
+        logo: `${appUrl}/images/logo.png`
+      }
+    }, {
+      headers: { Authorization: `Bearer ${FLW_SECRET}`, 'Content-Type': 'application/json' }
+    });
+
+    if (response.data.status !== 'success') {
+      return res.status(400).json({ error: response.data.message || 'Payment initialization failed' });
+    }
+
+    await pool.query(
+      `INSERT INTO registrations (tournament_id, user_id, paystack_ref, payment_status)
+       VALUES ($1,$2,$3,'pending')
+       ON CONFLICT (tournament_id, user_id) DO UPDATE SET paystack_ref=$3, payment_status='pending'`,
+      [t.id, req.user.id, tx_ref]
+    );
+
+    res.json({ link: response.data.data.link, tx_ref });
+  } catch (err) {
+    console.error('FLW pay error:', err.response?.data || err.message);
+    res.status(500).json({ error: err.response?.data?.message || err.message });
+  }
+});
+
+// ── Flutterwave: Verify payment after redirect ────────────────────────────────
+router.get('/:id/verify-flw', async (req, res) => {
+  try {
+    const { transaction_id, tx_ref, status } = req.query;
+    if (status === 'cancelled') return res.redirect('/dashboard.html?error=payment_cancelled');
+    if (!transaction_id) return res.redirect('/dashboard.html?error=no_transaction_id');
+
+    const FLW_SECRET = process.env.FLUTTERWAVE_SECRET_KEY;
+    if (!FLW_SECRET) return res.redirect('/dashboard.html?error=gateway_not_configured');
+
+    const response = await axios.get(
+      `https://api.flutterwave.com/v3/transactions/${transaction_id}/verify`,
+      { headers: { Authorization: `Bearer ${FLW_SECRET}` } }
+    );
+
+    const data = response.data.data;
+    if (data.status !== 'successful') return res.redirect('/dashboard.html?error=payment_failed');
+
+    const ref = data.tx_ref || tx_ref;
+    const reg = await pool.query(
+      "UPDATE registrations SET payment_status='paid' WHERE paystack_ref=$1 AND tournament_id=$2 RETURNING *",
+      [ref, req.params.id]
+    );
+
+    if (reg.rows.length) {
+      const r = reg.rows[0];
+      await pool.query(
+        'INSERT INTO bracket_entries (tournament_id, user_id) VALUES ($1,$2) ON CONFLICT (tournament_id, user_id) DO NOTHING',
+        [r.tournament_id, r.user_id]
+      );
+
+      try {
+        const userInfo = await pool.query('SELECT id, username, email, referred_by FROM users WHERE id=$1', [r.user_id]);
+        const u = userInfo.rows[0];
+        if (u && u.referred_by) {
+          const paidCount = await pool.query(
+            `SELECT COUNT(DISTINCT u2.id) FROM users u2
+             JOIN registrations r2 ON r2.user_id = u2.id
+             WHERE u2.referred_by=$1 AND r2.payment_status='paid'`,
+            [u.referred_by]
+          );
+          const totalPaid = parseInt(paidCount.rows[0].count) || 0;
+          const tiers = await pool.query(
+            'SELECT * FROM referral_tiers WHERE min_referrals <= $1 ORDER BY min_referrals DESC LIMIT 1',
+            [totalPaid]
+          );
+          if (tiers.rows.length) {
+            const tier = tiers.rows[0];
+            await pool.query(
+              'UPDATE users SET referral_cash = COALESCE(referral_cash,0) + $1 WHERE id=$2',
+              [tier.cash_reward, u.referred_by]
+            );
+          }
+        }
+      } catch(e) { console.warn('Referral reward failed:', e.message); }
+
+      try {
+        const [userRes, tRes] = await Promise.all([
+          pool.query('SELECT username, email FROM users WHERE id=$1', [r.user_id]),
+          pool.query('SELECT name, arena, entry_fee FROM tournaments WHERE id=$1', [r.tournament_id])
+        ]);
+        if (userRes.rows.length && tRes.rows.length) {
+          const { sendAdminRegistrationNotification } = require('../email');
+          sendAdminRegistrationNotification(userRes.rows[0], tRes.rows[0]).catch(() => {});
+        }
+      } catch {}
+    }
+
+    res.redirect('/dashboard.html?payment=success');
+  } catch (err) {
+    console.error('FLW verify error:', err.response?.data || err.message);
+    res.redirect('/dashboard.html?error=verification_failed');
+  }
+});
+
 module.exports = router;

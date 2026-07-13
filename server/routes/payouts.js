@@ -9,6 +9,10 @@ const { sendPayoutEmail } = require('../email');
 const PAYSTACK_SECRET = () => process.env.PAYSTACK_SECRET_KEY;
 const psHeaders = () => ({ Authorization: `Bearer ${PAYSTACK_SECRET()}` });
 
+const FLW_SECRET = () => process.env.FLUTTERWAVE_SECRET_KEY;
+const flwHeaders = () => ({ Authorization: `Bearer ${FLW_SECRET()}`, 'Content-Type': 'application/json' });
+const FLW_BASE = 'https://api.flutterwave.com/v3';
+
 // ─── PUBLIC/PLAYER ROUTES ─────────────────────────────────────────────────────
 
 // List all Nigerian banks from Paystack
@@ -356,7 +360,176 @@ router.post('/send-all/:tournament_id', adminMiddleware, async (req, res) => {
   }
 });
 
-// All payouts across all tournaments
+// ── FLUTTERWAVE ROUTES ────────────────────────────────────────────────────────
+
+// Get bank list for any country via Flutterwave
+router.get('/flw-banks/:country', authMiddleware, async (req, res) => {
+  try {
+    if (!FLW_SECRET()) return res.status(400).json({ error: 'Flutterwave not configured' });
+    const response = await axios.get(`${FLW_BASE}/banks/${req.params.country.toUpperCase()}`, { headers: flwHeaders() });
+    res.json(response.data.data || []);
+  } catch (err) {
+    res.status(500).json({ error: err.response?.data?.message || 'Could not fetch banks' });
+  }
+});
+
+// Resolve / verify bank account via Flutterwave
+router.post('/flw-resolve', authMiddleware, async (req, res) => {
+  try {
+    if (!FLW_SECRET()) return res.status(400).json({ error: 'Flutterwave not configured' });
+    const { account_number, account_bank } = req.body;
+    if (!account_number || !account_bank) return res.status(400).json({ error: 'account_number and account_bank required' });
+    const response = await axios.post(`${FLW_BASE}/accounts/resolve`, { account_number, account_bank }, { headers: flwHeaders() });
+    res.json(response.data.data);
+  } catch (err) {
+    res.status(400).json({ error: err.response?.data?.message || 'Could not verify account. Check details.' });
+  }
+});
+
+// Save / update Flutterwave payout account (bank or mobile money)
+router.post('/flw-account', authMiddleware, async (req, res) => {
+  try {
+    const { account_type, country, currency, account_number, account_name, bank_code, bank_name, network } = req.body;
+    if (!account_type || !country || !currency || !account_number || !account_name) {
+      return res.status(400).json({ error: 'account_type, country, currency, account_number, account_name are all required' });
+    }
+    const existing = await pool.query('SELECT id FROM flw_payout_accounts WHERE user_id=$1', [req.user.id]);
+    if (existing.rows.length) {
+      await pool.query(
+        `UPDATE flw_payout_accounts SET account_type=$1, country=$2, currency=$3, account_number=$4,
+         account_name=$5, bank_code=$6, bank_name=$7, network=$8, updated_at=NOW() WHERE user_id=$9`,
+        [account_type, country.toUpperCase(), currency.toUpperCase(), account_number,
+         account_name, bank_code||null, bank_name||null, network||null, req.user.id]
+      );
+    } else {
+      await pool.query(
+        `INSERT INTO flw_payout_accounts (user_id, account_type, country, currency, account_number, account_name, bank_code, bank_name, network)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [req.user.id, account_type, country.toUpperCase(), currency.toUpperCase(), account_number,
+         account_name, bank_code||null, bank_name||null, network||null]
+      );
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get my Flutterwave payout account
+router.get('/flw-account', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM flw_payout_accounts WHERE user_id=$1', [req.user.id]);
+    res.json(result.rows[0] || null);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: send payout via Flutterwave Transfer
+router.post('/send-flw/:tournament_id/:user_id', adminMiddleware, async (req, res) => {
+  try {
+    if (!FLW_SECRET()) {
+      return res.status(400).json({ error: 'Flutterwave not configured. Add FLUTTERWAVE_SECRET_KEY to Replit Secrets.' });
+    }
+    const { tournament_id, user_id } = req.params;
+    const { position, amount } = req.body;
+    if (!amount || parseInt(amount) <= 0) return res.status(400).json({ error: 'amount must be positive' });
+
+    const alreadyPaid = await pool.query(
+      "SELECT id FROM payouts WHERE tournament_id=$1 AND user_id=$2 AND status IN ('sent','processing')",
+      [tournament_id, user_id]
+    );
+    if (alreadyPaid.rows.length) return res.status(400).json({ error: 'Payout already sent to this player' });
+
+    const flwAcct = await pool.query('SELECT * FROM flw_payout_accounts WHERE user_id=$1', [user_id]);
+    if (!flwAcct.rows.length) {
+      return res.status(400).json({ error: 'Player has no Flutterwave payout account saved' });
+    }
+    const acct = flwAcct.rows[0];
+    const userRes = await pool.query('SELECT username, email FROM users WHERE id=$1', [user_id]);
+    const tRes = await pool.query('SELECT name FROM tournaments WHERE id=$1', [tournament_id]);
+    const user = userRes.rows[0];
+    const tournamentName = tRes.rows[0]?.name || 'Tournament';
+
+    const reference = `gdr-flw-${tournament_id.slice(0,8)}-${user_id.slice(0,8)}-${Date.now()}`;
+    const transferBody = {
+      account_bank: acct.bank_code || acct.network,
+      account_number: acct.account_number,
+      amount: parseInt(amount),
+      currency: acct.currency,
+      narration: `Prize: ${tournamentName} — Position ${position || '?'}`,
+      reference,
+      debit_currency: 'NGN'
+    };
+
+    const transferRes = await axios.post(`${FLW_BASE}/transfers`, transferBody, { headers: flwHeaders() });
+    const transfer = transferRes.data.data;
+    const status = (transfer.status === 'SUCCESSFUL' || transfer.status === 'successful') ? 'sent' : 'processing';
+
+    await pool.query(
+      `INSERT INTO payouts (tournament_id, user_id, position, amount, status, transfer_code, transfer_reference, initiated_by, paid_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW())
+       ON CONFLICT (tournament_id, user_id) DO UPDATE SET status=$5, transfer_code=$6, transfer_reference=$7, initiated_by=$8, paid_at=NOW()`,
+      [tournament_id, user_id, position||0, amount, status, String(transfer.id||''), reference, req.user.id]
+    );
+
+    sendPayoutEmail(user, tournamentName, amount, position, acct.account_name, acct.bank_name||acct.network||'Flutterwave')
+      .catch(() => {});
+    logAction(req.user.id, 'SEND_PAYOUT_FLW', { player: user.username, amount, currency: acct.currency, tournament: tournamentName }, req.ip).catch(() => {});
+
+    res.json({ success: true, status, reference, amount, currency: acct.currency });
+  } catch (err) {
+    const msg = err.response?.data?.message || err.message;
+    console.error('FLW transfer error:', msg);
+    try {
+      await pool.query(
+        `INSERT INTO payouts (tournament_id, user_id, position, amount, status, failure_reason, initiated_by)
+         VALUES ($1,$2,$3,$4,'failed',$5,$6)
+         ON CONFLICT (tournament_id, user_id) DO UPDATE SET status='failed', failure_reason=$5`,
+        [req.params.tournament_id, req.params.user_id, req.body.position||0, req.body.amount||0, msg, req.user.id]
+      );
+    } catch {}
+    res.status(400).json({ error: msg });
+  }
+});
+
+// Flutterwave webhook (transfer status updates)
+router.post('/webhook/flw', async (req, res) => {
+  try {
+    const secretHash = process.env.FLUTTERWAVE_WEBHOOK_HASH;
+    if (secretHash && req.headers['verif-hash'] !== secretHash) {
+      return res.status(401).json({ error: 'Invalid signature' });
+    }
+    const { event, data } = req.body;
+    if (event === 'transfer.completed' && data?.reference) {
+      const status = (data.status === 'SUCCESSFUL' || data.status === 'successful') ? 'sent' : 'failed';
+      await pool.query("UPDATE payouts SET status=$1 WHERE transfer_reference=$2", [status, data.reference]).catch(() => {});
+    }
+    res.status(200).json({ status: 'ok' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: get prize pool enriched with FLW account info
+router.get('/flw-accounts-for/:tournament_id', adminMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT be.user_id, fa.account_type, fa.country, fa.currency, fa.account_name, fa.bank_name, fa.network, fa.account_number
+       FROM bracket_entries be
+       LEFT JOIN flw_payout_accounts fa ON fa.user_id = be.user_id
+       WHERE be.tournament_id=$1`,
+      [req.params.tournament_id]
+    );
+    const map = {};
+    result.rows.forEach(r => { map[r.user_id] = r; });
+    res.json(map);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── All payouts across all tournaments
 router.get('/all', adminMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
