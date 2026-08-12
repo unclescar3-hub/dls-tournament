@@ -1,0 +1,99 @@
+// Prisma schema. Edit models as you build features.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  profile   Profile?
+  registrations Registration[]
+  payments  Payment[]
+  payouts   Payout[]
+}
+
+model Profile {
+  id        String  @id @default(cuid())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String  @unique
+  displayName String?
+  country   String?
+  phone     String?
+  bankName  String?
+  accountNumber String?
+  flutterwaveBeneficiaryId String?
+  createdAt DateTime @default(now())
+}
+
+model Tournament {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  organizer User     @relation(fields: [organizerId], references: [id])
+  organizerId String
+  entryFeeCents Int
+  currency  String  @default("NGN")
+  maxPlayers Int
+  status    String  @default("draft")
+  startsAt  DateTime?
+  createdAt DateTime @default(now())
+  registrations Registration[]
+  gameCodes GameCode[]
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+  paymentId String?
+  gameCode  GameCode? @relation(fields: [gameCodeId], references: [id])
+  gameCodeId String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+}
+
+model GameCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId String
+  issuedTo  User?    @relation(fields: [issuedToId], references: [id])
+  issuedToId String?
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  amountCents Int
+  currency  String
+  provider  String
+  providerPaymentId String?
+  type      String
+  status    String
+  createdAt DateTime @default(now())
+}
+
+model Payout {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  amountCents Int
+  currency  String
+  providerPayoutId String?
+  status    String
+  createdAt DateTime @default(now())
+}

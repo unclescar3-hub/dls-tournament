@@ -1,28 +1,32 @@
 {
-  "name": "workspace",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "dls-tournament",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "axios": "^1.16.0",
-    "bcryptjs": "^3.0.3",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.5.1",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "multer": "^2.1.1",
-    "nodemailer": "^9.0.3",
-    "pg": "^8.20.0",
-    "uuid": "^14.0.0"
+    "next": "13.4.7",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "next-auth": "4.22.1",
+    "@prisma/client": "5.5.0",
+    "prisma": "5.5.0",
+    "tailwindcss": "3.4.7",
+    "postcss": "8.4.24",
+    "autoprefixer": "10.4.14",
+    "nodemailer": "6.9.4"
+  },
+  "devDependencies": {
+    "typescript": "5.1.6",
+    "ts-node": "10.9.1",
+    "@types/node": "20.4.2",
+    "@types/react": "18.2.21",
+    "@types/react-dom": "18.2.7"
   }
 }
